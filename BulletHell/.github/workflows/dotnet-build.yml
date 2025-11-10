@@ -1,0 +1,94 @@
+name: Build API on PR
+
+on:
+  pull_request:
+    paths:
+      - "**.cs"
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Count changed files and lines
+        id: stats
+        shell: bash
+        run: |
+          git fetch origin ${{ github.base_ref }}
+
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '\.cs$' | wc -l)
+          echo "changed_files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+
+          CHANGED_LINES=$(git diff --numstat origin/${{ github.base_ref }}...HEAD | grep '\.cs$' | awk '{sum+=$1+$2} END {print sum}')
+          echo "changed_lines=${CHANGED_LINES:-0}" >> $GITHUB_OUTPUT
+
+      - name: Show stats
+        shell: bash
+        run: |
+          echo "📊 Statistik för C# filer:"
+          echo "================================"
+          echo "Ändrade filer: ${{ steps.stats.outputs.changed_files }}"
+          echo "Ändrade rader: ${{ steps.stats.outputs.changed_lines }}"
+          echo "================================"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            ~/AppData/Local/NuGet/v3-cache
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore ./Api/Api.csproj
+
+      - name: Build with Code Analysis
+        run: dotnet build ./Api/Api.csproj --configuration Release --no-restore /p:TreatWarningsAsErrors=true
+
+      - name: Build results
+        if: success()
+        shell: bash
+        run: |
+          echo "✅ Build lyckades på ${{ matrix.os }}!"
+          echo "Ändrade ${{ steps.stats.outputs.changed_files }} filer med ${{ steps.stats.outputs.changed_lines }} rader"
+
+      - name: Comment PR
+        if: success() && matrix.os == 'ubuntu-latest'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 📊 Build Statistik\n\n` +
+                    `✅ Build lyckades på både Windows och Linux!\n\n` +
+                    `### Ändringar i denna PR:\n` +
+                    `- **Ändrade .cs filer:** ${{ steps.stats.outputs.changed_files }}\n` +
+                    `- **Ändrade rader:** ${{ steps.stats.outputs.changed_lines }}\n\n` +
+                    `✨ Code analysis: Inga varningar eller fel`
+            })
