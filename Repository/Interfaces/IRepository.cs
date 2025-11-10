@@ -1,9 +1,9 @@
 ﻿namespace Repository.Interfaces;
 
-public interface IUserRepository
+public interface IRepository<T>
 {
-    public List<User> Get();
-    public User GetById();
+    public List<T> Get();
+    public T GetById();
     public bool Create();
     public bool Update();
     public bool Delete();

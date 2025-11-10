@@ -2,7 +2,7 @@
 
 using Interfaces;
 
-public class HighScoreRepository : IHighScoreRepository
+public class HighScoreRepository : IRepository<HighScore>
 {
     public List<HighScore> Get()
     {

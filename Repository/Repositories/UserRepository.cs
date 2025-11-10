@@ -2,7 +2,7 @@
 
 using Interfaces;
 
-public class UserRepository : IUserRepository
+public class UserRepository : IRepository<User>
 {
     public List<User> Get()
     {
