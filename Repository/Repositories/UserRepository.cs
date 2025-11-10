@@ -1,6 +1,7 @@
 ﻿namespace Repository.Repositories;
 
 using Interfaces;
+using Api.Models;
 
 public class UserRepository : IRepository<User>
 {
