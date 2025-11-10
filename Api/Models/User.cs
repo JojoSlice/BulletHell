@@ -15,5 +15,7 @@ namespace Api.Models
 
         [Required]
         public string PasswordHash { get; set; } = string.Empty;
+
+        public List<HighScore> HighScores { get; set; } = [];
     }
 }
