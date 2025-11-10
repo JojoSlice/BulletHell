@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Api.Models;
+﻿namespace Repository.Data;
 
-namespace Repository.Context;
+using Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 public partial class MyDbContext : DbContext
 {
@@ -14,7 +14,7 @@ public partial class MyDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Highscore> Highscores { get; set; }
+    public virtual DbSet<HighScore> Highscores { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -24,7 +24,7 @@ public partial class MyDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Highscore>(entity =>
+        modelBuilder.Entity<HighScore>(entity =>
         {
             entity.ToTable("highscore");
 
@@ -35,7 +35,7 @@ public partial class MyDbContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.UserId).HasColumnName("User-Id");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Highscores).HasForeignKey(d => d.UserId);
+            entity.HasOne(d => d.User).WithMany(p => p.HighScores).HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<User>(entity =>
