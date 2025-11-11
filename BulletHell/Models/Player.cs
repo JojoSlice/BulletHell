@@ -17,6 +17,8 @@ public class Player(Vector2 startPosition, IInputProvider input, ISpriteHelper s
     public int Width => _sprite?.Width ?? 0;
     public int Height => _sprite?.Height ?? 0;
 
+    private float _shootCooldown = 0f;
+
     public void LoadContent(Texture2D playerTexture)
     {
         ArgumentNullException.ThrowIfNull(playerTexture);
@@ -56,6 +58,9 @@ public class Player(Vector2 startPosition, IInputProvider input, ISpriteHelper s
         Vector2 direction = _input.GetDirection();
         Move(direction, deltaTime);
 
+        if (_shootCooldown < 0)
+            _shootCooldown -= deltaTime;
+
         _sprite?.Update(gameTime);
     }
 
@@ -65,6 +70,21 @@ public class Player(Vector2 startPosition, IInputProvider input, ISpriteHelper s
             direction.Normalize();
 
         Position += direction * _speed * deltaTime;
+    }
+
+    public Bullet? TryShoot(ISpriteHelper bulletSprite)
+    {
+        if (_shootCooldown <= 0 && _input.IsShootPressed())
+        {
+            _shootCooldown = BulletConfig.FireCooldown;
+
+            Vector2 bulletDirection = -Vector2.UnitY;
+
+            Vector2 bulletStartPosition = Position + new Vector2(Width / 2f, 0);
+
+            return new Bullet(bulletStartPosition, bulletDirection, bulletSprite);
+        }
+        return null;
     }
 
     public void Draw(SpriteBatch spriteBatch)
