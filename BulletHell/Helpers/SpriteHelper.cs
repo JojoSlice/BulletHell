@@ -1,9 +1,10 @@
+using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BulletHell.Helpers;
 
-public class SpriteHelper
+public class SpriteHelper : ISpriteHelper
 {
     private Texture2D texture;
     private Rectangle[] frames;

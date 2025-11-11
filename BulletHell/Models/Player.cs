@@ -1,58 +1,32 @@
-using BulletHell.Helpers;
+using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace BulletHell.Models;
 
-public class Player
+public class Player(Vector2 startPosition, IInputProvider input, ISpriteHelper sprite)
 {
-    public Vector2 Position { get; set; }
+    public Vector2 Position { get; set; } = startPosition;
     private readonly float speed = 300f;
-    private SpriteHelper sprite;
+    private readonly ISpriteHelper _sprite = sprite;
 
-    public int Width => sprite?.Width ?? 0;
-    public int Height => sprite?.Height ?? 0;
+    private readonly IInputProvider _input = input;
+    public int Width => _sprite?.Width ?? 0;
+    public int Height => _sprite?.Height ?? 0;
 
-    public Player(Vector2 startPosition)
+    public void LoadContent(Texture2D playerTexture, int frameWidth = 32, int frameHeight = 32)
     {
-        Position = startPosition;
-        sprite = new SpriteHelper();
-    }
-
-    public void LoadContent(ContentManager content)
-    {
-        Texture2D playerTexture = content.Load<Texture2D>("player");
-
-        sprite.LoadSpriteSheet(playerTexture, 32, 32, 0.1f);
+        _sprite.LoadSpriteSheet(playerTexture, frameWidth, frameHeight, 0.1f);
     }
 
     public void Update(GameTime gameTime)
     {
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        Vector2 direction = GetInputDirection();
+        Vector2 direction = _input.GetDirection();
         Move(direction, deltaTime);
 
-        sprite?.Update(gameTime);
-    }
-
-    private Vector2 GetInputDirection()
-    {
-        KeyboardState keyState = Keyboard.GetState();
-        Vector2 direction = Vector2.Zero;
-
-        if (keyState.IsKeyDown(Keys.W) || keyState.IsKeyDown(Keys.Up))
-            direction.Y -= 1;
-        if (keyState.IsKeyDown(Keys.S) || keyState.IsKeyDown(Keys.Down))
-            direction.Y += 1;
-        if (keyState.IsKeyDown(Keys.A) || keyState.IsKeyDown(Keys.Left))
-            direction.X -= 1;
-        if (keyState.IsKeyDown(Keys.D) || keyState.IsKeyDown(Keys.Right))
-            direction.X += 1;
-
-        return direction;
+        _sprite?.Update(gameTime);
     }
 
     private void Move(Vector2 direction, float deltaTime)
@@ -65,6 +39,6 @@ public class Player
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        sprite?.Draw(spriteBatch, Position, 0f, 1f);
+        _sprite?.Draw(spriteBatch, Position, 0f, 1f);
     }
 }
