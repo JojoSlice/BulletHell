@@ -5,4 +5,5 @@ namespace BulletHell.Interfaces;
 public interface IInputProvider
 {
     Vector2 GetDirection();
+    bool IsShootPressed();
 }

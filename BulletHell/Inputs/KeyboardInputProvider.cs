@@ -22,4 +22,10 @@ public class KeyboardInputProvider : IInputProvider
 
         return direction;
     }
+
+    public bool IsShootPressed()
+    {
+        KeyboardState keyState = Keyboard.GetState();
+        return keyState.IsKeyDown(Keys.Space);
+    }
 }
