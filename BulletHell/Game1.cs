@@ -16,11 +16,11 @@ public class Game1 : Game
     private int screenWidth;
     private int screenHeight;
 
-    private SpriteBatch _spriteBatch;
-    private Player _player;
+    private SpriteBatch? _spriteBatch;
+    private Player? _player;
 
     private List<Bullet> _bullets = [];
-    private Texture2D _bulletTexture;
+    private Texture2D? _bulletTexture;
 
     public Game1()
     {
@@ -48,7 +48,7 @@ public class Game1 : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         Texture2D playerTexture = Content.Load<Texture2D>("player");
-        _player.LoadContent(playerTexture);
+        _player!.LoadContent(playerTexture);
 
         _bulletTexture = Content.Load<Texture2D>("bullet");
     }
@@ -61,13 +61,13 @@ public class Game1 : Game
         )
             Exit();
 
-        _player.Update(gameTime);
+        _player!.Update(gameTime);
 
         ISpriteHelper bulletSprite = new SpriteHelper();
         Bullet? newBullet = _player.TryShoot(bulletSprite);
         if (newBullet != null)
         {
-            newBullet.LoadContent(_bulletTexture);
+            newBullet.LoadContent(_bulletTexture!);
             _bullets.Add(newBullet);
         }
 
@@ -91,8 +91,8 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        _spriteBatch.Begin();
-        _player.Draw(_spriteBatch);
+        _spriteBatch!.Begin();
+        _player!.Draw(_spriteBatch);
 
         foreach (Bullet bullet in _bullets)
             bullet.Draw(_spriteBatch);

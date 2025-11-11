@@ -58,7 +58,7 @@ public class Player(Vector2 startPosition, IInputProvider input, ISpriteHelper s
         Vector2 direction = _input.GetDirection();
         Move(direction, deltaTime);
 
-        if (_shootCooldown < 0)
+        if (_shootCooldown > 0)
             _shootCooldown -= deltaTime;
 
         _sprite?.Update(gameTime);
@@ -80,7 +80,7 @@ public class Player(Vector2 startPosition, IInputProvider input, ISpriteHelper s
 
             Vector2 bulletDirection = -Vector2.UnitY;
 
-            Vector2 bulletStartPosition = Position + new Vector2(Width / 2f, 0);
+            Vector2 bulletStartPosition = Position;
 
             return new Bullet(bulletStartPosition, bulletDirection, bulletSprite);
         }

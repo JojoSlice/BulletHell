@@ -7,8 +7,8 @@ namespace BulletHell.Helpers;
 
 public class SpriteHelper : ISpriteHelper
 {
-    private Texture2D _texture;
-    private Rectangle[] _frames;
+    private Texture2D? _texture;
+    private Rectangle[]? _frames;
     private int _currentFrame;
     private float _frameTime;
     private float _timeElapsed;
