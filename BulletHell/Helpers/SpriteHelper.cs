@@ -1,3 +1,4 @@
+using BulletHell.Configurations;
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,52 +7,51 @@ namespace BulletHell.Helpers;
 
 public class SpriteHelper : ISpriteHelper
 {
-    private Texture2D texture;
-    private Rectangle[] frames;
-    private int currentFrame;
-    private float frameTime;
-    private float timeElapsed;
-    private int frameWidth;
-    private int frameHeight;
+    private Texture2D _texture;
+    private Rectangle[] _frames;
+    private int _currentFrame;
+    private float _frameTime;
+    private float _timeElapsed;
+    private int _frameWidth;
+    private int _frameHeight;
 
-    public int Width => frameWidth;
-    public int Height => frameHeight;
+    public int Width => _frameWidth;
+    public int Height => _frameHeight;
 
     public SpriteHelper()
     {
-        currentFrame = 0;
-        frameTime = 0.1f; // 100ms per frame som standard
-        timeElapsed = 0f;
+        _currentFrame = 0;
+        _timeElapsed = 0f;
     }
 
     public void LoadSpriteSheet(
-        Texture2D texture,
-        int frameWidth = 32,
-        int frameHeight = 32,
-        float animationSpeed = 0.1f
+        Texture2D _texture,
+        int _frameWidth = SpriteDefaults.FrameWidth,
+        int _frameHeight = SpriteDefaults.FrameHeight,
+        float animationSpeed = SpriteDefaults.AnimationSpeed
     )
     {
-        this.texture = texture;
-        this.frameWidth = frameWidth;
-        this.frameHeight = frameHeight;
-        this.frameTime = animationSpeed;
+        this._texture = _texture;
+        this._frameWidth = _frameWidth;
+        this._frameHeight = _frameHeight;
+        this._frameTime = animationSpeed;
 
-        int columns = texture.Width / frameWidth;
-        int rows = texture.Height / frameHeight;
-        int totalFrames = columns * rows;
+        int columns = _texture.Width / _frameWidth;
+        int rows = _texture.Height / _frameHeight;
+        int total_frames = columns * rows;
 
-        frames = new Rectangle[totalFrames];
+        _frames = new Rectangle[total_frames];
         int frameIndex = 0;
 
         for (int row = 0; row < rows; row++)
         {
             for (int col = 0; col < columns; col++)
             {
-                frames[frameIndex] = new Rectangle(
-                    col * frameWidth,
-                    row * frameHeight,
-                    frameWidth,
-                    frameHeight
+                _frames[frameIndex] = new Rectangle(
+                    col * _frameWidth,
+                    row * _frameHeight,
+                    _frameWidth,
+                    _frameHeight
                 );
                 frameIndex++;
             }
@@ -60,15 +60,15 @@ public class SpriteHelper : ISpriteHelper
 
     public void Update(GameTime gameTime)
     {
-        if (frames == null || frames.Length == 0)
+        if (_frames == null || _frames.Length == 0)
             return;
 
-        timeElapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
+        _timeElapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        if (timeElapsed >= frameTime)
+        if (_timeElapsed >= _frameTime)
         {
-            timeElapsed = 0f;
-            currentFrame = (currentFrame + 1) % frames.Length;
+            _timeElapsed = 0f;
+            _currentFrame = (_currentFrame + 1) % _frames.Length;
         }
     }
 
@@ -80,16 +80,16 @@ public class SpriteHelper : ISpriteHelper
         float scale = 1f
     )
     {
-        if (texture == null || frames == null || frames.Length == 0)
+        if (_texture == null || _frames == null || _frames.Length == 0)
             return;
 
         spriteBatch.Draw(
-            texture,
+            _texture,
             position,
-            frames[currentFrame],
+            _frames[_currentFrame],
             color ?? Color.White,
             rotation,
-            new Vector2(frameWidth / 2, frameHeight / 2), // Centrera sprite
+            new Vector2(_frameWidth / 2, _frameHeight / 2), // Centrera sprite
             scale,
             SpriteEffects.None,
             0f
