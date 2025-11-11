@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.test", "Api.test\Api.te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulletHell", "BulletHell\BulletHell.csproj", "{50974E5D-A529-4771-A010-2FC666A3A564}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{4B030D34-E169-4767-BFA1-38E3F020B7D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{50974E5D-A529-4771-A010-2FC666A3A564}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50974E5D-A529-4771-A010-2FC666A3A564}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50974E5D-A529-4771-A010-2FC666A3A564}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B030D34-E169-4767-BFA1-38E3F020B7D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B030D34-E169-4767-BFA1-38E3F020B7D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B030D34-E169-4767-BFA1-38E3F020B7D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B030D34-E169-4767-BFA1-38E3F020B7D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
