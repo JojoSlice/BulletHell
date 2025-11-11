@@ -1,7 +1,8 @@
 ﻿namespace Repository.Repositories;
 
+using Domain.Entities;
 using Interfaces;
-using Api.Models;
+using Data;
 
 public class UserRepository : IRepository<User>
 {
