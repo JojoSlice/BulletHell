@@ -1,6 +1,6 @@
 ﻿namespace Repository.Data;
 
-using Api.Models;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 public partial class MyDbContext : DbContext
