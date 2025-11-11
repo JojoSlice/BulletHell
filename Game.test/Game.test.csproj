@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Game\Game.csproj" />
+    <ProjectReference Include="..\BulletHell\BulletHell.csproj" />
   </ItemGroup>
 
 </Project>
