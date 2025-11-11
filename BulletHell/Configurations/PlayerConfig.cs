@@ -1,0 +1,9 @@
+namespace BulletHell.Configurations;
+
+public static class PlayerConfig
+{
+    public const float Speed = 300f;
+    public const int SpriteWidth = 32;
+    public const int SpriteHeight = 32;
+    public const float AnimationSpeed = 0.1f;
+}
