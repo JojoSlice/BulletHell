@@ -1,8 +1,7 @@
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
 
-namespace Game.test;
-
+namespace BulletHell.test;
 
 public class FakeInputReader : IInputProvider
 {
@@ -20,6 +19,11 @@ public class FakeInputReader : IInputProvider
             "RIGHT" => new Vector2(1, 0),
             _ => Vector2.Zero
         };
+    }
+
+    public bool IsShootPressed()
+    {
+        throw new NotImplementedException();
     }
 }
 

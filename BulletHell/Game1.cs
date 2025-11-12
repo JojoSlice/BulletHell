@@ -12,6 +12,8 @@ namespace BulletHell;
 public class Game1 : Game
 {
     private readonly GraphicsDeviceManager _graphics;
+    private readonly IInputProvider _inputProvider;
+    private readonly ISpriteHelper _spiteHelper;
 
     private int screenWidth;
     private int screenHeight;
@@ -22,11 +24,13 @@ public class Game1 : Game
     private List<Bullet> _bullets = [];
     private Texture2D? _bulletTexture;
 
-    public Game1()
+    public Game1(IInputProvider inputProvider, ISpriteHelper spriteHelper)
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
+        _inputProvider = inputProvider;
+        _spiteHelper = spriteHelper;
     }
 
     protected override void Initialize()
@@ -36,9 +40,7 @@ public class Game1 : Game
 
         Vector2 startPosition = new(screenWidth / 2, screenHeight / 2);
 
-        IInputProvider input = new KeyboardInputProvider();
-        ISpriteHelper sprite = new SpriteHelper();
-        _player = new Player(startPosition, input, sprite);
+        _player = new Player(startPosition, _inputProvider, _spiteHelper);
 
         base.Initialize();
     }
