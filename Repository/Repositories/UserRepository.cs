@@ -1,33 +1,82 @@
 ﻿namespace Repository.Repositories;
 
+using Data;
 using Domain.Entities;
 using Interfaces;
-using Data;
 
 public class UserRepository : IRepository<User>
 {
-    public List<User> Get()
+    private readonly MyDbContext _db;
+    public UserRepository(MyDbContext context)
     {
-        throw new NotImplementedException();
+        _db = context;
+    }
+    
+    public IEnumerable<User?> Get()
+    {
+        try
+        {
+            return _db.Users.ToList();
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
     }
 
-    public User GetById()
+    public User? GetById(int id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return _db.Users.Find(id);
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
     }
 
-    public bool Create()
+    public bool Create(User user)
     {
-        throw new NotImplementedException();
+        try
+        {
+            _db.Users.Add(user);
+            _db.SaveChanges();
+            return true;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
     }
 
-    public bool Update()
+    public bool Update(User user)
     {
-        throw new NotImplementedException();
+        try
+        {
+            _db.Users.Update(user);
+            _db.SaveChanges();
+            return true;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
     }
 
-    public bool Delete()
+    public bool Delete(int id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var user = _db.Users.Find(id);
+            if (user != null)
+                _db.Users.Remove(user);
+            _db.SaveChanges();
+            return true;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
     }
 }
