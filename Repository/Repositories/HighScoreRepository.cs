@@ -1,33 +1,39 @@
 ﻿namespace Repository.Repositories;
 
+using Data;
 using Domain.Entities;
 using Interfaces;
-using Data;
+using Microsoft.EntityFrameworkCore;
 
-public class HighScoreRepository : IRepository<HighScore>
+public class HighScoreRepository(MyDbContext context) : IRepository<HighScore>
 {
-    public List<HighScore> Get()
+    private readonly MyDbContext _db = context;
+
+    public Task<List<HighScore>> GetAsync() => _db.Highscores.ToListAsync();
+
+    public Task<HighScore?> GetByIdAsync(int id) => _db.Highscores.FindAsync(id).AsTask();
+
+    public async Task<HighScore> CreateAsync(HighScore highScore)
     {
-        throw new NotImplementedException();
+        _db.Highscores.Add(highScore);
+        await _db.SaveChangesAsync();
+        return highScore;
     }
 
-    public HighScore GetById()
+    public async Task UpdateAsync(HighScore highScore)
     {
-        throw new NotImplementedException();
+        _db.Highscores.Update(highScore);
+        await _db.SaveChangesAsync();
     }
 
-    public bool Create()
+    public async Task DeleteAsync(int id)
     {
-        throw new NotImplementedException();
-    }
+        var highScore =
+            await _db.Highscores.FindAsync(id)
+            ?? throw new KeyNotFoundException($"Highscore with ID {id} not found.");
 
-    public bool Update()
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool Delete()
-    {
-        throw new NotImplementedException();
+        _db.Highscores.Remove(highScore);
+        await _db.SaveChangesAsync();
     }
 }
+

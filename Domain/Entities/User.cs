@@ -1,7 +1,6 @@
-namespace Domain.Entities;
-
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Domain.Entities;
 
 public class User
 {
@@ -16,3 +15,4 @@ public class User
 
     public List<HighScore> HighScores { get; set; } = [];
 }
+

@@ -3,80 +3,36 @@
 using Data;
 using Domain.Entities;
 using Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-public class UserRepository : IRepository<User>
+public class UserRepository(MyDbContext context) : IRepository<User>
 {
-    private readonly MyDbContext _db;
-    public UserRepository(MyDbContext context)
+    private readonly MyDbContext _db = context;
+
+    public Task<List<User>> GetAsync() => _db.Users.ToListAsync();
+
+    public Task<User?> GetByIdAsync(int id) => _db.Users.FindAsync(id).AsTask();
+
+    public async Task<User> CreateAsync(User user)
     {
-        _db = context;
-    }
-    
-    public IEnumerable<User?> Get()
-    {
-        try
-        {
-            return _db.Users.ToList();
-        }
-        catch (Exception e)
-        {
-            throw new Exception(e.Message);
-        }
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync();
+        return user;
     }
 
-    public User? GetById(int id)
+    public async Task UpdateAsync(User user)
     {
-        try
-        {
-            return _db.Users.Find(id);
-        }
-        catch (Exception e)
-        {
-            throw new Exception(e.Message);
-        }
+        _db.Users.Update(user);
+        await _db.SaveChangesAsync();
     }
 
-    public bool Create(User user)
+    public async Task DeleteAsync(int id)
     {
-        try
-        {
-            _db.Users.Add(user);
-            _db.SaveChanges();
-            return true;
-        }
-        catch (Exception e)
-        {
-            throw new Exception(e.Message);
-        }
-    }
+        var user =
+            await _db.Users.FindAsync(id)
+            ?? throw new KeyNotFoundException($"User with ID {id} not found.");
 
-    public bool Update(User user)
-    {
-        try
-        {
-            _db.Users.Update(user);
-            _db.SaveChanges();
-            return true;
-        }
-        catch (Exception e)
-        {
-            throw new Exception(e.Message);
-        }
-    }
-
-    public bool Delete(int id)
-    {
-        try
-        {
-            var user = _db.Users.Find(id);
-            if (user != null)
-                _db.Users.Remove(user);
-            _db.SaveChanges();
-            return true;
-        }
-        catch (Exception e)
-        {
-            throw new Exception(e.Message);
-        }
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync();
     }
 }
