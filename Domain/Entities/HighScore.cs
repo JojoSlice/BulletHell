@@ -1,8 +1,5 @@
 namespace Domain.Entities;
 
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 public class HighScore
 {
     public int Id { get; set; }
