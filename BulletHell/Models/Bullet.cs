@@ -19,6 +19,19 @@ public class Bullet(Vector2 startPosition, Vector2 direction, ISpriteHelper spri
     public int Width => _sprite?.Width ?? 0;
     public int Height => _sprite?.Height ?? 0;
 
+    public bool IsOutOfBounds(int screenWidth, int screenHeight)
+    {
+        return Position.X < 0
+            || Position.X > screenWidth
+            || Position.Y < 0
+            || Position.Y > screenHeight;
+    }
+
+    public bool ShouldBeRemoved(int screenWidth, int screenHeight)
+    {
+        return !IsAlive || IsOutOfBounds(screenWidth, screenHeight);
+    }
+
     public void LoadContent(Texture2D bulletTexture)
     {
         ArgumentNullException.ThrowIfNull(bulletTexture);
