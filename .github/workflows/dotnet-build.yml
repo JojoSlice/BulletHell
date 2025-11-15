@@ -28,10 +28,10 @@ jobs:
         run: |
           git fetch origin ${{ github.base_ref }}
 
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '\.cs$' | wc -l)
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '\.cs$' || true | wc -l)
           echo "changed_files=$CHANGED_FILES" >> $GITHUB_OUTPUT
 
-          CHANGED_LINES=$(git diff --numstat origin/${{ github.base_ref }}...HEAD | grep '\.cs$' | awk '{sum+=$1+$2} END {print sum}')
+          CHANGED_LINES=$(git diff --numstat origin/${{ github.base_ref }}...HEAD | grep '\.cs$' || true | awk '{sum+=$1+$2} END {print sum}')
           echo "changed_lines=${CHANGED_LINES:-0}" >> $GITHUB_OUTPUT
 
       - name: Show stats
