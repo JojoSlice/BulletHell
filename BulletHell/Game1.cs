@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using BulletHell.Helpers;
+﻿using BulletHell.Helpers;
 using BulletHell.Inputs;
 using BulletHell.Interfaces;
+using BulletHell.Managers;
 using BulletHell.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,9 +18,7 @@ public class Game1 : Game
 
     private SpriteBatch? _spriteBatch;
     private Player? _player;
-
-    private List<Bullet> _bullets = [];
-    private Texture2D? _bulletTexture;
+    private IBulletManager? _bulletManager;
 
     public Game1()
     {
@@ -40,6 +38,8 @@ public class Game1 : Game
         ISpriteHelper sprite = new SpriteHelper();
         _player = new Player(startPosition, input, sprite);
 
+        _bulletManager = new BulletManager();
+
         base.Initialize();
     }
 
@@ -50,7 +50,8 @@ public class Game1 : Game
         Texture2D playerTexture = Content.Load<Texture2D>("player");
         _player!.LoadContent(playerTexture);
 
-        _bulletTexture = Content.Load<Texture2D>("bullet");
+        Texture2D bulletTexture = Content.Load<Texture2D>("bullet");
+        _bulletManager!.LoadContent(bulletTexture);
     }
 
     protected override void Update(GameTime gameTime)
@@ -63,40 +64,24 @@ public class Game1 : Game
 
         _player!.Update(gameTime);
 
-        ISpriteHelper bulletSprite = new SpriteHelper();
-        Bullet? newBullet = _player.TryShoot(bulletSprite);
-        if (newBullet != null)
+        var shootInfo = _player.TryShoot();
+        if (shootInfo.HasValue)
         {
-            newBullet.LoadContent(_bulletTexture!);
-            _bullets.Add(newBullet);
+            _bulletManager!.CreateBullet(shootInfo.Value.position, shootInfo.Value.direction);
         }
 
-        foreach (Bullet bullet in _bullets)
-        {
-            bullet.Update(gameTime);
-        }
-
-        _bullets.RemoveAll(b =>
-            !b.IsAlive
-            || b.Position.X < 0
-            || b.Position.X > screenWidth
-            || b.Position.Y < 0
-            || b.Position.Y > screenHeight
-        );
+        _bulletManager!.Update(gameTime, screenWidth, screenHeight);
 
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        GraphicsDevice.Clear(Color.Black);
 
         _spriteBatch!.Begin();
         _player!.Draw(_spriteBatch);
-
-        foreach (Bullet bullet in _bullets)
-            bullet.Draw(_spriteBatch);
-
+        _bulletManager!.Draw(_spriteBatch);
         _spriteBatch.End();
 
         base.Draw(gameTime);

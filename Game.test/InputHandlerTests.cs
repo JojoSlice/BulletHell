@@ -21,6 +21,8 @@ public class FakeInputReader : IInputProvider
             _ => Vector2.Zero
         };
     }
+
+    public bool IsShootPressed() => false;
 }
 
 public class InputHandlerTests
