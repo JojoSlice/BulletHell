@@ -72,17 +72,16 @@ public class Player(Vector2 startPosition, IInputProvider input, ISpriteHelper s
         Position += direction * _speed * deltaTime;
     }
 
-    public Bullet? TryShoot(ISpriteHelper bulletSprite)
+    public (Vector2 position, Vector2 direction)? TryShoot()
     {
         if (_shootCooldown <= 0 && _input.IsShootPressed())
         {
             _shootCooldown = BulletConfig.FireCooldown;
 
             Vector2 bulletDirection = -Vector2.UnitY;
-
             Vector2 bulletStartPosition = Position;
 
-            return new Bullet(bulletStartPosition, bulletDirection, bulletSprite);
+            return (bulletStartPosition, bulletDirection);
         }
         return null;
     }
