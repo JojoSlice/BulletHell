@@ -76,6 +76,17 @@ jobs:
           echo "✅ Build lyckades på ${{ matrix.os }}!"
           echo "Ändrade ${{ steps.stats.outputs.changed_files }} filer med ${{ steps.stats.outputs.changed_lines }} rader"
 
+      - name: Run Tests
+        run: dotnet test
+      
+      - name: Tests passed
+        if: success()
+        run: echo "Tests passed ✅"
+      
+      - name: Tests failed
+        if: failure()
+        run: echo "Tests failed ❌"
+  
       - name: Comment PR
         if: success() && matrix.os == 'ubuntu-latest'
         uses: actions/github-script@v7
