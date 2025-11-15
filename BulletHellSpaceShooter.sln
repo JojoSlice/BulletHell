@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{68D6554B-F0B8-47B8-BACE-8683C763765B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulletHell.test", "BulletHell.test\BulletHell.test.csproj", "{838299DD-4C3A-4253-B12E-B2C803FA66F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulletHell.tests", "BulletHell.tests\BulletHell.tests.csproj", "{838299DD-4C3A-4253-B12E-B2C803FA66F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
