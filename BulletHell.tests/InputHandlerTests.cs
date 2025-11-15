@@ -21,7 +21,10 @@ public class FakeInputReader : IInputProvider
         };
     }
 
-    public bool IsShootPressed() => false;
+    public bool IsShootPressed()
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public class InputHandlerTests
