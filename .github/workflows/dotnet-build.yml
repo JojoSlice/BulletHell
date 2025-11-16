@@ -28,11 +28,11 @@ jobs:
         run: |
           git fetch origin ${{ github.base_ref }}
 
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '\.cs$' || true | wc -l)
-          echo "changed_files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | { grep '\.cs$' || true; } | wc -l)
+          echo "changed_files=${CHANGED_FILES}" >> "${GITHUB_OUTPUT}"
 
-          CHANGED_LINES=$(git diff --numstat origin/${{ github.base_ref }}...HEAD | grep '\.cs$' || true | awk '{sum+=$1+$2} END {print sum}')
-          echo "changed_lines=${CHANGED_LINES:-0}" >> $GITHUB_OUTPUT
+          CHANGED_LINES=$(git diff --numstat origin/${{ github.base_ref }}...HEAD | { grep '\.cs$' || true; } | awk '{sum+=$1+$2} END {print sum+0}')
+          echo "changed_lines=${CHANGED_LINES:-0}" >> "${GITHUB_OUTPUT}"
 
       - name: Show stats
         shell: bash
@@ -100,16 +100,24 @@ jobs:
 
       - name: Run tests
         id: test
-        run: dotnet test BulletHellSpaceShooter.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./TestResults --logger "trx;LogFileName=test-results.trx"
+        run: dotnet test BulletHellSpaceShooter.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./TestResults --logger "trx" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
 
       - name: List test results (debug)
         if: always()
         run: |
           echo "Contents of TestResults directory:"
-          ls -R TestResults/ || echo "TestResults directory not found"
+          ls -laR TestResults/ || echo "TestResults directory not found"
+          echo ""
+          echo "Looking for TRX files:"
+          find TestResults -name "*.trx" -type f 2>/dev/null || echo "No TRX files found"
+          echo ""
+          echo "Looking for coverage files:"
+          find TestResults -name "coverage.cobertura.xml" -type f 2>/dev/null || echo "No coverage files found"
 
       - name: Code Coverage Report
-        if: always()
+        id: coverage
+        if: always() && steps.test.outcome != 'skipped'
+        continue-on-error: true
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
           filename: TestResults/**/coverage.cobertura.xml
@@ -123,7 +131,7 @@ jobs:
           thresholds: '60 80'
 
       - name: Add Coverage PR Comment
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.coverage.outcome == 'success'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           recreate: true
@@ -131,12 +139,13 @@ jobs:
 
       - name: Test Report
         uses: dorny/test-reporter@v1
-        if: always()
+        if: always() && steps.test.outcome != 'skipped'
+        continue-on-error: true
         with:
           name: .NET Tests
           path: TestResults/**/*.trx
           reporter: dotnet-trx
-          fail-on-error: true
+          fail-on-error: false
 
       - name: Build results
         if: success()
