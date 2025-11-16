@@ -1,7 +1,7 @@
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
 
-namespace Game.test;
+namespace BulletHell.test;
 
 
 public class FakeInputReader : IInputProvider

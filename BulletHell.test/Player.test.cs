@@ -4,7 +4,7 @@ using BulletHell.Models;
 using Microsoft.Xna.Framework;
 using NSubstitute;
 
-namespace Game.test;
+namespace BulletHell.test;
 
 public class PlayerTest
 {

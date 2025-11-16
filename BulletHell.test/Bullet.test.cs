@@ -4,7 +4,7 @@ using BulletHell.Managers;
 using BulletHell.Models;
 using Microsoft.Xna.Framework;
 
-namespace Game.test;
+namespace BulletHell.test;
 
 public class BulletManagerTest
 {

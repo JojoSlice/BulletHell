@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.test", "Game.test\Game.test.csproj", "{E303F3BE-76CE-4157-9C21-69C3821C469F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulletHell.test", "BulletHell.test\BulletHell.test.csproj", "{E303F3BE-76CE-4157-9C21-69C3821C469F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{1D1F38B6-3EDE-4C6D-BB96-5CB4125AE86A}"
 EndProject
