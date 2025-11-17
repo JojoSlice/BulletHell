@@ -24,12 +24,18 @@ public class EnemyManager : IEnemyManager
 
     public void Update(GameTime gameTime, int screenWidth, int screenHeight)
     {
+        foreach (var enemy in _enemies)
+        {
+            enemy.Update(gameTime);
+        }
+        
         _enemies.RemoveAll(e =>
             e.Position.X < 0 ||
             e.Position.Y < 0 ||
             e.Position.X > screenWidth ||
             e.Position.Y > screenHeight
         );
+
     }
 
     public void Draw(SpriteBatch spriteBatch)
