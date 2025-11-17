@@ -14,7 +14,10 @@ public class EnemyManager : IEnemyManager
 
     public void LoadContent(Texture2D enemyTexture)
     {
-        
+        foreach (var enemy in _enemies)
+        {
+            enemy.LoadContent(enemyTexture);
+        }
     }
 
     public void AddEnemy(Enemy enemy)
@@ -40,6 +43,9 @@ public class EnemyManager : IEnemyManager
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        
+        foreach (var enemy in _enemies)
+        {
+            enemy.Draw(spriteBatch);
+        }
     }
 }
