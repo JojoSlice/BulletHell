@@ -9,36 +9,32 @@ using Microsoft.Xna.Framework.Input;
 
 namespace BulletHell.Scenes;
 
-public class BattleScene : Scene
+public class BattleScene(Game1 game) : Scene(game)
 {
     private int screenWidth;
     private int screenHeight;
-
     private Player? _player;
-    private IBulletManager? _bulletManager;
 
+    // konkret typ för prestanda!
+    private BulletManager? _bulletManager;
     private Texture2D? playerTexture;
     private Texture2D? bulletTexture;
 
-    public BattleScene(Game1 game)
-        : base(game)
+    public override void OnEnter()
     {
-        screenWidth = game.GraphicsDevice.Viewport.Width;
-        screenHeight = game.GraphicsDevice.Viewport.Height;
-
+        screenWidth = _game.GraphicsDevice.Viewport.Width;
+        screenHeight = _game.GraphicsDevice.Viewport.Height;
         Vector2 startPosition = new(screenWidth / 2, screenHeight / 2);
-
         IInputProvider input = new KeyboardInputProvider();
         ISpriteHelper sprite = new SpriteHelper();
         _player = new Player(startPosition, input, sprite);
-
         _bulletManager = new BulletManager();
-
-        playerTexture = game.Content.Load<Texture2D>("player");
+        playerTexture = _game.Content.Load<Texture2D>("player");
         _player.LoadContent(playerTexture);
-
-        bulletTexture = game.Content.Load<Texture2D>("bullet");
+        bulletTexture = _game.Content.Load<Texture2D>("bullet");
         _bulletManager.LoadContent(bulletTexture);
+
+        System.Console.WriteLine("BattleScene loading");
     }
 
     public override void Update(GameTime gameTime)
@@ -50,13 +46,11 @@ public class BattleScene : Scene
             _game.Exit();
 
         _player!.Update(gameTime);
-
         var shootInfo = _player.TryShoot();
         if (shootInfo.HasValue)
         {
             _bulletManager!.CreateBullet(shootInfo.Value.position, shootInfo.Value.direction);
         }
-
         _bulletManager!.Update(gameTime, screenWidth, screenHeight);
     }
 
@@ -64,10 +58,5 @@ public class BattleScene : Scene
     {
         _player!.Draw(spriteBatch);
         _bulletManager!.Draw(spriteBatch);
-    }
-
-    public override void OnEnter()
-    {
-        System.Console.WriteLine("Battle scene laddad");
     }
 }
