@@ -7,10 +7,10 @@ using Interfaces;
 using Mapping;
 using Repository.Repositories;
 
-public class HighScoreService(HighScoreRepository repository) : IHighScoreService
+public class HighScoreService(HighScoreRepository repository) : IService<HighScoreResponse, HighScore>
 {
     public async Task<Response<List<HighScoreResponse>>> GetAll() =>
-        (await repository.GetAsync()).MapToResponse();
+        (await repository.GetAllAsync()).MapToResponse();
 
     public async Task<Response<HighScoreResponse?>> GetById(int id) =>
         (await repository.GetByIdAsync(id)).MapToResponse();

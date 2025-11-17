@@ -9,7 +9,7 @@ public class UserRepository(MyDbContext context) : IRepository<User>
 {
     private readonly MyDbContext _db = context;
 
-    public async Task<List<User>> GetAsync() => await _db.Users.ToListAsync();
+    public async Task<List<User>> GetAllAsync() => await _db.Users.ToListAsync();
 
     public async Task<User?> GetByIdAsync(int id) => await _db.Users.FindAsync(id);
 
@@ -20,13 +20,14 @@ public class UserRepository(MyDbContext context) : IRepository<User>
         return user;
     }
 
-    public async Task UpdateAsync(User user)
+    public async Task<User> UpdateAsync(User user)
     {
         _db.Users.Update(user);
         await _db.SaveChangesAsync();
+        return user;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<string> DeleteAsync(int id)
     {
         var user =
             await _db.Users.FindAsync(id)
@@ -34,5 +35,6 @@ public class UserRepository(MyDbContext context) : IRepository<User>
 
         _db.Users.Remove(user);
         await _db.SaveChangesAsync();
+        return $"User with id {id} was deleted.";
     }
 }
