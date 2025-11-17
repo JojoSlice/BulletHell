@@ -9,9 +9,9 @@ public class UserRepository(MyDbContext context) : IRepository<User>
 {
     private readonly MyDbContext _db = context;
 
-    public Task<List<User>> GetAsync() => _db.Users.ToListAsync();
+    public async Task<List<User>> GetAsync() => await _db.Users.ToListAsync();
 
-    public Task<User?> GetByIdAsync(int id) => _db.Users.FindAsync(id).AsTask();
+    public async Task<User?> GetByIdAsync(int id) => await _db.Users.FindAsync(id);
 
     public async Task<User> CreateAsync(User user)
     {

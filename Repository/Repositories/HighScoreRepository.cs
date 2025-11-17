@@ -9,9 +9,9 @@ public class HighScoreRepository(MyDbContext context) : IRepository<HighScore>
 {
     private readonly MyDbContext _db = context;
 
-    public Task<List<HighScore>> GetAsync() => _db.Highscores.ToListAsync();
+    public async Task<List<HighScore>> GetAsync() => await _db.Highscores.ToListAsync();
 
-    public Task<HighScore?> GetByIdAsync(int id) => _db.Highscores.FindAsync(id).AsTask();
+    public async Task<HighScore?> GetByIdAsync(int id) => await _db.Highscores.FindAsync(id);
 
     public async Task<HighScore> CreateAsync(HighScore highScore)
     {
