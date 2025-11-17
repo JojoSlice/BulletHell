@@ -6,33 +6,37 @@ using Domain.Entities;
 
 public static class MappingExtensions
 {
-    private static GetHighScoreResponse MapHighScoreToResponse(this HighScore hs) => new()
+    
+    private static HighScoreResponse MapHighScoreToResponse(this HighScore hs) => new()
     {
         Id = hs.Id,
         Score = hs.Score,
         UserId = hs.UserId
     };
     
-    public static Response<GetAllResponse<GetHighScoreResponse>> MapToResponse(this List<HighScore> highScores)
+    public static Response<List<HighScoreResponse>> MapToResponse(this List<HighScore> highScores)
     {
-        return highScores.Count != 0 ? new Response<GetAllResponse<GetHighScoreResponse>>
+        return highScores.Count != 0 ? new Response<List<HighScoreResponse>>
         {
             IsSuccess = highScores.Count != 0,
-            Data = new GetAllResponse<GetHighScoreResponse>
-            {
-                Items = highScores.Select(hs => hs.MapHighScoreToResponse())
-            }
+            Data = highScores.Select(hs => hs.MapHighScoreToResponse()).ToList()
         }
-        : new Response<GetAllResponse<GetHighScoreResponse>>
+        : new Response<List<HighScoreResponse>>
         {
             IsSuccess = false,
             Data = null
         };
     }
 
-    public static Response<GetHighScoreResponse?> MapToResponse(this HighScore? highScore) => new()
+    public static Response<HighScoreResponse?> MapToResponse(this HighScore? highScore) => new()
     {
         IsSuccess = true,
         Data = highScore?.MapHighScoreToResponse()
+    };
+    
+    public static Response<string> MapToResponse(this string message) => new()
+    {
+        IsSuccess = true,
+        Data = message
     };
 }

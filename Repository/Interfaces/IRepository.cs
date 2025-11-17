@@ -5,7 +5,7 @@ public interface IRepository<T>
     public Task<List<T>> GetAsync();
     public Task<T?> GetByIdAsync(int id);
     public Task<T> CreateAsync(T entity);
-    public Task UpdateAsync(T entity);
-    public Task DeleteAsync(int id);
+    public Task<T> UpdateAsync(T entity);
+    public Task<string> DeleteAsync(int id);
 }
 

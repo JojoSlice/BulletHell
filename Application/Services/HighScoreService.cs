@@ -9,27 +9,18 @@ using Repository.Repositories;
 
 public class HighScoreService(HighScoreRepository repository) : IHighScoreService
 {
-    public async Task<Response<GetAllResponse<GetHighScoreResponse>>> GetAll() =>
+    public async Task<Response<List<HighScoreResponse>>> GetAll() =>
         (await repository.GetAsync()).MapToResponse();
 
-    public async Task<Response<GetHighScoreResponse?>> GetById(int id) =>
+    public async Task<Response<HighScoreResponse?>> GetById(int id) =>
         (await repository.GetByIdAsync(id)).MapToResponse();
 
-    public Response<CreateHighScoreResponse> Create(HighScore highScore)
-    {
-        //TODO: Implement Create
-        throw new NotImplementedException();
-    }
+    public async Task<Response<HighScoreResponse>> Create(HighScore highScore) =>
+        (await repository.CreateAsync(highScore)).MapToResponse()!;
 
-    public Response<UpdateHighScoreResponse> Update(int id, HighScore highScore)
-    {
-        //TODO: Implement Update
-        throw new NotImplementedException();
-    }
+    public async Task<Response<HighScoreResponse>> Update(HighScore highScore) =>
+        (await repository.UpdateAsync(highScore)).MapToResponse()!;
 
-    public Response<string> Delete(int id)
-    {
-        //TODO: Implement Delete
-        throw new NotImplementedException();
-    }
+    public async Task<Response<string>> Delete(int id) =>
+        (await repository.DeleteAsync(id)).MapToResponse();
 }
