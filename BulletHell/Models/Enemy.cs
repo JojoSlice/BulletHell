@@ -23,9 +23,11 @@ public class Enemy
         _velocity = Vector2.Zero;
     }
 
-    // TODO: ⬇️Detta kan inte enhetstestas ännu eftersom SpriteHelper kräver en riktig Texture2D.
     public void LoadContent(Texture2D enemyTexture)
     {
+        // NOTE: Går inte att enhetstesta just nu eftersom-
+        // SpriteHelper kräver en riktig Texture2D.
+        // Funktionaliteten verifieras istället i spelet.
         _sprite.LoadSpriteSheet
         (
             enemyTexture,
@@ -46,6 +48,8 @@ public class Enemy
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        
+        // NOTE: Draw anropas endast grafiskt och enhetstestas inte.
+        // Renderingen verifieras visuellt i spelet.
+        _sprite.Draw(spriteBatch, Position, 0f, 1f);
     }
 }
