@@ -23,6 +23,18 @@ public class Enemy
         _velocity = Vector2.Zero;
     }
 
+    // TODO: ⬇️Detta kan inte enhetstestas ännu eftersom SpriteHelper kräver en riktig Texture2D.
+    public void LoadContent(Texture2D enemyTexture)
+    {
+        _sprite.LoadSpriteSheet
+        (
+            enemyTexture,
+            SpriteDefaults.FrameWidth,
+            SpriteDefaults.FrameHeight,
+            SpriteDefaults.AnimationSpeed
+        );
+    }
+    
     public void Update(GameTime gameTime)
     {
         var movement = Vector2.UnitY * EnemyConfig.Speed * (float)(gameTime.ElapsedGameTime.TotalSeconds);
@@ -33,11 +45,6 @@ public class Enemy
     }
 
     public void Draw(SpriteBatch spriteBatch)
-    {
-        
-    }
-
-    public void LoadContent(Texture2D texture)
     {
         
     }
