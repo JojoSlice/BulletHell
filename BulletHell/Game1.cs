@@ -1,44 +1,45 @@
-﻿using BulletHell.Helpers;
-using BulletHell.Inputs;
-using BulletHell.Interfaces;
-using BulletHell.Managers;
-using BulletHell.Models;
+﻿using System.Collections.Generic;
+using BulletHell.Scenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace BulletHell;
 
 public class Game1 : Game
 {
     private readonly GraphicsDeviceManager _graphics;
-
-    private int screenWidth;
-    private int screenHeight;
-
     private SpriteBatch? _spriteBatch;
-    private Player? _player;
-    private IBulletManager? _bulletManager;
+
+    private Dictionary<string, Scene> scenes = null!;
+    private Scene currentScene = null!;
 
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
+
+        // Fullscreen
+        _graphics.IsFullScreen = true;
     }
 
     protected override void Initialize()
     {
-        screenWidth = _graphics.PreferredBackBufferWidth;
-        screenHeight = _graphics.PreferredBackBufferHeight;
+        // Sätt fönsterstorlek till skärmstorlek
+        _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+        _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+        _graphics.ApplyChanges();
 
-        Vector2 startPosition = new(screenWidth / 2, screenHeight / 2);
+        // Skapa alla scener
+        scenes = new Dictionary<string, Scene>
+        {
+            { "Menu", new MenuScene(this) },
+            { "Battle", new BattleScene(this) },
+        };
 
-        IInputProvider input = new KeyboardInputProvider();
-        ISpriteHelper sprite = new SpriteHelper();
-        _player = new Player(startPosition, input, sprite);
-
-        _bulletManager = new BulletManager();
+        // Starta med menyn
+        currentScene = scenes["Menu"];
+        currentScene.OnEnter();
 
         base.Initialize();
     }
@@ -46,42 +47,30 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+    }
 
-        Texture2D playerTexture = Content.Load<Texture2D>("player");
-        _player!.LoadContent(playerTexture);
-
-        Texture2D bulletTexture = Content.Load<Texture2D>("bullet");
-        _bulletManager!.LoadContent(bulletTexture);
+    public void ChangeScene(string sceneName)
+    {
+        if (scenes.ContainsKey(sceneName))
+        {
+            currentScene.OnExit();
+            currentScene = scenes[sceneName];
+            currentScene.OnEnter();
+        }
     }
 
     protected override void Update(GameTime gameTime)
     {
-        if (
-            GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed
-            || Keyboard.GetState().IsKeyDown(Keys.Escape)
-        )
-            Exit();
-
-        _player!.Update(gameTime);
-
-        var shootInfo = _player.TryShoot();
-        if (shootInfo.HasValue)
-        {
-            _bulletManager!.CreateBullet(shootInfo.Value.position, shootInfo.Value.direction);
-        }
-
-        _bulletManager!.Update(gameTime, screenWidth, screenHeight);
-
+        currentScene.Update(gameTime);
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.Black);
+        GraphicsDevice.Clear(Color.CornflowerBlue);
 
         _spriteBatch!.Begin();
-        _player!.Draw(_spriteBatch);
-        _bulletManager!.Draw(_spriteBatch);
+        currentScene.Draw(_spriteBatch);
         _spriteBatch.End();
 
         base.Draw(gameTime);
