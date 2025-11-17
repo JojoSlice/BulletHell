@@ -68,12 +68,26 @@ public class EnemyTest
     public void Update_ShouldUseEnemySpeed()
     {
         // Arrange
-
+        var startPosition = new Vector2(0, 0);
+        var spriteMock = Substitute.For<ISpriteHelper>();
+        var enemy = new Enemy(startPosition, spriteMock);
+        var deltaTime = 1.0f;
+        var totalTime = TimeSpan.Zero;
+        var elapsedTime = TimeSpan.FromSeconds(deltaTime);
+        var gameTime = new GameTime(totalTime, elapsedTime);
+        var expectedPosition = new Vector2(startPosition.X, startPosition.Y + EnemyConfig.Speed * deltaTime);
 
         // Act
+        enemy.Update(gameTime);
 
 
         // Assert
+        Assert.Equal(expectedPosition.X, enemy.Position.X, 4);
+        Assert.Equal(expectedPosition.Y, enemy.Position.Y, 4);
+
+        _output.WriteLine($"Speed test OK ✔ Expected ΔY = {EnemyConfig.Speed * deltaTime}");
+        _output.WriteLine($"Actual ΔY = {enemy.Position.Y - startPosition.Y}");
+
     }
 
     [Fact]
