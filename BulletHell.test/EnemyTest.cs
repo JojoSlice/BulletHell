@@ -89,6 +89,5 @@ public class EnemyTest
         _output.WriteLine($"Actual ΔY = {enemy.Position.Y - startPosition.Y}");
 
     }
-
-    // TODO: Enemy_ShouldDie_WhenHealthReachesZero
-    }
+    
+}
