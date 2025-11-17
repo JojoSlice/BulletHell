@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11205.157 d18.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulletHell.test", "BulletHell.test\BulletHell.test.csproj", "{E303F3BE-76CE-4157-9C21-69C3821C469F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{1D1F38B6-3EDE-4C6D-BB96-5CB4125AE86A}"
@@ -11,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{4B030D34-E169-4767-BFA1-38E3F020B7D8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{68D6554B-F0B8-47B8-BACE-8683C763765B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{4F5921FB-A9D0-48E3-ABEA-2AE264637F3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,5 +47,15 @@ Global
 		{68D6554B-F0B8-47B8-BACE-8683C763765B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68D6554B-F0B8-47B8-BACE-8683C763765B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68D6554B-F0B8-47B8-BACE-8683C763765B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F5921FB-A9D0-48E3-ABEA-2AE264637F3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F5921FB-A9D0-48E3-ABEA-2AE264637F3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F5921FB-A9D0-48E3-ABEA-2AE264637F3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F5921FB-A9D0-48E3-ABEA-2AE264637F3A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7E9DC54E-F675-4EF3-9B84-57153487FACA}
 	EndGlobalSection
 EndGlobal
