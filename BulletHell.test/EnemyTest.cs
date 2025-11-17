@@ -90,15 +90,5 @@ public class EnemyTest
 
     }
 
-    [Fact]
-    public void IsAlive_ShouldBeFalse_WhenOutOfBounds()
-    {
-        // Arrange
-
-
-        // Act
-
-
-        // Assert
+    // TODO: Enemy_ShouldDie_WhenHealthReachesZero
     }
-}
