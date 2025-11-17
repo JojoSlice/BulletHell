@@ -47,12 +47,21 @@ public class EnemyTest
     public void Update_ShouldCallSpriteUpdate()
     {
         // Arrange
-
-
+        var startPosition = new Vector2(10, 10);
+        var spriteMock = Substitute.For<ISpriteHelper>();
+        var enemy = new Enemy(startPosition, spriteMock);
+        var deltaTime = 1/60f;
+        var totalTime = TimeSpan.Zero;
+        var elapsedTime = TimeSpan.FromSeconds(deltaTime);
+        var gameTime = new GameTime(totalTime, elapsedTime);
+        
         // Act
-
-
+        enemy.Update(gameTime);
+        
         // Assert
+        spriteMock.Received(1).Update(gameTime);
+        
+        _output.WriteLine("sprite.Update(gameTime) was called once ✔");
     }
 
     [Fact]

@@ -28,6 +28,8 @@ public class Enemy
         var movement = Vector2.UnitY * EnemyConfig.Speed * (float)(gameTime.ElapsedGameTime.TotalSeconds);
         var newPosition = Position + movement;
         Position = newPosition;
+        
+        _sprite.Update(gameTime);
     }
 
     public void Draw(SpriteBatch spriteBatch)
