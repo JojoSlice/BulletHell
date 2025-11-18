@@ -7,15 +7,8 @@ using Xunit;
 
 namespace BulletHell.test;
 
-public class EnemyTest
+public class EnemyTest(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public EnemyTest(ITestOutputHelper output)
-    {
-        _output = output;
-    }
-    
     [Fact]
     public void Update_ShouldMoveDownwards()
     {
@@ -39,8 +32,8 @@ public class EnemyTest
         Assert.Equal(expectedPosition.Y, actual.Y, precision);
         
         // Output
-        _output.WriteLine($"Expected: {expectedPosition}");
-        _output.WriteLine($"Actual:   {actual}");
+        output.WriteLine($"Expected: {expectedPosition}");
+        output.WriteLine($"Actual:   {actual}");
     }
 
     [Fact]
@@ -64,9 +57,26 @@ public class EnemyTest
         Assert.Equal(expectedPosition.X, enemy.Position.X, 4);
         Assert.Equal(expectedPosition.Y, enemy.Position.Y, 4);
 
-        _output.WriteLine($"Speed test OK ✔ Expected ΔY = {EnemyConfig.Speed * deltaTime}");
-        _output.WriteLine($"Actual ΔY = {enemy.Position.Y - startPosition.Y}");
+        output.WriteLine($"Speed test OK ✔ Expected ΔY = {EnemyConfig.Speed * deltaTime}");
+        output.WriteLine($"Actual ΔY = {enemy.Position.Y - startPosition.Y}");
 
     }
+    
+    [Theory]
+    [InlineData(-50, 100, true)]
+    [InlineData(900, 100, true)]
+    [InlineData(100, 700, true)]
+    [InlineData(100, -10, false)]
+    [InlineData(100, 100, false)]
+    public void Enemy_IsOutOfBounds_ReturnsValidBoolean(float x, float y, bool expected)
+    {
+        var sprite = Substitute.For<ISpriteHelper>();
+        var enemy = new Enemy(new Vector2(x, y), sprite);
+
+        var actual = enemy.IsOutOfBounds(800, 600);
+
+        Assert.Equal(expected, actual);
+    }
+
     
 }
