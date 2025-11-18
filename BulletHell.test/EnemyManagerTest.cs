@@ -1,4 +1,5 @@
-﻿using BulletHell.Configurations;
+﻿using System.Runtime.InteropServices.Marshalling;
+using BulletHell.Configurations;
 using BulletHell.Models;
 using BulletHell.Interfaces;
 using BulletHell.Managers;
@@ -17,28 +18,69 @@ public class EnemyManagerTest
         _output = output;
     }
     
-    [Fact]
-    public void EnemyManager_ShouldRemoveOutOfBoundsEnemies()
+    [Theory]
+    [InlineData(-50, 100)]   // Left of screen
+    [InlineData(900, 100)]   // Right of screen (800 wide)
+    [InlineData(100, 700)]   // Below screen (600 high)
+    public void EnemyManager_ShouldRemoveOutOfBoundsEnemies(float x, float y)
     {
         // Arrange
         var sprite = Substitute.For<ISpriteHelper>();
-        var enemy = new Enemy(new Vector2(-100, -100), sprite);
+        var enemy = new Enemy(new Vector2(x, y), sprite);
 
         var manager = new EnemyManager();
         manager.AddEnemy(enemy);
 
+        int screenWidth = 800;
+        int screenHeight = 600;
+
+        int expectedCount = 0;
+
         // Act
-        var before = manager.Enemies.Count;
-        manager.Update(new GameTime(), 800, 600);
-        var after = manager.Enemies.Count;
+        manager.Update(new GameTime(), screenWidth, screenHeight);
+        int actualCount = manager.Enemies.Count;
 
         // Assert
-        Assert.Empty(manager.Enemies);
-        
+        Assert.Equal(expectedCount, actualCount);
+
         // Output
-        _output.WriteLine($"Enemies before update: {before}");
-        _output.WriteLine($"Enemies after update:  {after}");
-        _output.WriteLine("Result: Enemy removed because it was out of bounds ✔");
+        _output.WriteLine($"Enemy pos:  ({x}, {y})");
+        _output.WriteLine($"Expected count:   {expectedCount}");
+        _output.WriteLine($"Actual count:     {actualCount}");
+        _output.WriteLine("Result: Enemy removed ✔");
+    }
+    
+    [Theory]
+    [InlineData(100, 100)]
+    [InlineData(799, 599)]
+    [InlineData(400, 0)]
+    [InlineData(0, 300)]
+    public void EnemyManager_ShouldKeepEnemy_WhenInsideBounds(float x, float y)
+    {
+        // Arrange
+        var sprite = Substitute.For<ISpriteHelper>();
+        var enemy = new Enemy(new Vector2(x, y), sprite);
+
+        var manager = new EnemyManager();
+        manager.AddEnemy(enemy);
+
+        int screenWidth = 800;
+        int screenHeight = 600;
+
+        int expectedCount = 1;
+
+        // Act
+        manager.Update(new GameTime(), screenWidth, screenHeight);
+        int actualCount = manager.Enemies.Count;
+
+        // Assert
+        Assert.Equal(expectedCount, actualCount);
+
+        // Output
+        _output.WriteLine($"Enemy pos:  ({x}, {y})");
+        _output.WriteLine($"Expected count:   {expectedCount}");
+        _output.WriteLine($"Actual count:     {actualCount}");
+        _output.WriteLine("Result: Enemy spoted! ✔");
     }
 
     [Fact]
