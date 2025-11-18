@@ -83,8 +83,8 @@ public class MenuScene(Game1 game) : Scene(game)
         menuNavigator = new MenuNavigator();
 
         menuNavigator.AddItem(menuButtons[0]); // Start button
-        menuNavigator.AddItem(usernameField);
-        menuNavigator.AddItem(passwordField);
+        menuNavigator.AddItem(menuInputs[0]);
+        menuNavigator.AddItem(menuInputs[1]);
         menuNavigator.AddItem(menuButtons[1]); // Login button
         menuNavigator.AddItem(menuButtons[2]); // Exit button
     }
