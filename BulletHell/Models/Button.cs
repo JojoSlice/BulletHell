@@ -1,11 +1,12 @@
 using System;
+using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace BulletHell.Models;
 
-public class Button
+public class Button : INavigable
 {
     private readonly Rectangle _bounds;
     private readonly string _text;
@@ -14,8 +15,10 @@ public class Button
 
     private bool _isHovered;
     private bool _wasPressed;
+    private bool _isSelected;
 
     public event Action? OnClick;
+    public Rectangle Bounds => _bounds;
 
     public Button(GraphicsDevice graphicsDevice, SpriteFont font, string text, Rectangle bounds)
     {
@@ -25,6 +28,16 @@ public class Button
 
         _texture = new Texture2D(graphicsDevice, 1, 1);
         _texture.SetData(new[] { Color.White });
+    }
+
+    public void SetSelected(bool isSelected)
+    {
+        _isSelected = isSelected;
+    }
+
+    public void Activate()
+    {
+        OnClick?.Invoke();
     }
 
     public void Update(MouseState mouseState)
@@ -51,8 +64,9 @@ public class Button
         // Rita bakgrund
         spriteBatch.Draw(_texture, _bounds, bgColor);
 
-        // Rita ram
-        DrawBorder(spriteBatch, _bounds, Color.White, 2);
+        // Rita ram - grön om selected, annars vit
+        Color borderColor = _isSelected ? Color.Lime : Color.White;
+        DrawBorder(spriteBatch, _bounds, borderColor, 2);
 
         // Centrera text
         Vector2 textSize = _font.MeasureString(_text);
