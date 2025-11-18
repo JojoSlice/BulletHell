@@ -18,7 +18,9 @@ public class EnemyBullet
     }
 
     public void Update(GameTime gameTime)
-    {
+    { 
+        var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        Position += _velocity * deltaTime;
     }
 
     public void Draw(SpriteBatch spriteBatch)
