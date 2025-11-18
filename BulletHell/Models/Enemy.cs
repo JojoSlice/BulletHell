@@ -22,6 +22,17 @@ public class Enemy
         _sprite =  sprite;
         _velocity = Vector2.Zero;
     }
+    public bool IsOutOfBounds(int screenWidth, int screenHeight)
+    {
+        return Position.X < 0 ||
+               Position.X > screenWidth ||
+               Position.Y > screenHeight;
+    }
+
+    public bool ShouldBeRemoved(int screenWidth, int screenHeight)
+    {
+        return IsOutOfBounds(screenWidth, screenHeight);
+    }
 
     public void LoadContent(Texture2D enemyTexture)
     {

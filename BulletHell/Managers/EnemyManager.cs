@@ -47,11 +47,8 @@ public class EnemyManager : IEnemyManager
             enemy.Update(gameTime);
         }
 
-        _enemies.RemoveAll(e =>
-            e.Position.X < -100 ||
-            e.Position.X > screenWidth + 100 ||
-            e.Position.Y > screenHeight + 50
-        );
+        _enemies.RemoveAll(e => e.ShouldBeRemoved(screenWidth, screenHeight));
+
     }
 
     public void Draw(SpriteBatch spriteBatch)
