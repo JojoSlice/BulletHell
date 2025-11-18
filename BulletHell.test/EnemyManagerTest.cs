@@ -18,7 +18,7 @@ public class EnemyManagerTest
     }
     
     [Fact]
-    public void EnemyManager_ShouldRemoveDeadEnemies()
+    public void EnemyManager_ShouldRemoveOutOfBoundsEnemies()
     {
         // Arrange
         var sprite = Substitute.For<ISpriteHelper>();
