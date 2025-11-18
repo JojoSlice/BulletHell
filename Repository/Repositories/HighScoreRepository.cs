@@ -9,9 +9,9 @@ public class HighScoreRepository(MyDbContext context) : IRepository<HighScore>
 {
     private readonly MyDbContext _db = context;
 
-    public Task<List<HighScore>> GetAsync() => _db.Highscores.ToListAsync();
+    public async Task<List<HighScore>> GetAllAsync() => await _db.Highscores.ToListAsync();
 
-    public Task<HighScore?> GetByIdAsync(int id) => _db.Highscores.FindAsync(id).AsTask();
+    public async Task<HighScore?> GetByIdAsync(int id) => await _db.Highscores.FindAsync(id);
 
     public async Task<HighScore> CreateAsync(HighScore highScore)
     {
@@ -20,13 +20,14 @@ public class HighScoreRepository(MyDbContext context) : IRepository<HighScore>
         return highScore;
     }
 
-    public async Task UpdateAsync(HighScore highScore)
+    public async Task<HighScore> UpdateAsync(HighScore highScore)
     {
         _db.Highscores.Update(highScore);
         await _db.SaveChangesAsync();
+        return highScore;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<string> DeleteAsync(int id)
     {
         var highScore =
             await _db.Highscores.FindAsync(id)
@@ -34,6 +35,7 @@ public class HighScoreRepository(MyDbContext context) : IRepository<HighScore>
 
         _db.Highscores.Remove(highScore);
         await _db.SaveChangesAsync();
+        return $"HighScore with id {id} was deleted.";
     }
 }
 
