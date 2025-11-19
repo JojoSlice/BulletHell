@@ -48,7 +48,6 @@ public class Button : INavigable, IDisposable
 
     public void Update(MouseState mouseState)
     {
-        bool wasHovered = _isHovered;
         _isHovered = _bounds.Contains(mouseState.Position);
 
         bool isPressed = mouseState.LeftButton == ButtonState.Pressed;
