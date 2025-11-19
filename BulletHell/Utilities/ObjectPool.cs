@@ -110,7 +110,7 @@ public class ObjectPool<T> : IDisposable
             {
                 disposable.Dispose();
             }
-            catch (Exception ex) when (!(ex is OutOfMemoryException) && !(ex is StackOverflowException) && !(ex is ThreadAbortException))
+            catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
             {
                 // Ignore disposal exceptions except for critical ones; continue disposing other objects
             }
