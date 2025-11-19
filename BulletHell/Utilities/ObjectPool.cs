@@ -79,9 +79,14 @@ public class ObjectPool<T> : IDisposable
             return;
         }
 
-        _resetAction?.Invoke(obj);
-
-        _pool.Push(obj);
+        try
+        {
+            _resetAction?.Invoke(obj);
+        }
+        finally
+        {
+            _pool.Push(obj);
+        }
     }
 
     /// <summary>

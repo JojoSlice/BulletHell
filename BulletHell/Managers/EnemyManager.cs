@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using BulletHell.Models;
@@ -38,15 +39,16 @@ public class EnemyManager : IEnemyManager
 
     public void TryShootEnemies()
     {
-        foreach (var enemy in _enemies)
-        {
-            var shootData = enemy.TryShoot();
-            if (shootData.HasValue)
+        _enemies
+            .Select(enemy => enemy.TryShoot())
+            .Where(shootData => shootData.HasValue)
+            .Select(shootData => shootData!.Value)
+            .ToList()
+            .ForEach(data =>
             {
-                var (position, velocity) = shootData.Value;
+                var (position, velocity) = data;
                 _enemyBulletManager.CreateBullet(position, velocity);
-            }
-        }
+            });
     }
 
     public void Update(GameTime gameTime, int screenWidth, int screenHeight)

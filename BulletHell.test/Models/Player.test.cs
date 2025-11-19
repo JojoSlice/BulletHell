@@ -255,7 +255,7 @@ public class PlayerTests
     {
         // Arrange
         var mockSprite = Substitute.For<ISpriteHelper>();
-        var player = TestDataBuilders.CreateTestPlayer(sprite: mockSprite);
+        using var player = TestDataBuilders.CreateTestPlayer(sprite: mockSprite);
 
         // Act
         player.Dispose();

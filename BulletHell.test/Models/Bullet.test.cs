@@ -267,7 +267,7 @@ public class BulletTests
     {
         // Arrange
         var mockSprite = Substitute.For<ISpriteHelper>();
-        var bullet = TestDataBuilders.CreateTestBullet(sprite: mockSprite);
+        using var bullet = TestDataBuilders.CreateTestBullet(sprite: mockSprite);
 
         // Act
         bullet.Dispose();
@@ -281,7 +281,7 @@ public class BulletTests
     {
         // Arrange
         var mockSprite = Substitute.For<ISpriteHelper>();
-        var bullet = TestDataBuilders.CreateTestBullet(sprite: mockSprite);
+        using var bullet = TestDataBuilders.CreateTestBullet(sprite: mockSprite);
 
         // Act
         bullet.Dispose();
