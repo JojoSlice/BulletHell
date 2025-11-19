@@ -121,5 +121,29 @@ public class EnemyManagerTest
         _output.WriteLine("Result: Enemy updated correctly ✔");
 
     }
+    
+    [Fact]
+    public void EnemyManager_TryShoot_ShouldReturnAtLeastOneBullet()
+    {
+        // Arrange
+        var bulletManager = new EnemyBulletManager();
+        var manager = new EnemyManager(bulletManager);
 
+        var sprite = Substitute.For<ISpriteHelper>();
+        var enemy = new Enemy(new Vector2(100, 100), sprite);
+
+        manager.AddEnemy(enemy);
+
+        // Act
+        var bullets = manager.TryShoot();
+
+        // Assert
+        Assert.NotNull(bullets);
+        Assert.NotEmpty(bullets);
+        
+        // output
+        _output.WriteLine($"Enemy count: {manager.Enemies.Count}");
+        _output.WriteLine($"Bullets spawned: {bullets.Count()}");
+        _output.WriteLine("Result: EnemyManager.TryShoot() produced at least one bullet ✔");
+    }
 }

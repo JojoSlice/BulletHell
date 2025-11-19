@@ -35,6 +35,14 @@ public class EnemyManager : IEnemyManager
     {
         _enemies.Add(enemy);
     }
+    
+    public IEnumerable<EnemyBullet> TryShoot()
+    {
+        foreach (var enemy in _enemies)
+        {
+            yield return enemy.Shoot();
+        }
+    }
 
     public void Update(GameTime gameTime, int screenWidth, int screenHeight)
     {
