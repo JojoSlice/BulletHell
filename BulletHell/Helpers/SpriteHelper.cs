@@ -94,7 +94,7 @@ public class SpriteHelper : ISpriteHelper, IDisposable
             _frames[_currentFrame],
             color ?? Color.White,
             rotation,
-            new Vector2(_frameWidth / 2, _frameHeight / 2), // Center sprite
+            new Vector2((float)_frameWidth / 2, (float)_frameHeight / 2), // Center sprite
             scale,
             SpriteEffects.None,
             0f
