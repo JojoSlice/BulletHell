@@ -96,7 +96,7 @@ public class ObjectPool<T> : IDisposable
             {
                 items.Add(_pool.Pop());
             }
-            catch
+            catch (InvalidOperationException)
             {
                 break; // Could not pop more items
             }
