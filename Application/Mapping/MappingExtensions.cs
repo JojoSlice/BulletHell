@@ -1,9 +1,9 @@
-﻿namespace Application.Mapping;
-
+﻿using Contracts.Responses.Common;
 using Contracts.Responses.HighScore;
-using Contracts.Responses.Shared;
 using Contracts.Responses.User;
 using Domain.Entities;
+
+namespace Application.Mapping;
 
 public static class MappingExtensions
 {
@@ -66,6 +66,6 @@ public static class MappingExtensions
     public static Response<string> MapToResponse(this string message) => new()
     {
         IsSuccess = true,
-        Data = message
+        Data = message,
     };
 }

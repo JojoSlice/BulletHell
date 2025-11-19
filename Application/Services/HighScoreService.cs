@@ -1,11 +1,11 @@
-﻿namespace Application.Services;
-
+﻿using Application.Interfaces;
+using Application.Mapping;
+using Contracts.Responses.Common;
 using Contracts.Responses.HighScore;
-using Contracts.Responses.Shared;
 using Domain.Entities;
-using Interfaces;
-using Mapping;
 using Repository.Repositories;
+
+namespace Application.Services;
 
 public class HighScoreService(HighScoreRepository repository) : IService<HighScoreResponse, HighScore>
 {

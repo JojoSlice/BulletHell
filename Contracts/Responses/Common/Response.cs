@@ -1,4 +1,4 @@
-﻿namespace Contracts.Responses.Shared;
+﻿namespace Contracts.Responses.Common;
 
 public record Response<T>
 {

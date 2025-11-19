@@ -1,9 +1,9 @@
-﻿namespace Repository.Repositories;
-
-using Data;
-using Domain.Entities;
-using Interfaces;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Repository.Data;
+using Repository.Interfaces;
+
+namespace Repository.Repositories;
 
 public class HighScoreRepository(MyDbContext context) : IRepository<HighScore>
 {
@@ -38,4 +38,3 @@ public class HighScoreRepository(MyDbContext context) : IRepository<HighScore>
         return $"HighScore with id {id} was deleted.";
     }
 }
-

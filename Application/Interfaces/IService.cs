@@ -1,12 +1,14 @@
-﻿namespace Application.Interfaces;
+﻿using Contracts.Responses.Common;
 
-using Contracts.Responses.Shared;
+namespace Application.Interfaces;
 
-public interface IService<T,U> where T : class where U : class
+public interface IService<T, U>
+    where T : class
+    where U : class
 {
-    public Task<Response<List<T>>> GetAll();
-    public Task<Response<T?>> GetById(int id);
-    public Task<Response<T>> Create(U param);
-    public Task<Response<T>> Update(U param);
-    public Task<Response<string>> Delete(int id);
+    Task<Response<List<T>>> GetAll();
+    Task<Response<T?>> GetById(int id);
+    Task<Response<T>> Create(U param);
+    Task<Response<T>> Update(U param);
+    Task<Response<string>> Delete(int id);
 }

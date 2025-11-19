@@ -15,4 +15,3 @@ public class User
 
     public List<HighScore> HighScores { get; set; } = [];
 }
-
