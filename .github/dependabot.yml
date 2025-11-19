@@ -1,0 +1,47 @@
+version: 2
+updates:
+  # NuGet package updates for all .NET projects
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "nuget"
+    groups:
+      # Group MonoGame packages together
+      monogame:
+        patterns:
+          - "MonoGame.*"
+      # Group xUnit testing packages together
+      testing:
+        patterns:
+          - "xunit*"
+          - "coverlet*"
+          - "Microsoft.NET.Test.Sdk"
+      # Group Entity Framework packages together
+      entity-framework:
+        patterns:
+          - "Microsoft.EntityFrameworkCore*"
+      # Group Microsoft packages
+      microsoft:
+        patterns:
+          - "Microsoft.*"
+        exclude-patterns:
+          - "Microsoft.EntityFrameworkCore*"
+          - "Microsoft.NET.Test.Sdk"
+
+  # GitHub Actions updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
