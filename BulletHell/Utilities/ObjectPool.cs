@@ -88,18 +88,23 @@ public class ObjectPool<T> : IDisposable
     /// </summary>
     public void Clear()
     {
+        var items = new List<T>();
+        // Collect all remaining objects (ignore Pop errors to be extra defensive)
         while (_pool.Count > 0)
         {
-            T obj;
             try
             {
-                obj = _pool.Pop();
+                items.Add(_pool.Pop());
             }
-            catch (Exception)
+            catch
             {
-                // If Pop() fails, break to avoid infinite loop
-                break;
+                break; // Could not pop more items
             }
+        }
+
+        // Dispose items that implement IDisposable
+        foreach (var obj in items)
+        {
             if (obj is IDisposable disposable)
             {
                 try
