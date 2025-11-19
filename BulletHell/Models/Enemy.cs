@@ -56,6 +56,13 @@ public class Enemy
         
         _sprite.Update(gameTime);
     }
+    public EnemyBullet Shoot()
+    {
+        var start = Position;
+        Vector2 velocity = new Vector2(0, 1) * EnemyBulletConfig.Speed;
+
+        return new EnemyBullet(start, velocity);
+    }
 
     public void Draw(SpriteBatch spriteBatch)
     {
