@@ -19,8 +19,12 @@ public class BattleScene : Scene
     private int _screenHeight;
     private Player? _player;
     private BulletManager? _bulletManager;
+    private IEnemyManager? _enemyManager;
+    private EnemyBulletManager? _enemyBulletManager;
     private Texture2D? _playerTexture;
     private Texture2D? _bulletTexture;
+    private Texture2D? _enemyTexture;
+    private Texture2D? _enemyBulletTexture;
 
     public BattleScene(Game1 game)
         : base(game)
@@ -31,6 +35,7 @@ public class BattleScene : Scene
     {
         _player?.Dispose();
         _bulletManager?.Dispose();
+        _enemyBulletManager?.Dispose();
 
         _screenWidth = _game.GraphicsDevice.Viewport.Width;
         _screenHeight = _game.GraphicsDevice.Viewport.Height;
@@ -42,12 +47,26 @@ public class BattleScene : Scene
         _player.SetScreenBounds(_screenWidth, _screenHeight);
 
         _bulletManager = new BulletManager();
+        _enemyBulletManager = new EnemyBulletManager();
+        _enemyManager = new EnemyManager(_enemyBulletManager);
+
+        // Add initial enemy
+        _enemyManager.AddEnemy(new Enemy(
+            new Vector2(400, 0),
+            new SpriteHelper()
+        ));
 
         _playerTexture = _game.Content.Load<Texture2D>("player");
         _player.LoadContent(_playerTexture);
 
         _bulletTexture = _game.Content.Load<Texture2D>("bullet");
         _bulletManager.LoadContent(_bulletTexture);
+
+        _enemyTexture = _game.Content.Load<Texture2D>("enemy");
+        _enemyManager.LoadContent(_enemyTexture);
+
+        _enemyBulletTexture = _game.Content.Load<Texture2D>("enemy_bullet");
+        _enemyBulletManager.LoadContent(_enemyBulletTexture);
     }
 
     public override void Update(GameTime gameTime)
@@ -63,7 +82,7 @@ public class BattleScene : Scene
             return;
         }
 
-        if (_player == null || _bulletManager == null)
+        if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null)
             return;
 
         _player.Update(gameTime);
@@ -75,17 +94,21 @@ public class BattleScene : Scene
         }
 
         _bulletManager.Update(gameTime, _screenWidth, _screenHeight);
+        _enemyManager.Update(gameTime, _screenWidth, _screenHeight);
+        _enemyBulletManager.Update(gameTime, _screenWidth, _screenHeight);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        if (_player == null || _bulletManager == null)
+        if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null)
             return;
 
         _player.Draw(spriteBatch);
         _bulletManager.Draw(spriteBatch);
+        _enemyManager.Draw(spriteBatch);
+        _enemyBulletManager.Draw(spriteBatch);
     }
 
     protected override void Dispose(bool disposing)
@@ -98,9 +121,16 @@ public class BattleScene : Scene
             _bulletManager?.Dispose();
             _bulletManager = null;
 
+            _enemyBulletManager?.Dispose();
+            _enemyBulletManager = null;
+
+            _enemyManager = null;
+
             // Note: Textures are managed by ContentManager, don't dispose here
             _playerTexture = null;
             _bulletTexture = null;
+            _enemyTexture = null;
+            _enemyBulletTexture = null;
         }
 
         base.Dispose(disposing);

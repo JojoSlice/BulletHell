@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using BulletHell.Constants;
 using BulletHell.Scenes;
 using Microsoft.Xna.Framework;
@@ -21,29 +21,30 @@ public class Game1 : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
 
-        // Fullscreen
         _graphics.IsFullScreen = true;
     }
 
     protected override void Initialize()
     {
-        // Sätt fönsterstorlek till skärmstorlek
-        _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-        _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+        _graphics.PreferredBackBufferWidth = GraphicsAdapter
+            .DefaultAdapter
+            .CurrentDisplayMode
+            .Width;
+        _graphics.PreferredBackBufferHeight = GraphicsAdapter
+            .DefaultAdapter
+            .CurrentDisplayMode
+            .Height;
         _graphics.ApplyChanges();
 
-        // Create shared white texture for UI elements
         _sharedWhiteTexture = new Texture2D(GraphicsDevice, 1, 1);
         _sharedWhiteTexture.SetData(new[] { Color.White });
 
-        // Skapa alla scener
         _scenes = new Dictionary<string, Scene>
         {
             { SceneNames.Menu, new MenuScene(this, _sharedWhiteTexture) },
             { SceneNames.Battle, new BattleScene(this) },
         };
 
-        // Starta med menyn
         _currentScene = _scenes[SceneNames.Menu];
         _currentScene.OnEnter();
 
