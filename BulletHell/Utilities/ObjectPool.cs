@@ -110,7 +110,7 @@ public class ObjectPool<T> : IDisposable
             {
                 disposable.Dispose();
             }
-            catch
+            catch (Exception)
             {
                 // Ignore disposal exceptions; continue disposing other objects
             }
