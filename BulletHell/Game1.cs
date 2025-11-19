@@ -40,7 +40,8 @@ public class Game1 : Game
         _player = new Player(startPosition, input, sprite);
 
         _bulletManager = new BulletManager();
-        _enemyManager = new EnemyManager();
+        var enemyBulletManager = new EnemyBulletManager();
+        _enemyManager = new EnemyManager(enemyBulletManager);
         
         _enemyManager.AddEnemy(new Enemy(
             new Vector2(400, 0), 

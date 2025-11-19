@@ -13,6 +13,12 @@ public class EnemyManager : IEnemyManager
     private readonly List<Enemy> _enemies = new();
     private readonly Random _rand = new();
     private Texture2D? _enemyTexture;
+    private readonly EnemyBulletManager _enemyBulletManager;
+
+    public EnemyManager(EnemyBulletManager bulletManager)
+    {
+        _enemyBulletManager =  bulletManager;
+    }
 
     public IReadOnlyList<Enemy> Enemies => _enemies;
 

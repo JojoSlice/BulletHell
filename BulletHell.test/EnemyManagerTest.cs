@@ -28,7 +28,9 @@ public class EnemyManagerTest
         var sprite = Substitute.For<ISpriteHelper>();
         var enemy = new Enemy(new Vector2(x, y), sprite);
 
-        var manager = new EnemyManager();
+        var bulletManager = new EnemyBulletManager();
+        var manager = new EnemyManager(bulletManager);
+
         manager.AddEnemy(enemy);
 
         int screenWidth = 800;
@@ -61,7 +63,9 @@ public class EnemyManagerTest
         var sprite = Substitute.For<ISpriteHelper>();
         var enemy = new Enemy(new Vector2(x, y), sprite);
 
-        var manager = new EnemyManager();
+        var bulletManager = new EnemyBulletManager();
+        var manager = new EnemyManager(bulletManager);
+
         manager.AddEnemy(enemy);
 
         int screenWidth = 800;
@@ -92,7 +96,9 @@ public class EnemyManagerTest
         
         var startPosition = enemy.Position; // endast för output
         
-        var manager = new EnemyManager();
+        var bulletManager = new EnemyBulletManager();
+        var manager = new EnemyManager(bulletManager);
+
         manager.AddEnemy(enemy);
 
         var deltaTime = 1 / 60f;
