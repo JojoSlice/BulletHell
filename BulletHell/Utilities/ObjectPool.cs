@@ -90,10 +90,26 @@ public class ObjectPool<T> : IDisposable
     {
         while (_pool.Count > 0)
         {
-            var obj = _pool.Pop();
+            T obj = default!;
+            try
+            {
+                obj = _pool.Pop();
+            }
+            catch (Exception)
+            {
+                // If Pop() fails, break to avoid infinite loop
+                break;
+            }
             if (obj is IDisposable disposable)
             {
-                disposable.Dispose();
+                try
+                {
+                    disposable.Dispose();
+                }
+                catch
+                {
+                    // Ignore disposal exceptions; continue disposing other objects
+                }
             }
         }
     }
