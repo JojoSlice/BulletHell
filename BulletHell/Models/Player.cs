@@ -6,36 +6,69 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BulletHell.Models;
 
-public class Player(Vector2 startPosition, IInputProvider input, ISpriteHelper sprite)
+/// <summary>
+/// Represents the player character
+/// </summary>
+public class Player : IDisposable
 {
-    public Vector2 Position { get; set; } = startPosition;
     private readonly float _speed = PlayerConfig.Speed;
-    private readonly ISpriteHelper _sprite =
-        sprite ?? throw new ArgumentNullException(nameof(sprite));
-    private readonly IInputProvider _input =
-        input ?? throw new ArgumentNullException(nameof(input));
-    public int Width => _sprite?.Width ?? 0;
-    public int Height => _sprite?.Height ?? 0;
+    private readonly ISpriteHelper _sprite;
+    private readonly IInputProvider _input;
+    private float _shootCooldown;
+    private int _screenWidth;
+    private int _screenHeight;
+    private bool _disposed;
 
-    private float _shootCooldown = 0f;
+    public Vector2 Position { get; private set; }
+    public int Width => _sprite.Width;
+    public int Height => _sprite.Height;
 
+    public Player(Vector2 startPosition, IInputProvider input, ISpriteHelper sprite)
+    {
+        ArgumentNullException.ThrowIfNull(input, nameof(input));
+        ArgumentNullException.ThrowIfNull(sprite, nameof(sprite));
+
+        Position = startPosition;
+        _input = input;
+        _sprite = sprite;
+        _shootCooldown = 0f;
+    }
+
+    /// <summary>
+    /// Sets the screen boundaries for clamping player position
+    /// </summary>
+    public void SetScreenBounds(int screenWidth, int screenHeight)
+    {
+        _screenWidth = screenWidth;
+        _screenHeight = screenHeight;
+    }
+
+    /// <summary>
+    /// Loads the player texture and initializes the sprite
+    /// </summary>
     public void LoadContent(Texture2D playerTexture)
     {
         ArgumentNullException.ThrowIfNull(playerTexture);
 
         if (PlayerConfig.SpriteWidth <= 0)
-            throw new InvalidOperationException(
-                $"SpriteWidth must be positive, got {PlayerConfig.SpriteWidth}"
+            throw new ArgumentOutOfRangeException(
+                nameof(PlayerConfig.SpriteWidth),
+                PlayerConfig.SpriteWidth,
+                "SpriteWidth must be positive"
             );
 
         if (PlayerConfig.SpriteHeight <= 0)
-            throw new InvalidOperationException(
-                $"SpriteHeight must be positive, got {PlayerConfig.SpriteHeight}"
+            throw new ArgumentOutOfRangeException(
+                nameof(PlayerConfig.SpriteHeight),
+                PlayerConfig.SpriteHeight,
+                "SpriteHeight must be positive"
             );
 
         if (PlayerConfig.AnimationSpeed < 0)
-            throw new InvalidOperationException(
-                $"AnimationSpeed must be non-negative, got {PlayerConfig.AnimationSpeed}"
+            throw new ArgumentOutOfRangeException(
+                nameof(PlayerConfig.AnimationSpeed),
+                PlayerConfig.AnimationSpeed,
+                "AnimationSpeed must be non-negative"
             );
 
         _sprite.LoadSpriteSheet(
@@ -46,14 +79,14 @@ public class Player(Vector2 startPosition, IInputProvider input, ISpriteHelper s
         );
     }
 
+    /// <summary>
+    /// Updates player position and animation
+    /// </summary>
     public void Update(GameTime gameTime)
     {
         ArgumentNullException.ThrowIfNull(gameTime);
 
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-        if (deltaTime < 0)
-            throw new InvalidOperationException($"Delta time cannot be negative, got {deltaTime}");
 
         Vector2 direction = _input.GetDirection();
         Move(direction, deltaTime);
@@ -61,7 +94,7 @@ public class Player(Vector2 startPosition, IInputProvider input, ISpriteHelper s
         if (_shootCooldown > 0)
             _shootCooldown -= deltaTime;
 
-        _sprite?.Update(gameTime);
+        _sprite.Update(gameTime);
     }
 
     private void Move(Vector2 direction, float deltaTime)
@@ -69,9 +102,23 @@ public class Player(Vector2 startPosition, IInputProvider input, ISpriteHelper s
         if (direction != Vector2.Zero)
             direction.Normalize();
 
-        Position += direction * _speed * deltaTime;
+        Vector2 newPosition = Position + direction * _speed * deltaTime;
+
+        if (_screenWidth > 0 && _screenHeight > 0)
+        {
+            float halfWidth = Width / 2f;
+            float halfHeight = Height / 2f;
+
+            newPosition.X = Math.Clamp(newPosition.X, halfWidth, _screenWidth - halfWidth);
+            newPosition.Y = Math.Clamp(newPosition.Y, halfHeight, _screenHeight - halfHeight);
+        }
+
+        Position = newPosition;
     }
 
+    /// <summary>
+    /// Attempts to shoot a bullet if cooldown has elapsed
+    /// </summary>
     public (Vector2 position, Vector2 direction)? TryShoot()
     {
         if (_shootCooldown <= 0 && _input.IsShootPressed())
@@ -86,10 +133,32 @@ public class Player(Vector2 startPosition, IInputProvider input, ISpriteHelper s
         return null;
     }
 
+    /// <summary>
+    /// Draws the player to the screen
+    /// </summary>
     public void Draw(SpriteBatch spriteBatch)
     {
         ArgumentNullException.ThrowIfNull(spriteBatch);
 
         _sprite.Draw(spriteBatch, Position, 0f, 1f);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _sprite?.Dispose();
+            }
+
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }
