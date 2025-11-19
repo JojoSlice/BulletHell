@@ -1,6 +1,7 @@
 using System;
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework.Input;
+using System.Linq;
 
 namespace BulletHell.Inputs;
 
@@ -21,20 +22,17 @@ public class KeyboardTextInputHandler : ITextInputHandler
 
         Keys[] pressedKeys = currentKeyState.GetPressedKeys();
 
-        foreach (Keys key in pressedKeys)
+        foreach (Keys key in pressedKeys.Where(key => previousKeyState.IsKeyUp(key)))
         {
-            if (previousKeyState.IsKeyUp(key))
+            inputProcessed = true;
+
+            if (key == Keys.Escape || key == Keys.Enter)
             {
-                inputProcessed = true;
-
-                if (key == Keys.Escape || key == Keys.Enter)
-                {
-                    shouldUnfocus = true;
-                    break;
-                }
-
-                newText = ProcessTextKey(key, newText);
+                shouldUnfocus = true;
+                break;
             }
+
+            newText = ProcessTextKey(key, newText);
         }
 
         return new TextInputResult
