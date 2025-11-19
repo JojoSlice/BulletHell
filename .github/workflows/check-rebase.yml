@@ -19,7 +19,7 @@ jobs:
 
       - name: Kontrollera mergade commits (får ej finnas)
         run: |
-          if git log --merges ^origin/main HEAD | grep -q "Merge"; then
+          if git log --merges $(git merge-base HEAD origin/main)..HEAD | grep -q "Merge"; then
             echo "❌ Mergade commits upptäcktes — din PR är inte rebasad."
             echo ""
             echo "Så här löser du det:"
