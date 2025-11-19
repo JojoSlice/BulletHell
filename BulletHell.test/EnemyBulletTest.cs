@@ -6,7 +6,7 @@ using NSubstitute.Routing.Handlers;
 
 namespace BulletHell.test;
 
-public class EnemyBulletTest(ITestOutputHelper output)
+public class EnemyBulletTest()
 {
     [Fact]
     public void EnemyBullet_ShouldMoveAccordingToVelocity()
