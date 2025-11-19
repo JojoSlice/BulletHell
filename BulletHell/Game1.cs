@@ -20,6 +20,8 @@ public class Game1 : Game
     private Player? _player;
     private IBulletManager? _bulletManager;
     private IEnemyManager? _enemyManager;
+    private EnemyBulletManager? _enemyBulletManager;
+
 
     public Game1()
     {
@@ -40,8 +42,9 @@ public class Game1 : Game
         _player = new Player(startPosition, input, sprite);
 
         _bulletManager = new BulletManager();
-        var enemyBulletManager = new EnemyBulletManager();
-        _enemyManager = new EnemyManager(enemyBulletManager);
+        _enemyBulletManager = new EnemyBulletManager();
+        _enemyManager = new EnemyManager(_enemyBulletManager);
+
         
         _enemyManager.AddEnemy(new Enemy(
             new Vector2(400, 0), 
@@ -63,7 +66,9 @@ public class Game1 : Game
         
         Texture2D enemyTexture = Content.Load<Texture2D>("enemy");
         _enemyManager!.LoadContent(enemyTexture);
-
+        
+        Texture2D enemyBulletTexture = Content.Load<Texture2D>("enemy_bullet"); 
+        _enemyBulletManager!.LoadContent(enemyBulletTexture);
     }
 
     protected override void Update(GameTime gameTime)
@@ -85,6 +90,8 @@ public class Game1 : Game
         _bulletManager!.Update(gameTime, screenWidth, screenHeight);
         
         _enemyManager!.Update(gameTime, screenWidth, screenHeight);
+        
+        _enemyBulletManager!.Update(gameTime, screenWidth, screenHeight);
 
         base.Update(gameTime);
     }
@@ -97,6 +104,7 @@ public class Game1 : Game
         _player!.Draw(_spriteBatch);
         _bulletManager!.Draw(_spriteBatch);
         _enemyManager!.Draw(_spriteBatch);
+        _enemyBulletManager!.Draw(_spriteBatch);
         _spriteBatch.End();
 
         base.Draw(gameTime);

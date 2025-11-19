@@ -14,6 +14,7 @@ public class EnemyManager : IEnemyManager
     private readonly Random _rand = new();
     private Texture2D? _enemyTexture;
     private readonly EnemyBulletManager _enemyBulletManager;
+    private float _shootTimer = 0f;
 
     public EnemyManager(EnemyBulletManager bulletManager)
     {
@@ -60,9 +61,19 @@ public class EnemyManager : IEnemyManager
         {
             enemy.Update(gameTime);
         }
+        
+        _shootTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+        
+        if (_shootTimer <= 0f)
+        {
+            foreach (var bullet in TryShoot())
+                _enemyBulletManager.AddBullet(bullet);
 
+            _shootTimer = 1.5f;
+        }
+        
         _enemies.RemoveAll(e => e.ShouldBeRemoved(screenWidth, screenHeight));
-
+        
     }
 
     public void Draw(SpriteBatch spriteBatch)

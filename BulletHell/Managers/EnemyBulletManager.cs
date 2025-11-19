@@ -9,11 +9,22 @@ namespace BulletHell.Managers
     public class EnemyBulletManager : IEnemyBulletManager
     {
         private readonly List<EnemyBullet> _bullets = new();
+        private Texture2D? _texture;
 
         public IReadOnlyList<EnemyBullet> Bullets => _bullets;
+        
+        public void LoadContent(Texture2D texture)
+        {
+            _texture = texture;
+        }
 
         public void AddBullet(EnemyBullet bullet)
         {
+            if (_texture != null)
+            {
+                bullet.LoadContent(_texture);
+            }
+            
             _bullets.Add(bullet);
         }
 
@@ -29,6 +40,7 @@ namespace BulletHell.Managers
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            _bullets.ForEach(eB => eB.Draw(spriteBatch));
         }
     }
 }
