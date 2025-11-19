@@ -1,0 +1,51 @@
+name: Check Rebase
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-rebase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch main
+        run: git fetch origin main
+
+      - name: Kontrollera mergade commits (får ej finnas)
+        run: |
+          if git log --merges origin/main..HEAD | grep -q "Merge"; then
+            echo "❌ Mergade commits upptäcktes — din PR är inte rebasad."
+            echo ""
+            echo "Så här löser du det:"
+            echo "  git fetch origin main"
+            echo "  git rebase origin/main"
+            echo ""
+            echo "Om rebase slutförs utan konflikter, fortsätt med:"
+            echo "  git push --force-with-lease"
+            exit 1
+          fi
+
+      - name: Kontrollera att PR är uppdaterad med main
+        run: |
+            BASE=$(git merge-base HEAD origin/main)
+            if [ "$BASE" != "$(git rev-parse origin/main)" ]; then
+              echo "❌ Din PR är inte uppdaterad med senaste main — rebase krävs."
+              echo ""
+              echo "Så här gör du:"
+              echo "  git fetch origin main"
+              echo "  git rebase origin/main"
+              echo ""
+              echo "Om rebase lyckas utan konflikter, kör sedan:"
+              echo "  git push --force-with-lease"
+              exit 1
+            fi
+
+      - name: ✔ Rebase OK
+        if: success()
+        run: echo "✨ Branchen är korrekt rebasad och uppdaterad med main!"
