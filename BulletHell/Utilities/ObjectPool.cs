@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BulletHell.Utilities;
 
@@ -103,18 +104,15 @@ public class ObjectPool<T> : IDisposable
         }
 
         // Dispose items that implement IDisposable
-        foreach (var obj in items)
+        foreach (var disposable in items.OfType<IDisposable>())
         {
-            if (obj is IDisposable disposable)
+            try
             {
-                try
-                {
-                    disposable.Dispose();
-                }
-                catch
-                {
-                    // Ignore disposal exceptions; continue disposing other objects
-                }
+                disposable.Dispose();
+            }
+            catch
+            {
+                // Ignore disposal exceptions; continue disposing other objects
             }
         }
     }
