@@ -1,10 +1,6 @@
-using Application.Interfaces;
+using Api.Endpoints;
 using Application.ServiceCollection;
 using Repository.ServiceCollection;
-using Contracts;
-using Contracts.Responses.HighScore;
-using Domain.Entities;
-using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +16,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
 app.UseHttpsRedirection();
-app.MapGet(ApiEndpoints.HighScore.GetAll, async ([FromServices] IService<HighScoreResponse, HighScore> hss) => 
-    await hss.GetAll()).WithName("GetAllHighScores").Produces<List<HighScoreResponse>>(statusCode: StatusCodes.Status200OK);
+
+app.MapHighScoreEndpoints();
+app.MapUserEndpoints();
 
 app.Run();
