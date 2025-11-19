@@ -35,7 +35,7 @@ public class BattleScene : Scene
         _screenWidth = _game.GraphicsDevice.Viewport.Width;
         _screenHeight = _game.GraphicsDevice.Viewport.Height;
 
-        Vector2 startPosition = new(_screenWidth / 2, _screenHeight / 2);
+        Vector2 startPosition = new((float)_screenWidth / 2, (float)_screenHeight / 2);
         IInputProvider input = new KeyboardInputProvider();
         ISpriteHelper sprite = new SpriteHelper();
         _player = new Player(startPosition, input, sprite);
