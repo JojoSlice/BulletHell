@@ -269,19 +269,12 @@ public class PlayerTests
     {
         // Arrange
         var mockSprite = Substitute.For<ISpriteHelper>();
-        var player = TestDataBuilders.CreateTestPlayer(sprite: mockSprite);
-
-        // Act & Assert
-        try
+        using (var player = TestDataBuilders.CreateTestPlayer(sprite: mockSprite))
         {
+            // Act & Assert
             player.Dispose();
             player.Dispose();
             mockSprite.Received(1).Dispose();
-        }
-        finally
-        {
-            // Ensure Dispose runs even if an exception occurs
-            player.Dispose();
         }
     }
 }
