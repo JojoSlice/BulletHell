@@ -90,7 +90,7 @@ public class ObjectPool<T> : IDisposable
     {
         while (_pool.Count > 0)
         {
-            T obj = default!;
+            T obj;
             try
             {
                 obj = _pool.Pop();
