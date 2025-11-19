@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework.Input;
@@ -7,11 +8,12 @@ namespace BulletHell.Managers;
 /// <summary>
 /// Manages keyboard navigation through menu items
 /// </summary>
-public class MenuNavigator : IMenuNavigator
+public class MenuNavigator : IMenuNavigator, IDisposable
 {
     private readonly List<INavigable> _items = [];
     private int _selectedIndex;
     private KeyboardState _previousKeyState;
+    private bool _disposed;
 
     public int SelectedIndex => _selectedIndex;
 
@@ -24,7 +26,6 @@ public class MenuNavigator : IMenuNavigator
     {
         _items.Add(item);
 
-        // If this is the first item, select it
         if (_items.Count == 1)
         {
             _selectedIndex = 0;
@@ -37,15 +38,12 @@ public class MenuNavigator : IMenuNavigator
         if (_items.Count == 0)
             return;
 
-        // Deselect current item
         _items[_selectedIndex].SetSelected(false);
 
-        // Move up with wrapping
         _selectedIndex--;
         if (_selectedIndex < 0)
             _selectedIndex = _items.Count - 1;
 
-        // Select new item
         _items[_selectedIndex].SetSelected(true);
     }
 
@@ -54,15 +52,12 @@ public class MenuNavigator : IMenuNavigator
         if (_items.Count == 0)
             return;
 
-        // Deselect current item
         _items[_selectedIndex].SetSelected(false);
 
-        // Move down with wrapping
         _selectedIndex++;
         if (_selectedIndex >= _items.Count)
             _selectedIndex = 0;
 
-        // Select new item
         _items[_selectedIndex].SetSelected(true);
     }
 
@@ -76,19 +71,16 @@ public class MenuNavigator : IMenuNavigator
 
     public void Update(KeyboardState currentKeyState)
     {
-        // Check for navigation up (W or Up arrow)
         if (IsKeyPressed(currentKeyState, Keys.W) || IsKeyPressed(currentKeyState, Keys.Up))
         {
             NavigateUp();
         }
 
-        // Check for navigation down (S or Down arrow)
         if (IsKeyPressed(currentKeyState, Keys.S) || IsKeyPressed(currentKeyState, Keys.Down))
         {
             NavigateDown();
         }
 
-        // Check for activation (Enter or Space)
         if (IsKeyPressed(currentKeyState, Keys.Enter) || IsKeyPressed(currentKeyState, Keys.Space))
         {
             ActivateSelected();
@@ -106,5 +98,32 @@ public class MenuNavigator : IMenuNavigator
     private bool IsKeyPressed(KeyboardState currentKeyState, Keys key)
     {
         return currentKeyState.IsKeyDown(key) && _previousKeyState.IsKeyUp(key);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                foreach (var item in _items)
+                {
+                    if (item is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                    }
+                }
+
+                _items.Clear();
+            }
+
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }
