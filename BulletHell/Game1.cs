@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BulletHell.Constants;
 using BulletHell.Scenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,9 +10,10 @@ public class Game1 : Game
 {
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch? _spriteBatch;
-
-    private Dictionary<string, Scene> scenes = null!;
-    private Scene currentScene = null!;
+    private Texture2D? _sharedWhiteTexture;
+    private Dictionary<string, Scene>? _scenes;
+    private Scene? _currentScene;
+    private bool _disposed;
 
     public Game1()
     {
@@ -30,16 +32,20 @@ public class Game1 : Game
         _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
         _graphics.ApplyChanges();
 
+        // Create shared white texture for UI elements
+        _sharedWhiteTexture = new Texture2D(GraphicsDevice, 1, 1);
+        _sharedWhiteTexture.SetData(new[] { Color.White });
+
         // Skapa alla scener
-        scenes = new Dictionary<string, Scene>
+        _scenes = new Dictionary<string, Scene>
         {
-            { "Menu", new MenuScene(this) },
-            { "Battle", new BattleScene(this) },
+            { SceneNames.Menu, new MenuScene(this, _sharedWhiteTexture) },
+            { SceneNames.Battle, new BattleScene(this) },
         };
 
         // Starta med menyn
-        currentScene = scenes["Menu"];
-        currentScene.OnEnter();
+        _currentScene = _scenes[SceneNames.Menu];
+        _currentScene.OnEnter();
 
         base.Initialize();
     }
@@ -51,17 +57,17 @@ public class Game1 : Game
 
     public void ChangeScene(string sceneName)
     {
-        if (scenes.ContainsKey(sceneName))
+        if (_scenes?.ContainsKey(sceneName) == true && _currentScene != null)
         {
-            currentScene.OnExit();
-            currentScene = scenes[sceneName];
-            currentScene.OnEnter();
+            _currentScene.OnExit();
+            _currentScene = _scenes[sceneName];
+            _currentScene.OnEnter();
         }
     }
 
     protected override void Update(GameTime gameTime)
     {
-        currentScene.Update(gameTime);
+        _currentScene?.Update(gameTime);
         base.Update(gameTime);
     }
 
@@ -69,10 +75,44 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        _spriteBatch!.Begin();
-        currentScene.Draw(_spriteBatch);
-        _spriteBatch.End();
+        if (_spriteBatch != null && _currentScene != null)
+        {
+            _spriteBatch.Begin();
+            _currentScene.Draw(_spriteBatch);
+            _spriteBatch.End();
+        }
 
         base.Draw(gameTime);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _sharedWhiteTexture?.Dispose();
+                _sharedWhiteTexture = null;
+
+                _spriteBatch?.Dispose();
+                _spriteBatch = null;
+
+                // Dispose all scenes
+                if (_scenes != null)
+                {
+                    foreach (var scene in _scenes.Values)
+                    {
+                        scene.Dispose();
+                    }
+                    _scenes = null;
+                }
+
+                _currentScene = null;
+            }
+
+            _disposed = true;
+        }
+
+        base.Dispose(disposing);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using BulletHell.Constants;
 using BulletHell.Inputs;
 using BulletHell.Interfaces;
@@ -22,19 +23,19 @@ public class MenuScene : Scene
     private const int ExitButtonYOffset = 300;
     private const int BorderThickness = 2;
 
-    private readonly SpriteFont font;
-    private readonly Texture2D whiteTexture;
-    private readonly string title = "Bullet Hell";
-    private readonly int screenWidth;
-    private readonly int screenHeight;
-    private readonly IMenuInputProvider inputProvider;
-    private readonly ITextInputHandler textInputHandler;
+    private readonly SpriteFont _font;
+    private readonly Texture2D _whiteTexture;
+    private readonly string _title = "Bullet Hell";
+    private readonly int _screenWidth;
+    private readonly int _screenHeight;
+    private readonly IMenuInputProvider _inputProvider;
+    private readonly ITextInputHandler _textInputHandler;
 
-    private Button[] menuButtons;
-    private InputField[] menuInputs;
-    private InputField usernameField;
-    private InputField passwordField;
-    private IMenuNavigator menuNavigator;
+    private Button[] _menuButtons;
+    private InputField[] _menuInputs;
+    private InputField? _usernameField;
+    private InputField? _passwordField;
+    private IMenuNavigator? _menuNavigator;
 
     public MenuScene(Game1 game, Texture2D whiteTexture)
         : this(game, whiteTexture, new MouseKeyboardInputProvider(), new KeyboardTextInputHandler())
@@ -48,51 +49,48 @@ public class MenuScene : Scene
     )
         : base(game)
     {
-        this.whiteTexture = whiteTexture;
-        this.inputProvider = inputProvider;
-        this.textInputHandler = textInputHandler;
-        font = game.Content.Load<SpriteFont>("Font");
-        screenWidth = game.GraphicsDevice.Viewport.Width;
-        screenHeight = game.GraphicsDevice.Viewport.Height;
+        _whiteTexture = whiteTexture;
+        _inputProvider = inputProvider;
+        _textInputHandler = textInputHandler;
+        _font = game.Content.Load<SpriteFont>("Font");
+        _screenWidth = game.GraphicsDevice.Viewport.Width;
+        _screenHeight = game.GraphicsDevice.Viewport.Height;
 
-        menuButtons = [];
-        menuInputs = [];
-        usernameField = null!;
-        passwordField = null!;
-        menuNavigator = null!;
+        _menuButtons = [];
+        _menuInputs = [];
     }
 
     private Vector2 GetCenteredPosition(string text, float y)
     {
-        Vector2 size = font.MeasureString(text);
-        return new Vector2(screenWidth / 2 - size.X / 2, y);
+        var size = _font.MeasureString(text);
+        return new Vector2((_screenWidth / 2) - (size.X / 2), y);
     }
 
     private Button[] GetMenuButtons()
     {
-        int centerX = screenWidth / 2 - ButtonWidth / 2;
-        int centerY = screenHeight / 2;
+        var centerX = (_screenWidth / 2) - (ButtonWidth / 2);
+        var centerY = _screenHeight / 2;
 
         var startButton = new Button(
-            font,
+            _font,
             "Start Game",
             new(centerX, centerY + StartButtonYOffset, ButtonWidth, ButtonHeight),
-            whiteTexture
+            _whiteTexture
         );
         startButton.OnClick += () => _game.ChangeScene(SceneNames.Battle);
 
         var loginButton = new Button(
-            font,
+            _font,
             "Log In",
             new(centerX, centerY + LoginButtonYOffset, ButtonWidth, ButtonHeight),
-            whiteTexture
+            _whiteTexture
         );
 
         var exitButton = new Button(
-            font,
+            _font,
             "Exit",
             new(centerX, centerY + ExitButtonYOffset, ButtonWidth, ButtonHeight),
-            whiteTexture
+            _whiteTexture
         );
         exitButton.OnClick += () => _game.Exit();
 
@@ -101,46 +99,46 @@ public class MenuScene : Scene
 
     private InputField[] GetMenuInputs()
     {
-        int centerX = screenWidth / 2 - InputFieldWidth / 2;
-        int centerY = screenHeight / 2;
+        var centerX = (_screenWidth / 2) - (InputFieldWidth / 2);
+        var centerY = _screenHeight / 2;
 
-        return
-        [
-            usernameField = new InputField(
-                font,
-                "Username:",
-                new(centerX, centerY + UsernameFieldYOffset, InputFieldWidth, InputFieldHeight),
-                textInputHandler,
-                whiteTexture,
-                isPassword: false
-            ),
-            passwordField = new InputField(
-                font,
-                "Password:",
-                new(centerX, centerY + PasswordFieldYOffset, InputFieldWidth, InputFieldHeight),
-                textInputHandler,
-                whiteTexture,
-                isPassword: true
-            ),
-        ];
+        _usernameField = new InputField(
+            _font,
+            "Username:",
+            new(centerX, centerY + UsernameFieldYOffset, InputFieldWidth, InputFieldHeight),
+            _textInputHandler,
+            _whiteTexture,
+            isPassword: false
+        );
+
+        _passwordField = new InputField(
+            _font,
+            "Password:",
+            new(centerX, centerY + PasswordFieldYOffset, InputFieldWidth, InputFieldHeight),
+            _textInputHandler,
+            _whiteTexture,
+            isPassword: true
+        );
+
+        return [_usernameField, _passwordField];
     }
 
     public override void OnEnter()
     {
-        if (menuButtons == null || menuButtons.Length == 0)
+        if (_menuButtons == null || _menuButtons.Length == 0)
         {
-            menuButtons = GetMenuButtons();
-            menuInputs = GetMenuInputs();
-            menuNavigator = new MenuNavigator();
+            _menuButtons = GetMenuButtons();
+            _menuInputs = GetMenuInputs();
+            _menuNavigator = new MenuNavigator();
 
-            menuNavigator.AddItem(menuButtons[0]); // Start button
-            menuNavigator.AddItem(menuInputs[0]); // Username field
-            menuNavigator.AddItem(menuInputs[1]); // Password field
-            menuNavigator.AddItem(menuButtons[1]); // Login button
-            menuNavigator.AddItem(menuButtons[2]); // Exit button
+            _menuNavigator.AddItem(_menuButtons[0]); // Start button
+            _menuNavigator.AddItem(_menuInputs[0]); // Username field
+            _menuNavigator.AddItem(_menuInputs[1]); // Password field
+            _menuNavigator.AddItem(_menuButtons[1]); // Login button
+            _menuNavigator.AddItem(_menuButtons[2]); // Exit button
         }
 
-        if (usernameField != null)
+        if (_usernameField != null)
         {
             // TODO: InputField doesn't have a Clear() method, would need to add one
             // For now, text persists between scene changes
@@ -149,38 +147,38 @@ public class MenuScene : Scene
 
     public override void Update(GameTime gameTime)
     {
-        var mouseState = inputProvider.GetMouseState();
-        var keyState = inputProvider.GetKeyboardState();
+        var mouseState = _inputProvider.GetMouseState();
+        var keyState = _inputProvider.GetKeyboardState();
 
-        usernameField.Update(gameTime, mouseState);
-        passwordField.Update(gameTime, mouseState);
+        _usernameField?.Update(gameTime, mouseState);
+        _passwordField?.Update(gameTime, mouseState);
 
-        foreach (var button in menuButtons)
+        foreach (var button in _menuButtons)
         {
             button.Update(mouseState);
         }
 
-        if (!usernameField.IsFocused && !passwordField.IsFocused)
+        if (_usernameField?.IsFocused == false && _passwordField?.IsFocused == false)
         {
-            menuNavigator.Update(keyState);
+            _menuNavigator?.Update(keyState);
         }
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.DrawString(
-            font,
-            title,
-            GetCenteredPosition(title, TitleYPosition),
+            _font,
+            _title,
+            GetCenteredPosition(_title, TitleYPosition),
             Color.Black
         );
 
-        foreach (var inputField in menuInputs)
+        foreach (var inputField in _menuInputs)
         {
             inputField.Draw(spriteBatch);
         }
 
-        foreach (var button in menuButtons)
+        foreach (var button in _menuButtons)
         {
             button.Draw(spriteBatch);
         }
@@ -190,24 +188,28 @@ public class MenuScene : Scene
     {
         if (disposing)
         {
-            // Note: We don't dispose whiteTexture here as it's a shared resource
+            // Note: We don't dispose _whiteTexture here as it's a shared resource
             // owned by Game1 and will be disposed there
 
-            if (menuButtons != null)
+            if (_menuButtons != null)
             {
-                foreach (var button in menuButtons)
+                foreach (var button in _menuButtons)
                 {
                     button.Dispose();
                 }
             }
 
-            if (menuInputs != null)
+            if (_menuInputs != null)
             {
-                foreach (var inputField in menuInputs)
+                foreach (var inputField in _menuInputs)
                 {
                     inputField.Dispose();
                 }
             }
+
+            _menuNavigator = null;
+            _usernameField = null;
+            _passwordField = null;
         }
 
         base.Dispose(disposing);

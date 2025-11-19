@@ -7,7 +7,7 @@ namespace BulletHell.Scenes;
 public abstract class Scene : IDisposable
 {
     protected Game1 _game;
-    private bool _disposed;
+    protected bool _disposed;
 
     protected Scene(Game1 game)
     {
@@ -15,6 +15,7 @@ public abstract class Scene : IDisposable
     }
 
     public abstract void Update(GameTime gameTime);
+
     public abstract void Draw(SpriteBatch spriteBatch);
 
     public virtual void OnEnter() { }
@@ -28,6 +29,7 @@ public abstract class Scene : IDisposable
             if (disposing)
             {
                 // Dispose managed resources
+                _game = null!;
             }
 
             _disposed = true;
