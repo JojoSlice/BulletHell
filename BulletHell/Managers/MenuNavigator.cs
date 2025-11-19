@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework.Input;
-using System.Linq;
 
 namespace BulletHell.Managers;
 
