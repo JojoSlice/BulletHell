@@ -22,9 +22,9 @@ public class BulletTests
         // Arrange
         Vector2 startPosition = new(x, y);
         Vector2 direction = new(x, y);
-        ISpriteHelper bulletSprite = new SpriteHelper();
+        ISpriteHelper bulletSprite = Substitute.For<ISpriteHelper>();
 
-        var bullet = new Bullet(startPosition, direction, bulletSprite);
+        using var bullet = new Bullet(startPosition, direction, bulletSprite);
 
         // Act
         var actual = bullet.IsOutOfBounds(100, 100);
@@ -39,7 +39,7 @@ public class BulletTests
         // Arrange
         var startPosition = new Vector2(100, 100);
         var direction = Vector2.UnitY;
-        var bullet = TestDataBuilders.CreateTestBullet(startPosition, direction);
+        using var bullet = TestDataBuilders.CreateTestBullet(startPosition, direction);
         var gameTime = TestDataBuilders.OneFrame;
 
         // Act
@@ -55,7 +55,7 @@ public class BulletTests
     public void Update_ShouldIncrementTimeAlive()
     {
         // Arrange
-        var bullet = TestDataBuilders.CreateTestBullet();
+        using var bullet = TestDataBuilders.CreateTestBullet();
         var gameTime = TestDataBuilders.OneFrame;
 
         // Act
@@ -70,7 +70,7 @@ public class BulletTests
     {
         // Arrange
         var mockSprite = Substitute.For<ISpriteHelper>();
-        var bullet = TestDataBuilders.CreateTestBullet(sprite: mockSprite);
+        using var bullet = TestDataBuilders.CreateTestBullet(sprite: mockSprite);
         var gameTime = TestDataBuilders.OneFrame;
 
         // Act
@@ -84,7 +84,7 @@ public class BulletTests
     public void Update_WithNullGameTime_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var bullet = TestDataBuilders.CreateTestBullet();
+        using var bullet = TestDataBuilders.CreateTestBullet();
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => bullet.Update(null!));
@@ -99,7 +99,7 @@ public class BulletTests
         var mockSprite = Substitute.For<ISpriteHelper>();
 
         // Act
-        var bullet = new Bullet(startPosition, direction, mockSprite);
+        using var bullet = new Bullet(startPosition, direction, mockSprite);
         bullet.Update(TestDataBuilders.OneFrame);
 
         // Assert - if direction is normalized, movement should be based on unit vector
@@ -113,7 +113,7 @@ public class BulletTests
     public void Reset_ShouldUpdatePositionAndDirection()
     {
         // Arrange
-        var bullet = TestDataBuilders.CreateTestBullet(new Vector2(100, 100), Vector2.UnitY);
+        using var bullet = TestDataBuilders.CreateTestBullet(new Vector2(100, 100), Vector2.UnitY);
         var newPosition = new Vector2(200, 200);
         var newDirection = Vector2.UnitX;
 
@@ -128,7 +128,7 @@ public class BulletTests
     public void Reset_ShouldResetTimeAlive()
     {
         // Arrange
-        var bullet = TestDataBuilders.CreateTestBullet();
+        using var bullet = TestDataBuilders.CreateTestBullet();
 
         // Update bullet many times to increase time alive
         for (int i = 0; i < 100; i++)
@@ -147,7 +147,7 @@ public class BulletTests
     public void Reset_ShouldNormalizeDirection()
     {
         // Arrange
-        var bullet = TestDataBuilders.CreateTestBullet();
+        using var bullet = TestDataBuilders.CreateTestBullet();
         var newDirection = new Vector2(3, 4); // Length = 5
 
         // Act
@@ -166,7 +166,7 @@ public class BulletTests
     public void IsAlive_WhenTimeAliveExceedsLifetime_ShouldReturnFalse()
     {
         // Arrange
-        var bullet = TestDataBuilders.CreateTestBullet();
+        using var bullet = TestDataBuilders.CreateTestBullet();
 
         // Act - update for longer than lifetime
         for (int i = 0; i < 200; i++)
@@ -182,7 +182,7 @@ public class BulletTests
     public void IsAlive_WhenTimeAliveWithinLifetime_ShouldReturnTrue()
     {
         // Arrange
-        var bullet = TestDataBuilders.CreateTestBullet();
+        using var bullet = TestDataBuilders.CreateTestBullet();
 
         // Act
         bullet.Update(TestDataBuilders.OneFrame);
@@ -195,7 +195,7 @@ public class BulletTests
     public void ShouldBeRemoved_WhenOutOfBounds_ShouldReturnTrue()
     {
         // Arrange
-        var bullet = TestDataBuilders.CreateTestBullet(new Vector2(-10, 50), Vector2.UnitY);
+        using var bullet = TestDataBuilders.CreateTestBullet(new Vector2(-10, 50), Vector2.UnitY);
 
         // Act
         var result = bullet.ShouldBeRemoved(100, 100);
@@ -208,7 +208,7 @@ public class BulletTests
     public void ShouldBeRemoved_WhenNotAlive_ShouldReturnTrue()
     {
         // Arrange
-        var bullet = TestDataBuilders.CreateTestBullet();
+        using var bullet = TestDataBuilders.CreateTestBullet();
 
         // Update until no longer alive
         for (int i = 0; i < 200; i++)
@@ -227,7 +227,7 @@ public class BulletTests
     public void ShouldBeRemoved_WhenAliveAndInBounds_ShouldReturnFalse()
     {
         // Arrange
-        var bullet = TestDataBuilders.CreateTestBullet(new Vector2(50, 50), Vector2.UnitY);
+        using var bullet = TestDataBuilders.CreateTestBullet(new Vector2(50, 50), Vector2.UnitY);
 
         // Act
         var result = bullet.ShouldBeRemoved(100, 100);
@@ -243,7 +243,7 @@ public class BulletTests
     public void LoadContent_WithNullTexture_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var bullet = TestDataBuilders.CreateTestBullet();
+        using var bullet = TestDataBuilders.CreateTestBullet();
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => bullet.LoadContent(null!));
@@ -256,7 +256,7 @@ public class BulletTests
     public void Draw_WithNullSpriteBatch_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var bullet = TestDataBuilders.CreateTestBullet();
+        using var bullet = TestDataBuilders.CreateTestBullet();
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => bullet.Draw(null!));
