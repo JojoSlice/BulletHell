@@ -139,7 +139,7 @@ public class InputField : INavigable, IDisposable
         float fontHeight = _font.MeasureString("A").Y;
         Vector2 textPos = new(
             _bounds.X + TextPaddingX,
-            _bounds.Y + _bounds.Height / 2 - fontHeight / 2
+            _bounds.Y + ((float)_bounds.Height / 2) - fontHeight / 2
         );
         spriteBatch.DrawString(_font, _cachedDisplayText, textPos, Color.Black);
 
