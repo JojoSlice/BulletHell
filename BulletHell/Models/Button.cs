@@ -74,8 +74,8 @@ public class Button : INavigable, IDisposable
         {
             _cachedTextSize = _font.MeasureString(_text);
             _cachedTextPos = new Vector2(
-                _bounds.X + _bounds.Width / 2 - _cachedTextSize.X / 2,
-                _bounds.Y + _bounds.Height / 2 - _cachedTextSize.Y / 2
+                _bounds.X + (float)_bounds.Width / 2 - _cachedTextSize.X / 2,
+                _bounds.Y + (float)_bounds.Height / 2 - _cachedTextSize.Y / 2
             );
             _textMeasured = true;
         }
