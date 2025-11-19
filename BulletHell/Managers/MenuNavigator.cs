@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework.Input;
+using System.Linq;
 
 namespace BulletHell.Managers;
 
@@ -106,12 +107,9 @@ public class MenuNavigator : IMenuNavigator, IDisposable
         {
             if (disposing)
             {
-                foreach (var item in _items)
+                foreach (var disposable in _items.OfType<IDisposable>())
                 {
-                    if (item is IDisposable disposable)
-                    {
-                        disposable.Dispose();
-                    }
+                    disposable.Dispose();
                 }
 
                 _items.Clear();
