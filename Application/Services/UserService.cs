@@ -5,9 +5,9 @@ using Contracts.Responses.User;
 using Domain.Entities;
 using Interfaces;
 using Mapping;
-using Repository.Repositories;
+using Repository.Interfaces;
 
-public class UserService(UserRepository repository) : IService<UserResponse, User>
+public class UserService(IRepository<User> repository) : IService<UserResponse, User>
 {
     public async Task<Response<List<UserResponse>>> GetAll() =>
         (await repository.GetAllAsync()).MapToResponse();

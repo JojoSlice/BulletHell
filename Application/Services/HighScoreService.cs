@@ -5,9 +5,9 @@ using Contracts.Responses.Shared;
 using Domain.Entities;
 using Interfaces;
 using Mapping;
-using Repository.Repositories;
+using Repository.Interfaces;
 
-public class HighScoreService(HighScoreRepository repository) : IService<HighScoreResponse, HighScore>
+public class HighScoreService(IRepository<HighScore> repository) : IService<HighScoreResponse, HighScore>
 {
     public async Task<Response<List<HighScoreResponse>>> GetAll() =>
         (await repository.GetAllAsync()).MapToResponse();
