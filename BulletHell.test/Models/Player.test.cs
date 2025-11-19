@@ -271,11 +271,17 @@ public class PlayerTests
         var mockSprite = Substitute.For<ISpriteHelper>();
         var player = TestDataBuilders.CreateTestPlayer(sprite: mockSprite);
 
-        // Act
-        player.Dispose();
-        player.Dispose();
-
-        // Assert
-        mockSprite.Received(1).Dispose();
+        // Act & Assert
+        try
+        {
+            player.Dispose();
+            player.Dispose();
+            mockSprite.Received(1).Dispose();
+        }
+        finally
+        {
+            // Ensure Dispose runs even if an exception occurs
+            player.Dispose();
+        }
     }
 }
