@@ -19,6 +19,12 @@ namespace BulletHell.Managers
 
         public void Update(GameTime gameTime, int screenWidth, int screenHeight)
         {
+            foreach (var bullet in _bullets)
+            {
+                bullet.Update(gameTime);
+            }
+
+            _bullets.RemoveAll(eB => eB.ShouldBeRemoved(screenWidth, screenHeight));
         }
 
         public void Draw(SpriteBatch spriteBatch)

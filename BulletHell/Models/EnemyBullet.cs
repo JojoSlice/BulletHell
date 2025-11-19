@@ -12,6 +12,11 @@ public class EnemyBullet
         Position = startPosition;
         _velocity = velocity;
     }
+    
+    public bool ShouldBeRemoved(int screenWidth, int screenHeight)
+    {
+        return IsOutOfBounds(screenWidth, screenHeight);
+    }
 
     public void LoadContent(Texture2D bulletTexture)
     {
