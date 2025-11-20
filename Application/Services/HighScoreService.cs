@@ -16,11 +16,11 @@ public class HighScoreService(IRepository<HighScore> repository) : IHighScoreSer
     public async Task<Response<HighScoreResponse?>> GetById(int id) =>
         (await repository.GetByIdAsync(id)).MapToResponse();
 
-    public async Task<Response<HighScoreResponse>> Create(CreateHighScoreRequest highScore) => //TODO: Map request to entity
-        (await repository.CreateAsync(highScore)).MapToResponse()!;
+    public async Task<Response<HighScoreResponse>> Create(CreateHighScoreRequest highScore) =>
+        (await repository.CreateAsync(highScore.MapToDomain())).MapToResponse()!;
 
-    public async Task<Response<HighScoreResponse>> Update(UpdateHighScoreRequest highScore) => //TODO: Map request to entity
-        (await repository.UpdateAsync(highScore)).MapToResponse()!;
+    public async Task<Response<HighScoreResponse>> Update(UpdateHighScoreRequest highScore) =>
+        (await repository.UpdateAsync(highScore.MapToDomain())).MapToResponse()!;
 
     public async Task<Response<string>> Delete(int id) =>
         (await repository.DeleteAsync(id)).MapToResponse();

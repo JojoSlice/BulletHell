@@ -1,5 +1,7 @@
 ﻿namespace Application.Mapping;
 
+using Contracts.Requests.HighScore;
+using Contracts.Requests.User;
 using Contracts.Responses.HighScore;
 using Contracts.Responses.Shared;
 using Contracts.Responses.User;
@@ -37,6 +39,19 @@ public static class MappingExtensions
         Data = highScore?.MapHighScoreToResponse()
     };
 
+    public static HighScore MapToDomain(this CreateHighScoreRequest highScore) => new()
+    {
+        Score = highScore.Score,
+        UserId = highScore.UserId
+    };
+
+    public static HighScore MapToDomain(this UpdateHighScoreRequest highScore) => new()
+    {
+        Id = highScore.Id,
+        Score = highScore.Score,
+        UserId = highScore.UserId
+    };
+
     #endregion
 
     #region User extension methods
@@ -59,6 +74,20 @@ public static class MappingExtensions
     {
         IsSuccess = true,
         Data = user?.MapUserToResponse()
+    };
+
+    public static User MapToDomain(this CreateUserRequest user) => new()
+    {
+        UserName = user.UserName,
+        PasswordHash = user.PasswordHash,
+        HighScores = []
+    };
+
+    public static User MapToDomain(this UpdateUserRequest user) => new()
+    {
+        Id = user.Id,
+        UserName = user.UserName,
+        PasswordHash = user.PasswordHash
     };
 
     #endregion

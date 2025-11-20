@@ -16,11 +16,11 @@ public class UserService(IRepository<User> repository) : IUserService<UserRespon
     public async Task<Response<UserResponse?>> GetById(int id) =>
         (await repository.GetByIdAsync(id)).MapToResponse();
 
-    public async Task<Response<UserResponse>> Create(CreateUserRequest user) => //TODO: Map request to entity
-        (await repository.CreateAsync(user)).MapToResponse()!;
+    public async Task<Response<UserResponse>> Create(CreateUserRequest user) =>
+        (await repository.CreateAsync(user.MapToDomain())).MapToResponse()!;
 
-    public async Task<Response<UserResponse>> Update(UpdateUserRequest user) => //TODO: Map request to entity
-        (await repository.UpdateAsync(user)).MapToResponse()!;
+    public async Task<Response<UserResponse>> Update(UpdateUserRequest user) =>
+        (await repository.UpdateAsync(user.MapToDomain())).MapToResponse()!;
 
     public async Task<Response<string>> Delete(int id) =>
         (await repository.DeleteAsync(id)).MapToResponse();
