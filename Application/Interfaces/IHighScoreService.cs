@@ -1,5 +1,5 @@
-﻿using Contracts.Responses.Common;
-using Contracts.Requests.HighScore;
+﻿using Contracts.Requests.HighScore;
+using Contracts.Responses.Common;
 
 namespace Application.Interfaces;
 

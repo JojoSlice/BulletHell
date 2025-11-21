@@ -1,10 +1,10 @@
-﻿namespace Application.ServiceCollection;
-
+﻿using Application.Interfaces;
+using Application.Services;
 using Contracts.Responses.HighScore;
 using Contracts.Responses.User;
-using Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using Services;
+
+namespace Application.ServiceCollection;
 
 public static class ServiceCollectionExtension
 {
