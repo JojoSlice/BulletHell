@@ -123,7 +123,7 @@ public class EnemyManagerTest
     }
     
     [Fact]
-    public void EnemyManager_TryShoot_ShouldReturnAtLeastOneBullet()
+    public void EnemyManager_TryShootEnemies_ShouldCreateBulletsViaBulletManager()
     {
         // Arrange
         var bulletManager = new EnemyBulletManager();
@@ -135,15 +135,14 @@ public class EnemyManagerTest
         manager.AddEnemy(enemy);
 
         // Act
-        var bullets = manager.TryShoot();
+        manager.TryShootEnemies();
 
         // Assert
-        Assert.NotNull(bullets);
-        Assert.NotEmpty(bullets);
-        
+        Assert.NotEmpty(bulletManager.Bullets);
+
         // output
         _output.WriteLine($"Enemy count: {manager.Enemies.Count}");
-        _output.WriteLine($"Bullets spawned: {bullets.Count()}");
-        _output.WriteLine("Result: EnemyManager.TryShoot() produced at least one bullet ✔");
+        _output.WriteLine($"Bullets created: {bulletManager.Bullets.Count}");
+        _output.WriteLine("Result: EnemyManager.TryShootEnemies() created bullets via bullet manager ✔");
     }
 }

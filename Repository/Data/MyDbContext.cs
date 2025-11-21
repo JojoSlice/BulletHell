@@ -1,9 +1,7 @@
-﻿namespace Repository.Data;
-
-using System;
-using System.IO;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+
+namespace Repository.Data;
 
 public partial class MyDbContext : DbContext
 {

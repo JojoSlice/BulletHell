@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-namespace BulletHell.Configurations;
+﻿namespace BulletHell.Configurations;
 
 public static class EnemyConfig
 {

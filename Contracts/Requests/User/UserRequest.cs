@@ -1,6 +1,6 @@
-﻿namespace Contracts.Requests.User;
+﻿using System.ComponentModel.DataAnnotations;
 
-using System.ComponentModel.DataAnnotations;
+namespace Contracts.Requests.User;
 
 public record UserRequest
 {

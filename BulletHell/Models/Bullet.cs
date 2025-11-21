@@ -6,18 +6,37 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BulletHell.Models;
 
-public class Bullet(Vector2 startPosition, Vector2 direction, ISpriteHelper sprite)
+/// <summary>
+/// Represents a bullet in the game
+/// </summary>
+public class Bullet : IDisposable
 {
-    public Vector2 Position { get; private set; } = startPosition;
-    private readonly Vector2 _direction = direction;
     private readonly float _speed = BulletConfig.Speed;
-    private readonly ISpriteHelper _sprite =
-        sprite ?? throw new ArgumentNullException(nameof(sprite));
-    private float _timeAlive = 0f;
+    private readonly ISpriteHelper _sprite;
+    private Vector2 _direction;
+    private float _timeAlive;
+    private bool _disposed;
+
+    public Vector2 Position { get; private set; }
 
     public bool IsAlive => _timeAlive < BulletConfig.Lifetime;
-    public int Width => _sprite?.Width ?? 0;
-    public int Height => _sprite?.Height ?? 0;
+    public int Width => _sprite.Width;
+    public int Height => _sprite.Height;
+
+    public Bullet(Vector2 startPosition, Vector2 direction, ISpriteHelper sprite)
+    {
+        ArgumentNullException.ThrowIfNull(sprite, nameof(sprite));
+
+        Position = startPosition;
+        _sprite = sprite;
+
+        if (direction != Vector2.Zero)
+        {
+            direction.Normalize();
+        }
+        _direction = direction;
+        _timeAlive = 0f;
+    }
 
     public bool IsOutOfBounds(int screenWidth, int screenHeight)
     {
@@ -32,21 +51,30 @@ public class Bullet(Vector2 startPosition, Vector2 direction, ISpriteHelper spri
         return !IsAlive || IsOutOfBounds(screenWidth, screenHeight);
     }
 
+    /// <summary>
+    /// Loads the bullet texture and initializes the sprite
+    /// </summary>
     public void LoadContent(Texture2D bulletTexture)
     {
         ArgumentNullException.ThrowIfNull(bulletTexture);
 
         if (BulletConfig.SpriteWidth <= 0)
-            throw new InvalidOperationException(
-                $"SpriteWidth must be positive, got {BulletConfig.SpriteWidth}"
+            throw new ArgumentOutOfRangeException(
+                nameof(BulletConfig.SpriteWidth),
+                BulletConfig.SpriteWidth,
+                "SpriteWidth must be positive"
             );
         if (BulletConfig.SpriteHeight <= 0)
-            throw new InvalidOperationException(
-                $"SpriteHeight must be positive, got {BulletConfig.SpriteHeight}"
+            throw new ArgumentOutOfRangeException(
+                nameof(BulletConfig.SpriteHeight),
+                BulletConfig.SpriteHeight,
+                "SpriteHeight must be positive"
             );
         if (BulletConfig.AnimationSpeed <= 0)
-            throw new InvalidOperationException(
-                $"AnimationSpeed must be positive, got {BulletConfig.AnimationSpeed}"
+            throw new ArgumentOutOfRangeException(
+                nameof(BulletConfig.AnimationSpeed),
+                BulletConfig.AnimationSpeed,
+                "AnimationSpeed must be positive"
             );
 
         _sprite.LoadSpriteSheet(
@@ -57,26 +85,61 @@ public class Bullet(Vector2 startPosition, Vector2 direction, ISpriteHelper spri
         );
     }
 
+    /// <summary>
+    /// Updates bullet position and animation
+    /// </summary>
     public void Update(GameTime gameTime)
     {
         ArgumentNullException.ThrowIfNull(gameTime);
 
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        if (deltaTime < 0)
-            throw new InvalidOperationException($"Delta time cannot be negative, got {deltaTime}");
-
         Position += _direction * _speed * deltaTime;
-
         _timeAlive += deltaTime;
 
         _sprite.Update(gameTime);
     }
 
+    /// <summary>
+    /// Draws the bullet to the screen
+    /// </summary>
     public void Draw(SpriteBatch spriteBatch)
     {
         ArgumentNullException.ThrowIfNull(spriteBatch);
 
         _sprite.Draw(spriteBatch, Position, 0f, 1f);
+    }
+
+    /// <summary>
+    /// Resets the bullet state for reuse in object pooling
+    /// </summary>
+    public void Reset(Vector2 position, Vector2 direction)
+    {
+        Position = position;
+        if (direction != Vector2.Zero)
+        {
+            direction.Normalize();
+        }
+        _direction = direction;
+        _timeAlive = 0f;
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _sprite?.Dispose();
+            }
+
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

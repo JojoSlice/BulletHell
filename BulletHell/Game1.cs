@@ -1,55 +1,52 @@
-﻿using BulletHell.Helpers;
-using BulletHell.Inputs;
-using BulletHell.Interfaces;
-using BulletHell.Managers;
-using BulletHell.Models;
+using System.Collections.Generic;
+using BulletHell.Constants;
+using BulletHell.Scenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace BulletHell;
 
 public class Game1 : Game
 {
     private readonly GraphicsDeviceManager _graphics;
-
-    private int screenWidth;
-    private int screenHeight;
-
     private SpriteBatch? _spriteBatch;
-    private Player? _player;
-    private IBulletManager? _bulletManager;
-    private IEnemyManager? _enemyManager;
-    private EnemyBulletManager? _enemyBulletManager;
-
+    private Texture2D? _sharedWhiteTexture;
+    private Dictionary<string, Scene>? _scenes;
+    private Scene? _currentScene;
+    private bool _disposed;
 
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
+
+        _graphics.IsFullScreen = true;
     }
 
     protected override void Initialize()
     {
-        screenWidth = _graphics.PreferredBackBufferWidth;
-        screenHeight = _graphics.PreferredBackBufferHeight;
+        _graphics.PreferredBackBufferWidth = GraphicsAdapter
+            .DefaultAdapter
+            .CurrentDisplayMode
+            .Width;
+        _graphics.PreferredBackBufferHeight = GraphicsAdapter
+            .DefaultAdapter
+            .CurrentDisplayMode
+            .Height;
+        _graphics.ApplyChanges();
 
-        Vector2 startPosition = new(screenWidth / 2, screenHeight / 2);
+        _sharedWhiteTexture = new Texture2D(GraphicsDevice, 1, 1);
+        _sharedWhiteTexture.SetData(new[] { Color.White });
 
-        IInputProvider input = new KeyboardInputProvider();
-        ISpriteHelper sprite = new SpriteHelper();
-        _player = new Player(startPosition, input, sprite);
+        _scenes = new Dictionary<string, Scene>
+        {
+            { SceneNames.Menu, new MenuScene(this, _sharedWhiteTexture) },
+            { SceneNames.Battle, new BattleScene(this) },
+        };
 
-        _bulletManager = new BulletManager();
-        _enemyBulletManager = new EnemyBulletManager();
-        _enemyManager = new EnemyManager(_enemyBulletManager);
-
-        
-        _enemyManager.AddEnemy(new Enemy(
-            new Vector2(400, 0), 
-            new SpriteHelper()
-        ));
+        _currentScene = _scenes[SceneNames.Menu];
+        _currentScene.OnEnter();
 
         base.Initialize();
     }
@@ -57,56 +54,66 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+    }
 
-        Texture2D playerTexture = Content.Load<Texture2D>("player");
-        _player!.LoadContent(playerTexture);
-
-        Texture2D bulletTexture = Content.Load<Texture2D>("bullet");
-        _bulletManager!.LoadContent(bulletTexture);
-        
-        Texture2D enemyTexture = Content.Load<Texture2D>("enemy");
-        _enemyManager!.LoadContent(enemyTexture);
-        
-        Texture2D enemyBulletTexture = Content.Load<Texture2D>("enemy_bullet"); 
-        _enemyBulletManager!.LoadContent(enemyBulletTexture);
+    public void ChangeScene(string sceneName)
+    {
+        if (_scenes?.ContainsKey(sceneName) == true && _currentScene != null)
+        {
+            _currentScene.OnExit();
+            _currentScene = _scenes[sceneName];
+            _currentScene.OnEnter();
+        }
     }
 
     protected override void Update(GameTime gameTime)
     {
-        if (
-            GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed
-            || Keyboard.GetState().IsKeyDown(Keys.Escape)
-        )
-            Exit();
-
-        _player!.Update(gameTime);
-
-        var shootInfo = _player.TryShoot();
-        if (shootInfo.HasValue)
-        {
-            _bulletManager!.CreateBullet(shootInfo.Value.position, shootInfo.Value.direction);
-        }
-
-        _bulletManager!.Update(gameTime, screenWidth, screenHeight);
-        
-        _enemyManager!.Update(gameTime, screenWidth, screenHeight);
-        
-        _enemyBulletManager!.Update(gameTime, screenWidth, screenHeight);
-
+        _currentScene?.Update(gameTime);
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.Black);
+        GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        _spriteBatch!.Begin();
-        _player!.Draw(_spriteBatch);
-        _bulletManager!.Draw(_spriteBatch);
-        _enemyManager!.Draw(_spriteBatch);
-        _enemyBulletManager!.Draw(_spriteBatch);
-        _spriteBatch.End();
+        if (_spriteBatch != null && _currentScene != null)
+        {
+            _spriteBatch.Begin();
+            _currentScene.Draw(_spriteBatch);
+            _spriteBatch.End();
+        }
 
         base.Draw(gameTime);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _sharedWhiteTexture?.Dispose();
+                _sharedWhiteTexture = null;
+
+                _spriteBatch?.Dispose();
+                _spriteBatch = null;
+
+                // Dispose all scenes
+                if (_scenes != null)
+                {
+                    foreach (var scene in _scenes.Values)
+                    {
+                        scene.Dispose();
+                    }
+                    _scenes = null;
+                }
+
+                _currentScene = null;
+            }
+
+            _disposed = true;
+        }
+
+        base.Dispose(disposing);
     }
 }

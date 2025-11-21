@@ -1,9 +1,9 @@
-﻿namespace Application.Interfaces;
+﻿using Contracts.Responses.Common;
 
-using Contracts.Requests.User;
-using Contracts.Responses.Shared;
+namespace Application.Interfaces;
 
-public interface IUserService<T> where T : class
+public interface IUserService<T>
+    where T : class
 {
     public Task<Response<List<T>>> GetAll();
     public Task<Response<T?>> GetById(int id);

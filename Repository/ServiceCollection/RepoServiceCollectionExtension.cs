@@ -1,10 +1,11 @@
-﻿namespace Repository.ServiceCollection;
-
-using Microsoft.Extensions.DependencyInjection;
-using Data;
-using Domain.Entities;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Interfaces;
-using Repositories;
+using Domain.Entities;
+using Repository.Data;
+using Repository.Interfaces;
+using Repository.Repositories;
+
+namespace Repository.ServiceCollectionExtensions;
 
 public static class RepoServiceCollectionExtension
 {

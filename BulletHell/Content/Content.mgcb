@@ -49,6 +49,13 @@
 /processorParam:TextureFormat=Color
 /build:enemy.png
 
+#begin Font.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Font.spritefont
+
 #begin player.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -60,4 +67,3 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:player.png
-

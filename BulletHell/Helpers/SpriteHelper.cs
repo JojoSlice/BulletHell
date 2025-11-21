@@ -1,3 +1,4 @@
+using System;
 using BulletHell.Configurations;
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
@@ -5,7 +6,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BulletHell.Helpers;
 
-public class SpriteHelper : ISpriteHelper
+/// <summary>
+/// Helper class for managing sprite sheets and animations
+/// </summary>
+public class SpriteHelper : ISpriteHelper, IDisposable
 {
     private Texture2D? _texture;
     private Rectangle[]? _frames;
@@ -14,6 +18,7 @@ public class SpriteHelper : ISpriteHelper
     private float _timeElapsed;
     private int _frameWidth;
     private int _frameHeight;
+    private bool _disposed;
 
     public int Width => _frameWidth;
     public int Height => _frameHeight;
@@ -25,22 +30,22 @@ public class SpriteHelper : ISpriteHelper
     }
 
     public void LoadSpriteSheet(
-        Texture2D _texture,
-        int _frameWidth = SpriteDefaults.FrameWidth,
-        int _frameHeight = SpriteDefaults.FrameHeight,
+        Texture2D texture,
+        int frameWidth = SpriteDefaults.FrameWidth,
+        int frameHeight = SpriteDefaults.FrameHeight,
         float animationSpeed = SpriteDefaults.AnimationSpeed
     )
     {
-        this._texture = _texture;
-        this._frameWidth = _frameWidth;
-        this._frameHeight = _frameHeight;
-        this._frameTime = animationSpeed;
+        _texture = texture;
+        _frameWidth = frameWidth;
+        _frameHeight = frameHeight;
+        _frameTime = animationSpeed;
 
-        int columns = _texture.Width / _frameWidth;
-        int rows = _texture.Height / _frameHeight;
-        int total_frames = columns * rows;
+        int columns = texture.Width / frameWidth;
+        int rows = texture.Height / frameHeight;
+        int totalFrames = columns * rows;
 
-        _frames = new Rectangle[total_frames];
+        _frames = new Rectangle[totalFrames];
         int frameIndex = 0;
 
         for (int row = 0; row < rows; row++)
@@ -48,10 +53,10 @@ public class SpriteHelper : ISpriteHelper
             for (int col = 0; col < columns; col++)
             {
                 _frames[frameIndex] = new Rectangle(
-                    col * _frameWidth,
-                    row * _frameHeight,
-                    _frameWidth,
-                    _frameHeight
+                    col * frameWidth,
+                    row * frameHeight,
+                    frameWidth,
+                    frameHeight
                 );
                 frameIndex++;
             }
@@ -89,7 +94,7 @@ public class SpriteHelper : ISpriteHelper
             _frames[_currentFrame],
             color ?? Color.White,
             rotation,
-            new Vector2(_frameWidth / 2, _frameHeight / 2), // Centrera sprite
+            new Vector2((float)_frameWidth / 2, (float)_frameHeight / 2), // Center sprite
             scale,
             SpriteEffects.None,
             0f
@@ -104,5 +109,26 @@ public class SpriteHelper : ISpriteHelper
     )
     {
         Draw(spriteBatch, position, Color.White, rotation, scale);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                // Note: We don't dispose _texture here as it's managed by ContentManager
+                // and owned by the caller. Only dispose resources we own.
+                _frames = null;
+            }
+
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }
