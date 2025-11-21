@@ -1,9 +1,11 @@
 using System;
+using System.Net.Http;
 using BulletHell.Constants;
 using BulletHell.Inputs;
 using BulletHell.Interfaces;
 using BulletHell.Managers;
 using BulletHell.Models;
+using BulletHell.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -30,22 +32,38 @@ public class MenuScene : Scene
     private readonly int _screenHeight;
     private readonly IMenuInputProvider _inputProvider;
     private readonly ITextInputHandler _textInputHandler;
+    private readonly IUserApiClient _userApiClient;
+    private readonly IPasswordHasher _passwordHasher;
 
     private Button[] _menuButtons;
     private InputField[] _menuInputs;
     private InputField? _usernameField;
     private InputField? _passwordField;
     private IMenuNavigator? _menuNavigator;
+    private Button _modeToggleButton = null!;
+    private Button _actionButton = null!;
+
+    private RegistrationMode _currentMode = RegistrationMode.Login;
+
+    public RegistrationMode CurrentMode => _currentMode;
 
     public MenuScene(Game1 game, Texture2D whiteTexture)
-        : this(game, whiteTexture, new MouseKeyboardInputProvider(), new KeyboardTextInputHandler())
-    { }
+        : this(
+            game,
+            whiteTexture,
+            new MouseKeyboardInputProvider(),
+            new KeyboardTextInputHandler(),
+            new UserApiClient(new HttpClient { BaseAddress = new Uri("http://localhost:5000") }),
+            new BCryptPasswordHasher()
+        ) { }
 
     public MenuScene(
         Game1 game,
         Texture2D whiteTexture,
         IMenuInputProvider inputProvider,
-        ITextInputHandler textInputHandler
+        ITextInputHandler textInputHandler,
+        IUserApiClient userApiClient,
+        IPasswordHasher passwordHasher
     )
         : base(game)
     {
@@ -55,9 +73,76 @@ public class MenuScene : Scene
         _font = game.Content.Load<SpriteFont>("Font");
         _screenWidth = game.GraphicsDevice.Viewport.Width;
         _screenHeight = game.GraphicsDevice.Viewport.Height;
-
+        _userApiClient = userApiClient;
+        _passwordHasher = passwordHasher;
         _menuButtons = [];
         _menuInputs = [];
+    }
+
+    // Constructor for testing - doesn't require Game1.Content or GraphicsDevice
+    internal MenuScene(
+        Game1 game,
+        Texture2D whiteTexture,
+        SpriteFont font,
+        int screenWidth,
+        int screenHeight,
+        IMenuInputProvider inputProvider,
+        ITextInputHandler textInputHandler,
+        IUserApiClient userApiClient,
+        IPasswordHasher passwordHasher
+    )
+        : base(game)
+    {
+        _whiteTexture = whiteTexture;
+        _font = font;
+        _screenWidth = screenWidth;
+        _screenHeight = screenHeight;
+        _inputProvider = inputProvider;
+        _textInputHandler = textInputHandler;
+        _userApiClient = userApiClient;
+        _passwordHasher = passwordHasher;
+        _menuButtons = [];
+        _menuInputs = [];
+    }
+
+    public void ToggleMode()
+    {
+        _currentMode =
+            _currentMode == RegistrationMode.Login
+                ? RegistrationMode.Register
+                : RegistrationMode.Login;
+
+        // Uppdatera knapp-text
+        UpdateActionButtonText();
+    }
+
+    public string GetActionButtonText()
+    {
+        return _currentMode == RegistrationMode.Login ? "Log In" : "Register";
+    }
+
+    private void UpdateActionButtonText()
+    {
+        _actionButton?.UpdateText(GetActionButtonText());
+    }
+
+    private void OnModeToggleClicked()
+    {
+        ToggleMode();
+        _modeToggleButton.UpdateText($"Mode: {_currentMode}");
+    }
+
+    private void OnActionButtonClicked()
+    {
+        // TODO: Implementera i steg 4 (Registreringslogik)
+        // if (_currentMode == RegistrationMode.Register)
+        // {
+        //     await HandleRegistrationAsync();
+        // }
+        // else
+        // {
+        //     HandleLogin();
+        // }
     }
 
     private Vector2 GetCenteredPosition(string text, float y)
@@ -125,6 +210,34 @@ public class MenuScene : Scene
 
     public override void OnEnter()
     {
+        _modeToggleButton = new Button(
+            _font,
+            "Mode: Login",
+            new Rectangle(
+                _game.GraphicsDevice.Viewport.Width / 2 - ButtonWidth / 2,
+                100, // Ovanför username field
+                ButtonWidth,
+                ButtonHeight
+            ),
+            _whiteTexture
+        );
+
+        _modeToggleButton.OnClick += OnModeToggleClicked;
+
+        _actionButton = new Button(
+            _font,
+            GetActionButtonText(),
+            new Rectangle(
+                _game.GraphicsDevice.Viewport.Width / 2 - ButtonWidth / 2,
+                400,
+                ButtonWidth,
+                ButtonHeight
+            ),
+            _whiteTexture
+        );
+
+        _actionButton.OnClick += OnActionButtonClicked;
+
         if (_menuButtons == null || _menuButtons.Length == 0)
         {
             _menuButtons = GetMenuButtons();
@@ -145,6 +258,21 @@ public class MenuScene : Scene
         }
     }
 
+    public override void OnExit()
+    {
+        if (_modeToggleButton != null)
+        {
+            _modeToggleButton.OnClick -= OnModeToggleClicked;
+        }
+
+        if (_actionButton != null)
+        {
+            _actionButton.OnClick -= OnActionButtonClicked;
+        }
+
+        base.OnExit();
+    }
+
     public override void Update(GameTime gameTime)
     {
         var mouseState = _inputProvider.GetMouseState();
@@ -152,6 +280,9 @@ public class MenuScene : Scene
 
         _usernameField?.Update(gameTime, mouseState);
         _passwordField?.Update(gameTime, mouseState);
+
+        _modeToggleButton?.Update(mouseState);
+        _actionButton?.Update(mouseState);
 
         foreach (var button in _menuButtons)
         {
@@ -173,10 +304,14 @@ public class MenuScene : Scene
             Color.Black
         );
 
+        _modeToggleButton?.Draw(spriteBatch);
+
         foreach (var inputField in _menuInputs)
         {
             inputField.Draw(spriteBatch);
         }
+
+        _actionButton?.Draw(spriteBatch);
 
         foreach (var button in _menuButtons)
         {
@@ -190,6 +325,9 @@ public class MenuScene : Scene
         {
             // Note: We don't dispose _whiteTexture here as it's a shared resource
             // owned by Game1 and will be disposed there
+
+            _modeToggleButton?.Dispose();
+            _actionButton?.Dispose();
 
             if (_menuButtons != null)
             {
