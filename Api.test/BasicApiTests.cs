@@ -1,7 +1,7 @@
 ﻿using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace Api.Tests
+namespace Api.test
 {
     public class BasicApiTests(ITestOutputHelper output)
     {
