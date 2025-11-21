@@ -25,7 +25,7 @@ public partial class MyDbContext : DbContext
             return;
 
         // Fallback: attempt to resolve the scaffolded database file relative to the app base
-        var defaultPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Repository", "Data", "database.sqlite");
+        var defaultPath = Path.Join(AppContext.BaseDirectory, "..", "..", "..", "..", "Repository", "Data", "database.sqlite");
         defaultPath = Path.GetFullPath(defaultPath);
         optionsBuilder.UseSqlite($"Data Source={defaultPath}");
     }
