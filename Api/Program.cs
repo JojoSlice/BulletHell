@@ -22,4 +22,5 @@ app.MapUserEndpoints();
 
 app.Run();
 
+// Needed for WebApplicationFactory in tests
 public partial class Program { }
