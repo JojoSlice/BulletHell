@@ -1,12 +1,5 @@
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
 using BulletHell.Interfaces;
-using BulletHell.Models;
-using BulletHell.Services;
-using NSubstitute;
-using Xunit;
+using BulletHell.test.TestUtilities;
 
 namespace BulletHell.test.Services;
 
@@ -25,30 +18,75 @@ public class UserApiClientTests
     public async Task RegisterUserAsync_ShouldReturnSuccess_WhenApiReturns201()
     {
         // Arrange
-        var username = "testuser";
-        var passwordHash = "$2a$12$hashedpassword";
+        var fakeHandler = new FakeHttpMessageHandler(request =>
+        {
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal("/api/users", request.RequestUri?.AbsolutePath);
+
+            return FakeHttpResponseBuilder.CreateUserCreatedResponse(userId: 123);
+        });
+
+        var httpClient = new HttpClient(fakeHandler)
+        {
+            BaseAddress = new Uri("http://localhost:5000"),
+        };
+
+        var apiClient = new UserApiClient(httpClient);
 
         // Act
-        var result = await _apiClient.RegisterUserAsync(username, passwordHash);
+        var result = await apiClient.RegisterUserAsync("testuser", "$2a$12$hash");
 
         // Assert
         Assert.True(result.Success);
-        Assert.NotNull(result.UserId);
+        Assert.Equal(123, result.UserId);
+        Assert.Contains("success", result.Message.ToLower());
     }
 
     [Fact]
     public async Task RegisterUserAsync_ShouldReturnFailure_WhenApiReturns400()
     {
         // Arrange
-        var username = "";
-        var passwordHash = "$2a$12$hashedpassword";
+        var fakeHandler = new FakeHttpMessageHandler(request =>
+            FakeHttpResponseBuilder.CreateBadRequestResponse("Username är obligatoriskt")
+        );
+
+        var httpClient = new HttpClient(fakeHandler)
+        {
+            BaseAddress = new Uri("http://localhost:5000"),
+        };
+
+        var apiClient = new UserApiClient(httpClient);
 
         // Act
-        var result = await _apiClient.RegisterUserAsync(username, passwordHash);
+        var result = await apiClient.RegisterUserAsync("", "$2a$12$hash");
 
         // Assert
         Assert.False(result.Success);
-        Assert.Contains("validation", result.Message.ToLower());
+        Assert.Contains("Username är obligatoriskt", result.Message);
+        Assert.Null(result.UserId);
+    }
+
+    [Fact]
+    public async Task RegisterUserAsync_ShouldReturnFailure_WhenApiReturns500()
+    {
+        // Arrange
+        var fakeHandler = new FakeHttpMessageHandler(request =>
+            FakeHttpResponseBuilder.CreateServerErrorResponse()
+        );
+
+        var httpClient = new HttpClient(fakeHandler)
+        {
+            BaseAddress = new Uri("http://localhost:5000"),
+        };
+
+        var apiClient = new UserApiClient(httpClient);
+
+        // Act
+        var result = await apiClient.RegisterUserAsync("testuser", "$2a$12$hash");
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Contains("server", result.Message.ToLower());
     }
 
     [Fact]
