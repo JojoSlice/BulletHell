@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Domain.Entities;
+﻿using Domain.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using Repository.Data;
 using Repository.Interfaces;
 using Repository.Repositories;
