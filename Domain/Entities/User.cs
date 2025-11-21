@@ -4,14 +4,14 @@ namespace Domain.Entities;
 
 public class User
 {
-    public int Id { get; set; }
+    public int Id { get; init; }
 
     [Required]
     [MaxLength(50)]
-    public string UserName { get; set; } = string.Empty;
+    public string UserName { get; init; } = string.Empty;
 
     [Required]
-    public string PasswordHash { get; set; } = string.Empty;
+    public string PasswordHash { get; init; } = string.Empty;
 
-    public List<HighScore> HighScores { get; set; } = [];
+    public List<HighScore> HighScores { get; init; } = [];
 }

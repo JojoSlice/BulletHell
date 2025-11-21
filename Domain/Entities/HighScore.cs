@@ -2,11 +2,11 @@ namespace Domain.Entities;
 
 public class HighScore
 {
-    public int Id { get; set; }
+    public int Id { get; init; }
 
-    public int Score { get; set; } = 0;
+    public int Score { get; init; } = 0;
 
-    public int UserId { get; set; }
+    public int UserId { get; init; }
 
-    public User? User { get; set; }
+    public User? User { get; init; }
 }
