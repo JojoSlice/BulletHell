@@ -12,9 +12,9 @@ public class Button : INavigable, IDisposable
     private const int BorderThickness = 2;
 
     private readonly Rectangle _bounds;
-    private readonly string _text;
     private readonly SpriteFont _font;
     private readonly Texture2D _texture;
+    private string _text;
 
     private bool _isHovered;
     private bool _wasPressed;
@@ -44,6 +44,12 @@ public class Button : INavigable, IDisposable
     public void Activate()
     {
         OnClick?.Invoke();
+    }
+
+    public void UpdateText(string newText)
+    {
+        _text = newText;
+        _textMeasured = false; // Force re-measurement of text
     }
 
     public void Update(MouseState mouseState)
