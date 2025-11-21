@@ -21,3 +21,5 @@ app.MapHighScoreEndpoints();
 app.MapUserEndpoints();
 
 app.Run();
+
+public partial class Program { }
