@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using NSubstitute;
 using Xunit;
 
-namespace BulletHell.test;
+namespace BulletHell.test.Models;
 
 public class EnemyTest(ITestOutputHelper output)
 {
@@ -30,7 +30,7 @@ public class EnemyTest(ITestOutputHelper output)
         // Assert
         Assert.Equal(expectedPosition.X, actual.X, precision);
         Assert.Equal(expectedPosition.Y, actual.Y, precision);
-        
+
         // Output
         output.WriteLine($"Expected: {expectedPosition}");
         output.WriteLine($"Actual:   {actual}");
@@ -61,7 +61,7 @@ public class EnemyTest(ITestOutputHelper output)
         output.WriteLine($"Actual ΔY = {enemy.Position.Y - startPosition.Y}");
 
     }
-    
+
     [Theory]
     [InlineData(-50, 100, true)]
     [InlineData(900, 100, true)]
@@ -78,5 +78,5 @@ public class EnemyTest(ITestOutputHelper output)
         Assert.Equal(expected, actual);
     }
 
-    
+
 }
