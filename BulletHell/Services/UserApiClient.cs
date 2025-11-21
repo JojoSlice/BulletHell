@@ -67,12 +67,20 @@ public class UserApiClient : IUserApiClient
                 Message = $"Could not connetct to server: {ex.Message}",
             };
         }
-        catch (Exception ex)
+        catch (TaskCanceledException ex)
         {
             return new RegistrationResult
             {
                 Success = false,
-                Message = $"Unexpected error: {ex.Message}",
+                Message = $"Operation timed out: {ex.Message}",
+            };
+        }
+        catch (JsonException ex)
+        {
+            return new RegistrationResult
+            {
+                Success = false,
+                Message = $"Response parsing error: {ex.Message}",
             };
         }
     }
