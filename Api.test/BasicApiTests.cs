@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Api.Tests
 {
-    public class BasicApiTests
+    public class BasicApiTests(ITestOutputHelper output)
     {
         [Fact]
         public async Task Api_Starts_WithoutErrors()
@@ -13,10 +13,14 @@ namespace Api.Tests
             var client = factory.CreateClient();
 
             // Act
-            var response = await client.GetAsync("/");
+            var response = await client.GetAsync("/api/users");
 
             // Assert
             Assert.True(response.IsSuccessStatusCode);
+
+            // Output
+            output.WriteLine($"StatusCode: {(int)response.StatusCode} ({response.StatusCode})");
+
         }
     }
 }
