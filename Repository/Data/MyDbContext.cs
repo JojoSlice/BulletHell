@@ -1,9 +1,9 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Repository.Data;
 
-public partial class MyDbContext : DbContext
+public class MyDbContext : DbContext
 {
     public MyDbContext()
     {
@@ -19,7 +19,16 @@ public partial class MyDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlite("Data Source=database.sqlite");
+    {
+        // Respect DI configuration; only configure a default if none provided.
+        if (optionsBuilder.IsConfigured)
+            return;
+
+        // Fallback: attempt to resolve the scaffolded database file relative to the app base
+        var defaultPath = Path.Join(AppContext.BaseDirectory, "..", "..", "..", "..", "Repository", "Data", "database.sqlite");
+        defaultPath = Path.GetFullPath(defaultPath);
+        optionsBuilder.UseSqlite($"Data Source={defaultPath}");
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,7 +39,7 @@ public partial class MyDbContext : DbContext
             entity.HasIndex(e => e.Id, "IX_highscore_id").IsUnique();
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
+                .ValueGeneratedOnAdd()
                 .HasColumnName("id");
             entity.Property(e => e.UserId).HasColumnName("User-Id");
 
@@ -42,12 +51,10 @@ public partial class MyDbContext : DbContext
             entity.ToTable("user");
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
+                .ValueGeneratedOnAdd()
                 .HasColumnName("id");
         });
 
-        OnModelCreatingPartial(modelBuilder);
     }
 
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

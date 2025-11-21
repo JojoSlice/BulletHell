@@ -7,34 +7,32 @@ namespace Repository.Repositories;
 
 public class HighScoreRepository(MyDbContext context) : IRepository<HighScore>
 {
-    private readonly MyDbContext _db = context;
+    public async Task<List<HighScore>> GetAllAsync() => await context.Highscores.ToListAsync();
 
-    public async Task<List<HighScore>> GetAllAsync() => await _db.Highscores.ToListAsync();
-
-    public async Task<HighScore?> GetByIdAsync(int id) => await _db.Highscores.FindAsync(id);
+    public async Task<HighScore?> GetByIdAsync(int id) => await context.Highscores.FindAsync(id);
 
     public async Task<HighScore> CreateAsync(HighScore highScore)
     {
-        _db.Highscores.Add(highScore);
-        await _db.SaveChangesAsync();
+        context.Highscores.Add(highScore);
+        await context.SaveChangesAsync();
         return highScore;
     }
 
     public async Task<HighScore> UpdateAsync(HighScore highScore)
     {
-        _db.Highscores.Update(highScore);
-        await _db.SaveChangesAsync();
+        context.Highscores.Update(highScore);
+        await context.SaveChangesAsync();
         return highScore;
     }
 
     public async Task<string> DeleteAsync(int id)
     {
         var highScore =
-            await _db.Highscores.FindAsync(id)
+            await context.Highscores.FindAsync(id)
             ?? throw new KeyNotFoundException($"Highscore with ID {id} not found.");
 
-        _db.Highscores.Remove(highScore);
-        await _db.SaveChangesAsync();
+        context.Highscores.Remove(highScore);
+        await context.SaveChangesAsync();
         return $"HighScore with id {id} was deleted.";
     }
 }
