@@ -1,3 +1,5 @@
+using Contracts.Requests.HighScore;
+using Contracts.Requests.User;
 using Contracts.Responses.Common;
 using Contracts.Responses.HighScore;
 using Contracts.Responses.User;
@@ -89,7 +91,7 @@ public static class MappingExtensions
     };
 
     #endregion
-    
+
     public static Response<string> MapToResponse(this string message) => new()
     {
         IsSuccess = true,

@@ -8,7 +8,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddRepositoryServices();
 builder.Services.AddApplicationServices();
-    
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

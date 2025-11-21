@@ -1,13 +1,13 @@
-﻿namespace Application.Interfaces;
-
+﻿using Contracts.Responses.Common;
 using Contracts.Requests.HighScore;
-using Contracts.Responses.Shared;
+
+namespace Application.Interfaces;
 
 public interface IHighScoreService<T> where T : class
 {
-    public Task<Response<List<T>>> GetAll();
-    public Task<Response<T?>> GetById(int id);
-    public Task<Response<T>> Create(CreateHighScoreRequest highScore);
-    public Task<Response<T>> Update(UpdateHighScoreRequest highScore);
-    public Task<Response<string>> Delete(int id);
+    Task<Response<List<T>>> GetAll();
+    Task<Response<T?>> GetById(int id);
+    Task<Response<T>> Create(CreateHighScoreRequest highScore);
+    Task<Response<T>> Update(UpdateHighScoreRequest highScore);
+    Task<Response<string>> Delete(int id);
 }
