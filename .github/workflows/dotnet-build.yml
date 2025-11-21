@@ -161,7 +161,7 @@ jobs:
           path: code-coverage-results.md
 
       - name: Test Report
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: always() && steps.test.outcome != 'skipped'
         continue-on-error: true
         with:
