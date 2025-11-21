@@ -6,7 +6,7 @@ using BulletHell.Models;
 using Microsoft.Xna.Framework;
 using NSubstitute;
 
-namespace BulletHell.test;
+namespace BulletHell.test.Managers;
 
 public class EnemyBulletManagerTest(ITestOutputHelper output)
 {
@@ -54,8 +54,8 @@ public class EnemyBulletManagerTest(ITestOutputHelper output)
         // Assert
         Assert.Empty(manager.Bullets);
     }
-    
-    
+
+
     [Fact]
     public void EnemyBulletManager_ShouldUpdateAllBullets()
     {

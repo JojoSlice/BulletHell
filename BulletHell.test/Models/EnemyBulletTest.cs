@@ -5,7 +5,7 @@ using BulletHell.Models;
 using Microsoft.Xna.Framework;
 using NSubstitute;
 
-namespace BulletHell.test;
+namespace BulletHell.test.Models;
 
 public class EnemyBulletTest()
 {
