@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Repository.Data;
 
-public partial class MyDbContext : DbContext
+public class MyDbContext : DbContext
 {
     public MyDbContext()
     {
@@ -55,8 +55,6 @@ public partial class MyDbContext : DbContext
                 .HasColumnName("id");
         });
 
-        OnModelCreatingPartial(modelBuilder);
     }
 
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

@@ -1,17 +1,16 @@
-﻿namespace Api.Endpoints;
-
-using Application.Services;
+﻿using Application.Services;
 using Contracts;
 using Contracts.Requests.HighScore;
 using Contracts.Responses.HighScore;
 using Microsoft.AspNetCore.Mvc;
 
+namespace Api.Endpoints;
 public static class HighScoreEndpoints
 {
     public static void MapHighScoreEndpoints(this WebApplication app)
     {
         // GET all HighScores
-        app.MapGet(ApiEndpoints.HighScore.GetAll, async ([FromServices] HighScoreService hss) => 
+        app.MapGet(ApiEndpoints.HighScore.GetAll, async ([FromServices] HighScoreService hss) =>
         await hss.GetAll()).WithName("GetAllHighScores").Produces<List<HighScoreResponse>>();
 
         // GET HighScore by ID
