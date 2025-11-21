@@ -1,4 +1,5 @@
 using BulletHell.Interfaces;
+using BulletHell.Services;
 using BulletHell.test.TestUtilities;
 
 namespace BulletHell.test.Services;
@@ -47,7 +48,7 @@ public class UserApiClientTests
     {
         // Arrange
         var fakeHandler = new FakeHttpMessageHandler(request =>
-            FakeHttpResponseBuilder.CreateBadRequestResponse("Username är obligatoriskt")
+            FakeHttpResponseBuilder.CreateBadRequestResponse("Invalid username")
         );
 
         var httpClient = new HttpClient(fakeHandler)
@@ -62,7 +63,7 @@ public class UserApiClientTests
 
         // Assert
         Assert.False(result.Success);
-        Assert.Contains("Username är obligatoriskt", result.Message);
+        Assert.Contains("Invalid username", result.Message);
         Assert.Null(result.UserId);
     }
 
