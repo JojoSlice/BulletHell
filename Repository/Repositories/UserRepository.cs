@@ -1,9 +1,9 @@
-﻿namespace Repository.Repositories;
-
-using Data;
-using Domain.Entities;
-using Interfaces;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Repository.Data;
+using Repository.Interfaces;
+
+namespace Repository.Repositories;
 
 public class UserRepository(MyDbContext context) : IRepository<User>
 {

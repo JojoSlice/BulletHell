@@ -1,27 +1,31 @@
 ﻿using BulletHell.Configurations;
+using BulletHell.Interfaces;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BulletHell.Models;
-using BulletHell.Interfaces;
-using Microsoft.Xna.Framework;
 
 public class Enemy
 {
-    public Vector2 Position { get; private set; }
-    private Vector2 _velocity;
     private readonly ISpriteHelper _sprite;
+    private Vector2 _velocity;
+    private float _shootCooldown = 0f;
+
+    public Vector2 Position { get; private set; }
 
     public int Width => _sprite.Width;
+
     public int Height => _sprite.Height;
 
-    public bool IsAlive { get; private set; } =  true;
+    public bool IsAlive { get; private set; } = true;
 
     public Enemy(Vector2 startPosition, ISpriteHelper sprite)
     {
         Position = startPosition;
-        _sprite =  sprite;
+        _sprite = sprite;
         _velocity = Vector2.Zero;
     }
+
     public bool IsOutOfBounds(int screenWidth, int screenHeight)
     {
         return Position.X < 0 ||
@@ -39,29 +43,38 @@ public class Enemy
         // NOTE: Går inte att enhetstesta just nu eftersom-
         // SpriteHelper kräver en riktig Texture2D.
         // Funktionaliteten verifieras istället i spelet.
-        _sprite.LoadSpriteSheet
-        (
+        _sprite.LoadSpriteSheet(
             enemyTexture,
             SpriteDefaults.FrameWidth,
             SpriteDefaults.FrameHeight,
-            SpriteDefaults.AnimationSpeed
-        );
+            SpriteDefaults.AnimationSpeed);
     }
-    
+
     public void Update(GameTime gameTime)
     {
-        var movement = Vector2.UnitY * EnemyConfig.Speed * (float)(gameTime.ElapsedGameTime.TotalSeconds);
+        var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        var movement = Vector2.UnitY * EnemyConfig.Speed * deltaTime;
         var newPosition = Position + movement;
         Position = newPosition;
-        
+
+        if (_shootCooldown > 0)
+        {
+            _shootCooldown -= deltaTime;
+        }
+
         _sprite.Update(gameTime);
     }
-    public EnemyBullet Shoot()
-    {
-        var start = Position;
-        Vector2 velocity = new Vector2(0, 1) * EnemyBulletConfig.Speed;
 
-        return new EnemyBullet(start, velocity);
+    public (Vector2 position, Vector2 velocity)? TryShoot()
+    {
+        if (_shootCooldown <= 0)
+        {
+            _shootCooldown = EnemyBulletConfig.FireCooldown;
+            Vector2 bulletVelocity = new Vector2(0, 1) * EnemyBulletConfig.Speed;
+            Vector2 bulletStartPosition = Position;
+            return (bulletStartPosition, bulletVelocity);
+        }
+        return null;
     }
 
     public void Draw(SpriteBatch spriteBatch)

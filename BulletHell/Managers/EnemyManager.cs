@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using BulletHell.Models;
@@ -10,15 +11,14 @@ namespace BulletHell.Managers;
 
 public class EnemyManager : IEnemyManager
 {
+    private readonly EnemyBulletManager _enemyBulletManager;
     private readonly List<Enemy> _enemies = new();
     private readonly Random _rand = new();
     private Texture2D? _enemyTexture;
-    private readonly EnemyBulletManager _enemyBulletManager;
-    private float _shootTimer = 0f;
 
     public EnemyManager(EnemyBulletManager bulletManager)
     {
-        _enemyBulletManager =  bulletManager;
+        _enemyBulletManager = bulletManager;
     }
 
     public IReadOnlyList<Enemy> Enemies => _enemies;
@@ -36,13 +36,19 @@ public class EnemyManager : IEnemyManager
     {
         _enemies.Add(enemy);
     }
-    
-    public IEnumerable<EnemyBullet> TryShoot()
+
+    public void TryShootEnemies()
     {
-        foreach (var enemy in _enemies)
-        {
-            yield return enemy.Shoot();
-        }
+        _enemies
+            .Select(enemy => enemy.TryShoot())
+            .Where(shootData => shootData.HasValue)
+            .Select(shootData => shootData!.Value)
+            .ToList()
+            .ForEach(data =>
+            {
+                var (position, velocity) = data;
+                _enemyBulletManager.CreateBullet(position, velocity);
+            });
     }
 
     public void Update(GameTime gameTime, int screenWidth, int screenHeight)
@@ -61,19 +67,10 @@ public class EnemyManager : IEnemyManager
         {
             enemy.Update(gameTime);
         }
-        
-        _shootTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-        
-        if (_shootTimer <= 0f)
-        {
-            foreach (var bullet in TryShoot())
-                _enemyBulletManager.AddBullet(bullet);
 
-            _shootTimer = 1.5f;
-        }
-        
+        TryShootEnemies();
+
         _enemies.RemoveAll(e => e.ShouldBeRemoved(screenWidth, screenHeight));
-        
     }
 
     public void Draw(SpriteBatch spriteBatch)

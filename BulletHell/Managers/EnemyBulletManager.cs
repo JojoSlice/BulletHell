@@ -1,46 +1,88 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using System.Collections.Generic;
+using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using BulletHell.Models;
+using BulletHell.Utilities;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace BulletHell.Managers
+namespace BulletHell.Managers;
+
+public class EnemyBulletManager : IEnemyBulletManager, IDisposable
 {
-    public class EnemyBulletManager : IEnemyBulletManager
+    private readonly List<EnemyBullet> _activeBullets = new();
+    private readonly ObjectPool<EnemyBullet> _bulletPool;
+    private Texture2D? _bulletTexture;
+
+    public IReadOnlyList<EnemyBullet> Bullets => _activeBullets;
+
+    public EnemyBulletManager()
     {
-        private readonly List<EnemyBullet> _bullets = new();
-        private Texture2D? _texture;
-
-        public IReadOnlyList<EnemyBullet> Bullets => _bullets;
-        
-        public void LoadContent(Texture2D texture)
-        {
-            _texture = texture;
-        }
-
-        public void AddBullet(EnemyBullet bullet)
-        {
-            if (_texture != null)
+        _bulletPool = new ObjectPool<EnemyBullet>(
+            createFunc: () =>
             {
-                bullet.LoadContent(_texture);
-            }
-            
-            _bullets.Add(bullet);
+                ISpriteHelper sprite = new SpriteHelper();
+                return new EnemyBullet(Vector2.Zero, Vector2.Zero, sprite);
+            },
+            resetAction: null,
+            initialSize: 100,
+            maxSize: 500
+        );
+    }
+
+    public void LoadContent(Texture2D texture)
+    {
+        _bulletTexture = texture;
+    }
+
+    public void CreateBullet(Vector2 position, Vector2 velocity)
+    {
+        var bullet = _bulletPool.Get();
+        bullet.Reset(position, velocity);
+
+        if (bullet.Width == 0 && _bulletTexture != null)
+        {
+            bullet.LoadContent(_bulletTexture);
         }
 
-        public void Update(GameTime gameTime, int screenWidth, int screenHeight)
-        {
-            foreach (var bullet in _bullets)
-            {
-                bullet.Update(gameTime);
-            }
+        _activeBullets.Add(bullet);
+    }
 
-            _bullets.RemoveAll(eB => eB.ShouldBeRemoved(screenWidth, screenHeight));
+    public void Update(GameTime gameTime, int screenWidth, int screenHeight)
+    {
+        foreach (var bullet in _activeBullets)
+        {
+            bullet.Update(gameTime);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        var bulletsToRemove = _activeBullets.FindAll(b => b.ShouldBeRemoved(screenWidth, screenHeight));
+        foreach (var bullet in bulletsToRemove)
         {
-            _bullets.ForEach(eB => eB.Draw(spriteBatch));
+            _activeBullets.Remove(bullet);
+            _bulletPool.Return(bullet);
+        }
+    }
+
+    public void Draw(SpriteBatch spriteBatch)
+    {
+        foreach (var bullet in _activeBullets)
+        {
+            bullet.Draw(spriteBatch);
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _bulletPool?.Dispose();
         }
     }
 }

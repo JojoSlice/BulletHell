@@ -4,6 +4,21 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <NoWarn>SA1633;SA1309;SA1101;SA1600;SA1009;SA1111;SA1503;SA1407;SA1516;SA1202;SA1201;SA1519;SA1513;SA1122;SA1515;SA1502;SA1316;SA1512;SA1401;SA0001</NoWarn>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="stylecop.json" />
+    </ItemGroup>
 
 </Project>

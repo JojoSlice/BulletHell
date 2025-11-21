@@ -1,11 +1,11 @@
-﻿namespace Application.Services;
-
-using Contracts.Responses.Shared;
+﻿using Application.Interfaces;
+using Application.Mapping;
+using Contracts.Responses.Common;
 using Contracts.Responses.User;
 using Domain.Entities;
-using Interfaces;
-using Mapping;
 using Repository.Repositories;
+
+namespace Application.Services;
 
 public class UserService(UserRepository repository) : IService<UserResponse, User>
 {

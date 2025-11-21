@@ -48,11 +48,20 @@ jobs:
         with:
           dotnet-version: "9.0.x"
 
+      - name: Install MonoGame dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libopenal-dev \
+            libgl1-mesa-dev \
+            libglu1-mesa-dev \
+            xvfb
+
       - name: Cache NuGet packages
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: ubuntu-nuget-${{ hashFiles('**/*.csproj') }}
+          key: ubuntu-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
           restore-keys: |
             ubuntu-nuget-
 
@@ -62,7 +71,7 @@ jobs:
 
       - name: Check for vulnerable packages
         id: vulnerability-check
-        continue-on-error: true
+        continue-on-error: false
         run: |
           echo "Checking for vulnerable NuGet packages..."
           dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
@@ -100,7 +109,21 @@ jobs:
 
       - name: Run tests
         id: test
-        run: dotnet test BulletHellSpaceShooter.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./TestResults --logger "trx" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+        env:
+          DISPLAY: :99
+        run: |
+          # Start virtual display for MonoGame tests
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          sleep 2
+
+          dotnet test BulletHellSpaceShooter.sln \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults \
+            --logger "trx" \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
 
       - name: List test results (debug)
         if: always()
@@ -122,13 +145,13 @@ jobs:
         with:
           filename: TestResults/**/coverage.cobertura.xml
           badge: true
-          fail_below_min: false
+          fail_below_min: true
           format: markdown
           hide_branch_rate: false
           hide_complexity: true
           indicators: true
           output: both
-          thresholds: '60 80'
+          thresholds: '70 85'
 
       - name: Add Coverage PR Comment
         if: github.event_name == 'pull_request' && steps.coverage.outcome == 'success'

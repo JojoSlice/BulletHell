@@ -5,34 +5,30 @@ using BulletHell.Managers;
 using BulletHell.Models;
 using Microsoft.Xna.Framework;
 using NSubstitute;
-using Vector2 = System.Numerics.Vector2;
 
 namespace BulletHell.test;
 
 public class EnemyBulletManagerTest(ITestOutputHelper output)
 {
     [Fact]
-    public void EnemyBulletManager_ShouldAddBulletToList()
+    public void EnemyBulletManager_ShouldCreateBulletAndAddToList()
     {
         // Arrange
         var bulletManager = new EnemyBulletManager();
         var startPosition = new Vector2(10, 10);
         var velocity = new Vector2(10, 10);
-        var enemyBullet = new EnemyBullet(startPosition, velocity);
-        var expected = enemyBullet;
 
         // Act
-        bulletManager.AddBullet(enemyBullet);
+        bulletManager.CreateBullet(startPosition, velocity);
         var actualList = bulletManager.Bullets;
-        ;
 
         // Assert
         Assert.Single(actualList);
-        Assert.Equal(expected, actualList[0]);
+        Assert.Equal(startPosition, actualList[0].Position);
 
         // Output
-        output.WriteLine($"Bullet count after AddBullet: {actualList.Count}");
-        output.WriteLine("Result: Bullet successfully added ✔");
+        output.WriteLine($"Bullet count after CreateBullet: {actualList.Count}");
+        output.WriteLine("Result: Bullet successfully created and added ✔");
     }
 
     [Theory]
@@ -46,8 +42,7 @@ public class EnemyBulletManagerTest(ITestOutputHelper output)
         var manager = new EnemyBulletManager();
         var startPosition = new Vector2(x, y);
         var velocity = new Vector2(10, 10);
-        var bullet = new EnemyBullet(startPosition, velocity);
-        manager.AddBullet(bullet);
+        manager.CreateBullet(startPosition, velocity);
 
         int screenWith = 800;
         int screenHeight = 600;
@@ -55,7 +50,6 @@ public class EnemyBulletManagerTest(ITestOutputHelper output)
 
         // Act
         manager.Update(gameTime, screenWith, screenHeight);
-
 
         // Assert
         Assert.Empty(manager.Bullets);
@@ -69,23 +63,22 @@ public class EnemyBulletManagerTest(ITestOutputHelper output)
         var manager = new EnemyBulletManager();
         var startingPosition = new Vector2(10, 10);
         var velocity = new Vector2(10, 10);
-        var enemyBullet = new EnemyBullet(startingPosition, velocity);
-        
-        manager.AddBullet(enemyBullet);
+
+        manager.CreateBullet(startingPosition, velocity);
 
         var deltaTime = 1 / 60f;
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(deltaTime));
         var expectedPos =  startingPosition + velocity * deltaTime;
-        
+
         // Act
         manager.Update(gameTime, 800, 600);
-        var actualPos = enemyBullet.Position;
+        var actualPos = manager.Bullets[0].Position;
 
         // Assert
         var precision = 4;
         Assert.Equal(expectedPos.X, actualPos.X, precision);
         Assert.Equal(expectedPos.Y, actualPos.Y, precision);
-        
+
         // output
         output.WriteLine($"Start position:    {startingPosition}");
         output.WriteLine($"Expected position: {expectedPos.X} - {expectedPos.Y}");

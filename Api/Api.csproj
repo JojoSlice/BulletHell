@@ -4,15 +4,27 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <NoWarn>SA1633;SA1309;SA1101;SA1600;SA1009;SA1111;SA1503;SA1407;SA1516;SA1202;SA1201;SA1519;SA1513;SA1122;SA1515;SA1502;SA1316;SA1512;SA1401;SA0001;SA1124;SA1413;SA1314;SA1127;SA1028;SA1649;SA1400;SA1025;SA1110</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\Repository\Repository.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
 
 </Project>
