@@ -141,6 +141,6 @@ public class MenuUIFactory
     public Vector2 GetCenteredPosition(string text, float y)
     {
         var size = _font.MeasureString(text);
-        return new Vector2((_screenWidth / 2) - (size.X / 2), y);
+        return new Vector2(((float)_screenWidth / 2) - (size.X / 2), y);
     }
 }
