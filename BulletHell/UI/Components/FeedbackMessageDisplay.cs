@@ -46,7 +46,7 @@ public class FeedbackMessageDisplay
         }
 
         var messageSize = font.MeasureString(_message);
-        var messagePosition = new Vector2(screenWidth / 2 - messageSize.X / 2, yPosition);
+        var messagePosition = new Vector2((float)screenWidth / 2 - messageSize.X / 2, yPosition);
 
         spriteBatch.DrawString(font, _message, messagePosition, _color);
     }
