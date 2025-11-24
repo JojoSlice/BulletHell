@@ -1,5 +1,6 @@
-﻿using System.Numerics;
-using BulletHell.Models;
+﻿using BulletHell.Models;
+using BulletHell.test.Helpers;
+using Microsoft.Xna.Framework;
 
 namespace BulletHell.test.Models;
 
@@ -59,5 +60,79 @@ public class ColliderTest
         var actual = collider.IsColliding();
 
         Assert.False(actual);
+    }
+
+    [Theory]
+    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.PlayerBulletCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
+    public void Collider_PlayerBullet_CollisionMatchesFriendly(Player player, Bullet bullet, bool areFriendly)
+    {
+        var collider = new Collider(player.Position, bullet.Position);
+        Assert.Equal(!areFriendly, collider.IsColliding());
+    }
+
+    [Theory]
+    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.BulletBulletCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
+    public void Collider_BulletBullet_CollisionMatchesFriendly(Bullet b1, Bullet b2, bool areFriendly)
+    {
+        var collider = new Collider(b1.Position, b2.Position);
+        Assert.Equal(!areFriendly, collider.IsColliding());
+    }
+
+    [Theory]
+    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.EnemyEnemyBulletCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
+    public void Collider_EnemyEnemyBullet_CollisionMatchesFriendly(Enemy enemy, EnemyBullet enemyBullet, bool areFriendly)
+    {
+        var collider = new Collider(enemy.Position, enemyBullet.Position);
+        Assert.Equal(!areFriendly, collider.IsColliding());
+    }
+
+    [Theory]
+    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.EnemyEnemyCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
+    public void Collider_EnemyEnemy_CollisionMatchesFriendly(Enemy e1, Enemy e2, bool areFriendly)
+    {
+        var collider = new Collider(e1.Position, e2.Position);
+        Assert.Equal(!areFriendly, collider.IsColliding());
+    }
+
+    [Theory]
+    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.EnemyBulletEnemyBulletCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
+    public void Collider_EnemyBulletEnemyBullet_CollisionMatchesFriendly(EnemyBullet eb1, EnemyBullet eb2, bool areFriendly)
+    {
+        var collider = new Collider(eb1.Position, eb2.Position);
+        Assert.Equal(!areFriendly, collider.IsColliding());
+    }
+
+    [Theory]
+    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.PlayerEnemyCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
+    public void Collider_PlayerEnemy_CollisionMatchesFriendly(Player p, Enemy e, bool areFriendly)
+    {
+        var collider = new Collider(p.Position, e.Position);
+        Assert.Equal(!areFriendly, collider.IsColliding());
+    }
+
+    [Theory]
+    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.PlayerEnemyBulletCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
+    public void Collider_PlayerEnemyBullet_CollisionMatchesFriendly(Player p, EnemyBullet eb, bool areFriendly)
+    {
+        var collider = new Collider(p.Position, eb.Position);
+        Assert.Equal(!areFriendly, collider.IsColliding());
+    }
+
+    [Theory]
+    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.BulletEnemyCollisionData),
+        MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
+    public void Collider_BulletEnemy_CollisionMatchesFriendly(Bullet b, Enemy e, bool areFriendly)
+    {
+        var collider = new Collider(b.Position, e.Position);
+        Assert.Equal(!areFriendly, collider.IsColliding());
+    }
+
+    [Theory]
+    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.BulletEnemyBulletCollisionData),
+        MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
+    public void Collider_BulletEnemyBullet_CollisionMatchesFriendly(Bullet b, EnemyBullet eb, bool areFriendly)
+    {
+        var collider = new Collider(b.Position, eb.Position);
+        Assert.Equal(!areFriendly, collider.IsColliding());
     }
 }
