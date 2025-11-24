@@ -1,138 +1,72 @@
-﻿using BulletHell.Models;
-using BulletHell.test.Helpers;
+using BulletHell.Models;
 using Microsoft.Xna.Framework;
 
 namespace BulletHell.test.Models;
 
-public class ColliderTest
+public class ColliderTests
 {
-    [Theory]
-    [InlineData(2,2)]
-    [InlineData(4,7)]
-    [InlineData(6,12)]
-    [InlineData(8,17)]
-    [InlineData(10,22)]
-    [InlineData(12,27)]
-    public void Collider_CheckObjectsDistance_ReturnsCorrect(int x, int y)
+    [Fact]
+    public void Constructor_SetsPosition()
     {
-        var object1 = new Vector2(1, 1);
-        var object2 = new Vector2(x, y);
-        var expectedDistance = ((object1.X - object2.X) * (object1.X - object1.X)) + ((object1.Y - object2.Y) * (object1.Y - object2.Y));
-        var collider = new Collider(object1, object2);
+        // Arrange
+        var pos = new Vector2(10f, 20f);
 
-        var actualDistance = collider.Distance();
+        // Act
+        var collider = new Collider(pos);
 
-        Assert.Equal(expectedDistance, actualDistance);
+        // Assert
+        Assert.Equal(pos, collider.Position);
     }
 
     [Fact]
-    public void Collider_CheckObjectsDistance_ReturnsZero_WhenObjectsAreSame()
+    public void Default_Radius_IsZero()
     {
-        var object1 = new Vector2(1, 1);
-        var collider = new Collider(object1, object1);
-        var actualDistance = collider.Distance();
-        Assert.Equal(0, actualDistance);
-    }
+        // Arrange & Act
+        var collider = new Collider(Vector2.Zero);
 
-    [Theory]
-    [InlineData(2, 2, 2, 2)]
-    [InlineData(4, 7, 3, 5)]
-    [InlineData(6, 12, 4, 4)]
-    [InlineData(8, 17, 5, 5)]
-    [InlineData(10, 22, 6, 6)]
-    public void Collider_CheckCollision_ReturnsTrueIfTouching(int x, int y, int radius1, int radius2)
-    {
-        var object1 = new Vector2(1, 1);
-        var object2 = new Vector2(x, y);
-        var collider = new Collider(object1, object2);
-        var expected = (radius1 + radius2) * (radius1 + radius2) > collider.Distance();
-
-        var actual = collider.IsColliding();
-        Assert.Equal(expected, actual);
+        // Assert
+        Assert.Equal(0f, collider.Radius);
     }
 
     [Fact]
-    public void Collider_CheckCollision_ReturnsFalse_WhenObjectsAreSame()
+    public void Can_Set_Radius()
     {
-        var object1 = new Vector2(1, 1);
-        var collider = new Collider(object1, object1);
+        // Arrange
+        var collider = new Collider(Vector2.Zero);
 
-        var actual = collider.IsColliding();
+        // Act
+        collider.Radius = 5.5f;
 
-        Assert.False(actual);
+        // Assert
+        Assert.Equal(5.5f, collider.Radius);
     }
 
-    [Theory]
-    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.PlayerBulletCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
-    public void Collider_PlayerBullet_CollisionMatchesFriendly(Player player, Bullet bullet, bool areFriendly)
+    [Fact]
+    public void Default_ColliderType_IsNull_And_CanBeSet()
     {
-        var collider = new Collider(player.Position, bullet.Position);
-        Assert.Equal(!areFriendly, collider.IsColliding());
+        // Arrange
+        var collider = new Collider(Vector2.Zero);
+
+        // Assert default
+        Assert.Null(collider.ColliderType);
+
+        // Act - set type
+        collider.ColliderType = typeof(object);
+
+        // Assert set
+        Assert.Equal(typeof(object), collider.ColliderType);
     }
 
-    [Theory]
-    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.BulletBulletCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
-    public void Collider_BulletBullet_CollisionMatchesFriendly(Bullet b1, Bullet b2, bool areFriendly)
+    [Fact]
+    public void Position_IsMutable()
     {
-        var collider = new Collider(b1.Position, b2.Position);
-        Assert.Equal(!areFriendly, collider.IsColliding());
-    }
+        // Arrange
+        var collider = new Collider(new Vector2(1, 2));
 
-    [Theory]
-    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.EnemyEnemyBulletCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
-    public void Collider_EnemyEnemyBullet_CollisionMatchesFriendly(Enemy enemy, EnemyBullet enemyBullet, bool areFriendly)
-    {
-        var collider = new Collider(enemy.Position, enemyBullet.Position);
-        Assert.Equal(!areFriendly, collider.IsColliding());
-    }
+        // Act
+        collider.Position = new Vector2(3, 4);
 
-    [Theory]
-    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.EnemyEnemyCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
-    public void Collider_EnemyEnemy_CollisionMatchesFriendly(Enemy e1, Enemy e2, bool areFriendly)
-    {
-        var collider = new Collider(e1.Position, e2.Position);
-        Assert.Equal(!areFriendly, collider.IsColliding());
-    }
-
-    [Theory]
-    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.EnemyBulletEnemyBulletCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
-    public void Collider_EnemyBulletEnemyBullet_CollisionMatchesFriendly(EnemyBullet eb1, EnemyBullet eb2, bool areFriendly)
-    {
-        var collider = new Collider(eb1.Position, eb2.Position);
-        Assert.Equal(!areFriendly, collider.IsColliding());
-    }
-
-    [Theory]
-    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.PlayerEnemyCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
-    public void Collider_PlayerEnemy_CollisionMatchesFriendly(Player p, Enemy e, bool areFriendly)
-    {
-        var collider = new Collider(p.Position, e.Position);
-        Assert.Equal(!areFriendly, collider.IsColliding());
-    }
-
-    [Theory]
-    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.PlayerEnemyBulletCollisionData), MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
-    public void Collider_PlayerEnemyBullet_CollisionMatchesFriendly(Player p, EnemyBullet eb, bool areFriendly)
-    {
-        var collider = new Collider(p.Position, eb.Position);
-        Assert.Equal(!areFriendly, collider.IsColliding());
-    }
-
-    [Theory]
-    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.BulletEnemyCollisionData),
-        MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
-    public void Collider_BulletEnemy_CollisionMatchesFriendly(Bullet b, Enemy e, bool areFriendly)
-    {
-        var collider = new Collider(b.Position, e.Position);
-        Assert.Equal(!areFriendly, collider.IsColliding());
-    }
-
-    [Theory]
-    [MemberData(nameof(FriendlyCollisionHelperDataTheoryTests.BulletEnemyBulletCollisionData),
-        MemberType = typeof(FriendlyCollisionHelperDataTheoryTests))]
-    public void Collider_BulletEnemyBullet_CollisionMatchesFriendly(Bullet b, EnemyBullet eb, bool areFriendly)
-    {
-        var collider = new Collider(b.Position, eb.Position);
-        Assert.Equal(!areFriendly, collider.IsColliding());
+        // Assert
+        Assert.Equal(new Vector2(3, 4), collider.Position);
     }
 }
