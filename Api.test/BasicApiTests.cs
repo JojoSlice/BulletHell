@@ -3,23 +3,30 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Api.test
 {
-    public class BasicApiTests(ITestOutputHelper output)
+    public class BasicApiTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
+        private readonly HttpClient _client;
+        private readonly ITestOutputHelper _output;
+
+        public BasicApiTests(CustomWebApplicationFactory<Program> factory, ITestOutputHelper output)
+        {
+            _output = output;
+            _client = factory.CreateClient();
+        }
+
         [Fact]
         public async Task Api_Starts_WithoutErrors()
         {
-            // Arrange
-            await using var factory = new WebApplicationFactory<Program>();
-            var client = factory.CreateClient();
-
             // Act
-            var response = await client.GetAsync("/api/users");
+            var response = await _client.GetAsync("/api/users");
 
             // Assert
-            Assert.True(response.IsSuccessStatusCode);
+            response.EnsureSuccessStatusCode();
+            Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
+            Assert.True(response.Content.Headers.ContentLength > 0);
 
             // Output
-            output.WriteLine($"StatusCode: {(int)response.StatusCode} ({response.StatusCode})");
+            _output.WriteLine($"StatusCode: {(int)response.StatusCode} ({response.StatusCode})");
 
         }
     }

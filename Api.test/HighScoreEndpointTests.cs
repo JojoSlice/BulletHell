@@ -4,22 +4,26 @@ using System.Net;
 
 namespace Api.test;
 
-public class HighScoreEndpointTests(ITestOutputHelper output)
+public class HighScoreEndPointTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
+    private readonly HttpClient _client;
+    private readonly ITestOutputHelper _output;
+
+    public HighScoreEndPointTests(CustomWebApplicationFactory<Program> factory, ITestOutputHelper output)
+    {
+        _output = output;
+        _client = factory.CreateClient();
+    }
     [Fact]
     public async Task GetHighScores_Returns200Ok()
     {
-        // Arrange
-        await using var factory = new WebApplicationFactory<Program>();
-        var client = factory.CreateClient();
-
-        // Act
-        var response = await client.GetAsync("/api/highscores");
+         // Act
+        var response = await _client.GetAsync("/api/highscores");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         // Output
-        output.WriteLine($"Status: {response.StatusCode}");
+        _output.WriteLine($"Status: {response.StatusCode}");
     }
 }
