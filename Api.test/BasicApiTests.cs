@@ -18,11 +18,11 @@ namespace Api.test
         public async Task Api_Starts_WithoutErrors()
         {
             // Act
-            var response = await _client.GetAsync("/api/users");
+            var response = await _client.GetAsync("/api/users", TestContext.Current.CancellationToken);
 
             // Assert
             response.EnsureSuccessStatusCode();
-            Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
+            Assert.Equal("application/json", response.Content.Headers.ContentType!.MediaType);
             Assert.True(response.Content.Headers.ContentLength > 0);
 
             // Output
