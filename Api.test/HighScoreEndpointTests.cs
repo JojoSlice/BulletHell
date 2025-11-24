@@ -14,11 +14,12 @@ public class HighScoreEndPointTests : IClassFixture<CustomWebApplicationFactory<
         _output = output;
         _client = factory.CreateClient();
     }
+
     [Fact]
     public async Task GetHighScores_Returns200Ok()
     {
-         // Act
-         var response = await _client.GetAsync("/api/highscores", TestContext.Current.CancellationToken);
+        // Act
+        var response = await _client.GetAsync("/api/highscores", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

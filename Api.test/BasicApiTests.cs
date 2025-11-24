@@ -27,7 +27,6 @@ namespace Api.test
 
             // Output
             _output.WriteLine($"StatusCode: {(int)response.StatusCode} ({response.StatusCode})");
-
         }
     }
 }
