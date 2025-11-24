@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 using BulletHell.Constants;
 using BulletHell.Inputs;
 using BulletHell.Interfaces;
@@ -24,6 +25,7 @@ public class MenuScene : Scene
     private const int LoginButtonYOffset = 220;
     private const int ExitButtonYOffset = 300;
     private const int BorderThickness = 2;
+    private const float FeedbackDuration = 3f; // Sekunder
 
     private readonly SpriteFont _font;
     private readonly Texture2D _whiteTexture;
@@ -44,6 +46,9 @@ public class MenuScene : Scene
     private Button _actionButton = null!;
 
     private RegistrationMode _currentMode = RegistrationMode.Login;
+    private string _feedbackMessage = string.Empty;
+    private Color _feedbackColor = Color.White;
+    private float _feedbackTimer = 0f;
 
     public RegistrationMode CurrentMode => _currentMode;
 
@@ -132,17 +137,106 @@ public class MenuScene : Scene
         _modeToggleButton.UpdateText($"Mode: {_currentMode}");
     }
 
-    private void OnActionButtonClicked()
+    public async Task<RegistrationResult> RegisterUserAsync(string username, string password)
     {
-        // TODO: Implementera i steg 4 (Registreringslogik)
-        // if (_currentMode == RegistrationMode.Register)
-        // {
-        //     await HandleRegistrationAsync();
-        // }
-        // else
-        // {
-        //     HandleLogin();
-        // }
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            return new RegistrationResult
+            {
+                Success = false,
+                Message = "Användarnamn får inte vara tomt",
+            };
+        }
+
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            return new RegistrationResult
+            {
+                Success = false,
+                Message = "Lösenord får inte vara tomt",
+            };
+        }
+
+        if (username.Length < 3)
+        {
+            return new RegistrationResult
+            {
+                Success = false,
+                Message = "Användarnamn måste vara minst 3 tecken",
+            };
+        }
+
+        if (password.Length < 6)
+        {
+            return new RegistrationResult
+            {
+                Success = false,
+                Message = "Lösenord måste vara minst 6 tecken",
+            };
+        }
+
+        var passwordHash = _passwordHasher.HashPassword(password);
+
+        return await _userApiClient.RegisterUserAsync(username, passwordHash);
+    }
+
+    private async void OnActionButtonClicked()
+    {
+        if (_currentMode == RegistrationMode.Register)
+        {
+            await HandleRegistrationAsync();
+        }
+        else
+        {
+            HandleLogin();
+        }
+    }
+
+    private async Task HandleRegistrationAsync()
+    {
+        var username = _usernameField?.Text ?? "";
+        var password = _passwordField?.Text ?? "";
+
+        var originalText = _actionButton.Text;
+        _actionButton.UpdateText("Registrerar...");
+        _actionButton.Enabled = false;
+
+        try
+        {
+            var result = await RegisterUserAsync(username, password);
+
+            if (result.Success)
+            {
+                ShowMessage($"Välkommen {username}!", Color.Green);
+
+                // Rensa fält (note: InputField doesn't have Clear() method yet, would need to be added)
+                // För nu hoppar vi över detta
+
+                ToggleMode();
+            }
+            else
+            {
+                ShowMessage(result.Message, Color.Red);
+            }
+        }
+        finally
+        {
+            _actionButton.UpdateText(originalText);
+            _actionButton.Enabled = true;
+        }
+    }
+
+    private void HandleLogin()
+    {
+        // TODO: Implementera login senare om behövs
+        ShowMessage("Login ej implementerad än", Color.Yellow);
+    }
+
+    private void ShowMessage(string message, Color color)
+    {
+        _feedbackMessage = message;
+        _feedbackColor = color;
+        _feedbackTimer = FeedbackDuration;
     }
 
     private Vector2 GetCenteredPosition(string text, float y)
@@ -293,6 +387,15 @@ public class MenuScene : Scene
         {
             _menuNavigator?.Update(keyState);
         }
+
+        if (_feedbackTimer > 0)
+        {
+            _feedbackTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (_feedbackTimer < 0)
+            {
+                _feedbackMessage = string.Empty;
+            }
+        }
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -316,6 +419,14 @@ public class MenuScene : Scene
         foreach (var button in _menuButtons)
         {
             button.Draw(spriteBatch);
+        }
+
+        if (!string.IsNullOrEmpty(_feedbackMessage))
+        {
+            var messageSize = _font.MeasureString(_feedbackMessage);
+            var messagePosition = new Vector2(_screenWidth / 2 - messageSize.X / 2, 50);
+
+            spriteBatch.DrawString(_font, _feedbackMessage, messagePosition, _feedbackColor);
         }
     }
 

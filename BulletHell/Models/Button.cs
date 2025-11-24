@@ -20,6 +20,7 @@ public class Button : INavigable, IDisposable
     private bool _wasPressed;
     private bool _isSelected;
     private bool _disposed;
+    private bool _enabled = true;
 
     private Vector2 _cachedTextSize;
     private Vector2 _cachedTextPos;
@@ -27,6 +28,12 @@ public class Button : INavigable, IDisposable
 
     public event Action? OnClick;
     public Rectangle Bounds => _bounds;
+    public string Text => _text;
+    public bool Enabled
+    {
+        get => _enabled;
+        set => _enabled = value;
+    }
 
     public Button(SpriteFont font, string text, Rectangle bounds, Texture2D whiteTexture)
     {
@@ -49,11 +56,18 @@ public class Button : INavigable, IDisposable
     public void UpdateText(string newText)
     {
         _text = newText;
-        _textMeasured = false; // Force re-measurement of text
+        _textMeasured = false;
     }
 
     public void Update(MouseState mouseState)
     {
+        if (!_enabled)
+        {
+            _isHovered = false;
+            _wasPressed = false;
+            return;
+        }
+
         _isHovered = _bounds.Contains(mouseState.Position);
 
         bool isPressed = mouseState.LeftButton == ButtonState.Pressed;
@@ -68,7 +82,10 @@ public class Button : INavigable, IDisposable
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        Color bgColor = _wasPressed ? Color.DimGray : (_isHovered ? Color.Gray : Color.DarkGray);
+        Color bgColor =
+            !_enabled ? Color.DarkSlateGray
+            : _wasPressed ? Color.DimGray
+            : (_isHovered ? Color.Gray : Color.DarkGray);
 
         spriteBatch.Draw(_texture, _bounds, bgColor);
 
