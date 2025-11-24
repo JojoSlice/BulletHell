@@ -424,7 +424,7 @@ public class MenuScene : Scene
         if (!string.IsNullOrEmpty(_feedbackMessage))
         {
             var messageSize = _font.MeasureString(_feedbackMessage);
-            var messagePosition = new Vector2(_screenWidth / 2 - messageSize.X / 2, 50);
+            var messagePosition = new Vector2((float)_screenWidth / 2 - messageSize.X / 2, 50);
 
             spriteBatch.DrawString(_font, _feedbackMessage, messagePosition, _feedbackColor);
         }
