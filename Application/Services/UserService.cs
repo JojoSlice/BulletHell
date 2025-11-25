@@ -29,16 +29,8 @@ public class UserService(IRepository<User> repository) : IUserService<UserRespon
     {
         var user = await repository.GetByUsernameAsync(request.UserName);
 
-        if (user == null)
-        {
-            return new Response<UserResponse?>
-            {
-                IsSuccess = false,
-                Data = null,
-            };
-        }
-
-        if (user.PasswordHash != request.PasswordHash)
+        if (user == null
+        || (user.PasswordHash != request.PasswordHash))
         {
             return new Response<UserResponse?>
             {
