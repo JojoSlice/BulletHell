@@ -19,10 +19,7 @@ public class CollisionManagerTests
     {
         var collider1 = new Collider(new Vector2(1, 1));
         var collider2 = new Collider(new Vector2(x, y));
-        var expectedDistance = ((collider1.Position.X - collider2.Position.X)
-                                * (collider1.Position.X - collider2.Position.X))
-                                + ((collider1.Position.Y - collider2.Position.Y)
-                                * (collider1.Position.Y - collider2.Position.Y));
+        var expectedDistance = Vector2.Distance(collider1.Position, collider2.Position);
         var collMan = new CollisionManager(collider1, collider2);
         var actualDistance = collMan.Distance();
 
@@ -52,7 +49,8 @@ public class CollisionManagerTests
         object2.Radius = radius2;
 
         var collMan = new CollisionManager(object1, object2);
-        var expected = (radius1 + radius2) * (radius1 + radius2) >= collMan.Distance();
+        var expected = (float)(radius1 + radius2) * (radius1 + radius2) >=
+                       Vector2.DistanceSquared(object1.Position, object2.Position);
 
         var actual = collMan.IsColliding();
         Assert.Equal(expected, actual);
