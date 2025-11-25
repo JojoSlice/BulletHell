@@ -34,7 +34,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
             PasswordHash = passwordHash,
         };
 
-        await _client.PostAsJsonAsync("/api/users", createRequest);
+        await _client.PostAsJsonAsync("/api/users", createRequest, TestContext.Current.CancellationToken);
 
         var loginRequest = new LoginRequest
         {
@@ -52,7 +52,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var result = await response.Content.ReadFromJsonAsync<Response<UserResponse>>();
+        var result = await response.Content.ReadFromJsonAsync<Response<UserResponse>>(TestContext.Current.CancellationToken);
         Assert.NotNull(result);
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Data);
@@ -74,7 +74,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
             PasswordHash = correctPasswordHash,
         };
 
-        await _client.PostAsJsonAsync("/api/users", createRequest);
+        await _client.PostAsJsonAsync("/api/users", createRequest, TestContext.Current.CancellationToken);
 
         var loginRequest = new LoginRequest
         {
@@ -92,7 +92,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var result = await response.Content.ReadFromJsonAsync<Response<UserResponse>>();
+        var result = await response.Content.ReadFromJsonAsync<Response<UserResponse>>(TestContext.Current.CancellationToken);
         Assert.NotNull(result);
         Assert.False(result.IsSuccess);
         Assert.Null(result.Data);
@@ -120,7 +120,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var result = await response.Content.ReadFromJsonAsync<Response<UserResponse>>();
+        var result = await response.Content.ReadFromJsonAsync<Response<UserResponse>>(TestContext.Current.CancellationToken);
         Assert.NotNull(result);
         Assert.False(result.IsSuccess);
         Assert.Null(result.Data);
