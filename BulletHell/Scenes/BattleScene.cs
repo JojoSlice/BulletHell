@@ -70,7 +70,7 @@ public class BattleScene : Scene
         _enemyBulletManager.LoadContent(_enemyBulletTexture);
 
         _camera = new Camera();
-        _camera.SetWorldBounds(_screenWidth * 2, _screenHeight * 2);
+        _camera.SetWorldBounds((float)_screenWidth * 2, (float)_screenHeight * 2);
     }
 
     public override void Update(GameTime gameTime)
