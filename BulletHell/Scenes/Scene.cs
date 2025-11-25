@@ -18,6 +18,18 @@ public abstract class Scene : IDisposable
 
     public abstract void Draw(SpriteBatch spriteBatch);
 
+    /// <summary>
+    /// Gets the camera transformation matrix for this scene.
+    /// Returns null if the scene doesn't use a camera.
+    /// </summary>
+    public virtual Matrix? GetCameraTransform() => null;
+
+    /// <summary>
+    /// Draws HUD elements that should not be affected by camera transformation.
+    /// These elements use screen coordinates and remain fixed on screen.
+    /// </summary>
+    public virtual void DrawHUD(SpriteBatch spriteBatch) { }
+
     public virtual void OnEnter() { }
 
     public virtual void OnExit() { }
