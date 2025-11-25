@@ -22,6 +22,7 @@ public class Player : IDisposable
     public Vector2 Position { get; private set; }
     public int Width => _sprite.Width;
     public int Height => _sprite.Height;
+    public int Health { get; private set; } = PlayerConfig.StartingHealth;
 
     public Player(Vector2 startPosition, IInputProvider input, ISpriteHelper sprite)
     {
