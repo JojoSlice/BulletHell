@@ -1,7 +1,7 @@
 ﻿using BulletHell.Scenes;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace BulletHell.Debug;
+namespace BulletHell.DebugUI;
 
 public class DebugOverlay
 {
