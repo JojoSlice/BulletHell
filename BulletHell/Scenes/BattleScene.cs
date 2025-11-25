@@ -54,8 +54,8 @@ public class BattleScene : Scene
         _enemyManager = new EnemyManager(_enemyBulletManager);
 
         _hud = new HUD();
-        _hud.MaxHP = 100; // eller vad du vill
-        _hud.HP = _player.Health; // Koppla spelarens HP
+        _hud.MaxHP = 100;
+        _hud.HP = _player.Health;
 
         // Add initial enemy
         _enemyManager.AddEnemy(new Enemy(
