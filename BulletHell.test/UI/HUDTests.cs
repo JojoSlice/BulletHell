@@ -45,4 +45,23 @@ public class HUDTests
         _output.WriteLine($"Expected: {expected}");
         _output.WriteLine($"Actual:   {actual}");
     }
+
+    [Fact]
+    public void HUD_ShouldStoreAndReturnAmmo()
+    {
+        // Arrange
+        var expected = 30;
+
+        // Act
+        var hud = new HUD();
+        hud.Ammo = expected;
+        var actual = hud.Ammo;
+
+        // Assert
+        Assert.Equal(expected, actual);
+
+        // Output
+        _output.WriteLine($"Expected: {expected}");
+        _output.WriteLine($"Actual:   {actual}");
+    }
 }
