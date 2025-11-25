@@ -5,7 +5,6 @@ using BulletHell.Inputs;
 using BulletHell.Interfaces;
 using BulletHell.Managers;
 using BulletHell.Models;
-using BulletHell.UI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -17,10 +16,6 @@ namespace BulletHell.Scenes;
 /// </summary>
 public class BattleScene : Scene
 {
-    private Camera? _camera;
-    private HUD? _hud;
-    private SpriteFont? _hudFont;
-
     private int _screenWidth;
     private int _screenHeight;
     private Player? _player;
@@ -56,9 +51,6 @@ public class BattleScene : Scene
         _enemyBulletManager = new EnemyBulletManager();
         _enemyManager = new EnemyManager(_enemyBulletManager);
 
-        _hud = new HUD();
-        _hudFont = _game.Content.Load<SpriteFont>("hud_font");
-
         // Add initial enemy
         _enemyManager.AddEnemy(new Enemy(
             new Vector2(400, 0),
@@ -77,8 +69,6 @@ public class BattleScene : Scene
         _enemyBulletTexture = _game.Content.Load<Texture2D>("enemy_bullet");
         _enemyBulletManager.LoadContent(_enemyBulletTexture);
 
-        _camera = new Camera();
-        _camera.SetWorldBounds((float)_screenWidth * 2, (float)_screenHeight * 2);
     }
 
     public override void Update(GameTime gameTime)
@@ -109,8 +99,6 @@ public class BattleScene : Scene
         _enemyManager.Update(gameTime, _screenWidth, _screenHeight);
         _enemyBulletManager.Update(gameTime, _screenWidth, _screenHeight);
 
-        _hud.HP = _player.Health;
-        _hud.Ammo = 30;
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -124,11 +112,6 @@ public class BattleScene : Scene
         _bulletManager.Draw(spriteBatch);
         _enemyManager.Draw(spriteBatch);
         _enemyBulletManager.Draw(spriteBatch);
-
-        if (_hud != null && _hudFont != null)
-        {
-            _hud.Draw(spriteBatch, _hudFont);
-        }
     }
 
     protected override void Dispose(bool disposing)
