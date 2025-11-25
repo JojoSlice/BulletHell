@@ -17,6 +17,5 @@ public class HUD
         // HP bar fylld
         int hpWidth = (int)(200 * (HP / (float)MaxHP));
         spriteBatch.Draw(TextureHelper.WhitePixel(spriteBatch.GraphicsDevice), new Rectangle(10, 10, hpWidth, 20), Color.LimeGreen);
-
     }
 }
