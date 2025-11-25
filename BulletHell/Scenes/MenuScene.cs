@@ -1,9 +1,15 @@
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using BulletHell.Constants;
 using BulletHell.Inputs;
 using BulletHell.Interfaces;
 using BulletHell.Managers;
 using BulletHell.Models;
+using BulletHell.Services;
+using BulletHell.Services.Validation;
+using BulletHell.UI.Components;
+using BulletHell.UI.Factories;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -11,138 +17,247 @@ namespace BulletHell.Scenes;
 
 public class MenuScene : Scene
 {
-    private const int ButtonWidth = 300;
-    private const int ButtonHeight = 50;
-    private const int InputFieldWidth = 300;
-    private const int InputFieldHeight = 40;
     private const int TitleYPosition = 200;
-    private const int StartButtonYOffset = 0;
-    private const int UsernameFieldYOffset = 80;
-    private const int PasswordFieldYOffset = 150;
-    private const int LoginButtonYOffset = 220;
-    private const int ExitButtonYOffset = 300;
-    private const int BorderThickness = 2;
+    private const int FeedbackMessageYPosition = 50;
+    private const float FeedbackDuration = 3f;
 
     private readonly SpriteFont _font;
-    private readonly Texture2D _whiteTexture;
     private readonly string _title = "Bullet Hell";
     private readonly int _screenWidth;
     private readonly int _screenHeight;
     private readonly IMenuInputProvider _inputProvider;
-    private readonly ITextInputHandler _textInputHandler;
+    private readonly IUserApiClient _userApiClient;
+    private readonly IPasswordHasher _passwordHasher;
+    private readonly UserCredentialsValidator _validator;
+    private readonly FeedbackMessageDisplay _feedbackDisplay;
+    private readonly MenuUIFactory _uiFactory;
 
     private Button[] _menuButtons;
-    private InputField[] _menuInputs;
     private InputField? _usernameField;
     private InputField? _passwordField;
     private IMenuNavigator? _menuNavigator;
+    private Button _modeToggleButton = null!;
+    private Button _actionButton = null!;
+
+    private RegistrationMode _currentMode = RegistrationMode.Login;
+
+    public RegistrationMode CurrentMode => _currentMode;
 
     public MenuScene(Game1 game, Texture2D whiteTexture)
-        : this(game, whiteTexture, new MouseKeyboardInputProvider(), new KeyboardTextInputHandler())
-    { }
+        : this(
+            game,
+            whiteTexture,
+            new MouseKeyboardInputProvider(),
+            new KeyboardTextInputHandler(),
+            new UserApiClient(new HttpClient { BaseAddress = new Uri("http://localhost:5000") }),
+            new BCryptPasswordHasher()
+        ) { }
 
     public MenuScene(
         Game1 game,
         Texture2D whiteTexture,
         IMenuInputProvider inputProvider,
-        ITextInputHandler textInputHandler
+        ITextInputHandler textInputHandler,
+        IUserApiClient userApiClient,
+        IPasswordHasher passwordHasher
     )
         : base(game)
     {
-        _whiteTexture = whiteTexture;
         _inputProvider = inputProvider;
-        _textInputHandler = textInputHandler;
         _font = game.Content.Load<SpriteFont>("Font");
         _screenWidth = game.GraphicsDevice.Viewport.Width;
         _screenHeight = game.GraphicsDevice.Viewport.Height;
-
+        _userApiClient = userApiClient;
+        _passwordHasher = passwordHasher;
+        _validator = new UserCredentialsValidator();
+        _feedbackDisplay = new FeedbackMessageDisplay();
+        _uiFactory = new MenuUIFactory(_font, whiteTexture, textInputHandler, _screenWidth, _screenHeight);
         _menuButtons = [];
-        _menuInputs = [];
     }
 
-    private Vector2 GetCenteredPosition(string text, float y)
+    // Constructor for testing - doesn't require Game1.Content or GraphicsDevice
+    internal MenuScene(
+        Game1 game,
+        Texture2D whiteTexture,
+        SpriteFont font,
+        int screenWidth,
+        int screenHeight,
+        IMenuInputProvider inputProvider,
+        ITextInputHandler textInputHandler,
+        IUserApiClient userApiClient,
+        IPasswordHasher passwordHasher
+    )
+        : base(game)
     {
-        var size = _font.MeasureString(text);
-        return new Vector2(((float)_screenWidth / 2) - (size.X / 2), y);
+        _font = font;
+        _screenWidth = screenWidth;
+        _screenHeight = screenHeight;
+        _inputProvider = inputProvider;
+        _userApiClient = userApiClient;
+        _passwordHasher = passwordHasher;
+        _validator = new UserCredentialsValidator();
+        _feedbackDisplay = new FeedbackMessageDisplay();
+        _uiFactory = new MenuUIFactory(font, whiteTexture, textInputHandler, screenWidth, screenHeight);
+        _menuButtons = [];
     }
 
-    private Button[] GetMenuButtons()
+    public void ToggleMode()
     {
-        var centerX = (_screenWidth / 2) - (ButtonWidth / 2);
-        var centerY = _screenHeight / 2;
+        _currentMode =
+            _currentMode == RegistrationMode.Login
+                ? RegistrationMode.Register
+                : RegistrationMode.Login;
 
-        var startButton = new Button(
-            _font,
-            "Start Game",
-            new(centerX, centerY + StartButtonYOffset, ButtonWidth, ButtonHeight),
-            _whiteTexture
-        );
-        startButton.OnClick += () => _game.ChangeScene(SceneNames.Battle);
-
-        var loginButton = new Button(
-            _font,
-            "Log In",
-            new(centerX, centerY + LoginButtonYOffset, ButtonWidth, ButtonHeight),
-            _whiteTexture
-        );
-
-        var exitButton = new Button(
-            _font,
-            "Exit",
-            new(centerX, centerY + ExitButtonYOffset, ButtonWidth, ButtonHeight),
-            _whiteTexture
-        );
-        exitButton.OnClick += () => _game.Exit();
-
-        return [startButton, loginButton, exitButton];
+        // Uppdatera knapp-text
+        UpdateActionButtonText();
     }
 
-    private InputField[] GetMenuInputs()
+    public string GetActionButtonText()
     {
-        var centerX = (_screenWidth / 2) - (InputFieldWidth / 2);
-        var centerY = _screenHeight / 2;
+        return _currentMode == RegistrationMode.Login ? "Log In" : "Register";
+    }
 
-        _usernameField = new InputField(
-            _font,
-            "Username:",
-            new(centerX, centerY + UsernameFieldYOffset, InputFieldWidth, InputFieldHeight),
-            _textInputHandler,
-            _whiteTexture,
-            isPassword: false
-        );
+    private void UpdateActionButtonText()
+    {
+        _actionButton?.UpdateText(GetActionButtonText());
+    }
 
-        _passwordField = new InputField(
-            _font,
-            "Password:",
-            new(centerX, centerY + PasswordFieldYOffset, InputFieldWidth, InputFieldHeight),
-            _textInputHandler,
-            _whiteTexture,
-            isPassword: true
-        );
+    private void OnModeToggleClicked()
+    {
+        ToggleMode();
+        _modeToggleButton.UpdateText($"Mode: {_currentMode}");
+    }
 
-        return [_usernameField, _passwordField];
+    public async Task<RegistrationResult> RegisterUserAsync(string username, string password)
+    {
+        var validationResult = _validator.Validate(username, password);
+        if (!validationResult.IsValid)
+        {
+            return new RegistrationResult
+            {
+                Success = false,
+                Message = validationResult.ErrorMessage,
+            };
+        }
+
+        var passwordHash = _passwordHasher.HashPassword(password);
+        return await _userApiClient.RegisterUserAsync(username, passwordHash);
+    }
+
+    private async void OnActionButtonClicked()
+    {
+        if (_currentMode == RegistrationMode.Register)
+        {
+            await HandleRegistrationAsync();
+        }
+        else
+        {
+            HandleLogin();
+        }
+    }
+
+    private async Task HandleRegistrationAsync()
+    {
+        var username = _usernameField?.Text ?? "";
+        var password = _passwordField?.Text ?? "";
+
+        var originalText = _actionButton.Text;
+        _actionButton.UpdateText("Registrerar...");
+        _actionButton.Enabled = false;
+
+        try
+        {
+            var result = await RegisterUserAsync(username, password);
+
+            if (result.Success)
+            {
+                ShowMessage($"Välkommen {username}!", Color.Green);
+
+                // Rensa fält (note: InputField doesn't have Clear() method yet, would need to be added)
+                // För nu hoppar vi över detta
+
+                ToggleMode();
+            }
+            else
+            {
+                ShowMessage(result.Message, Color.Red);
+            }
+        }
+        finally
+        {
+            _actionButton.UpdateText(originalText);
+            _actionButton.Enabled = true;
+        }
+    }
+
+    private void HandleLogin()
+    {
+        // TODO: Implementera login senare om behövs
+        ShowMessage("Login ej implementerad än", Color.Yellow);
+    }
+
+    private void ShowMessage(string message, Color color)
+    {
+        _feedbackDisplay.Show(message, color, FeedbackDuration);
     }
 
     public override void OnEnter()
     {
+        InitializeModeToggleButton();
+        InitializeActionButton();
+        InitializeMenuComponents();
+        SetupMenuNavigation();
+    }
+
+    private void InitializeModeToggleButton()
+    {
+        _modeToggleButton = _uiFactory.CreateModeToggleButton(_currentMode, OnModeToggleClicked);
+    }
+
+    private void InitializeActionButton()
+    {
+        _actionButton = _uiFactory.CreateActionButton(GetActionButtonText(), OnActionButtonClicked);
+    }
+
+    private void InitializeMenuComponents()
+    {
         if (_menuButtons == null || _menuButtons.Length == 0)
         {
-            _menuButtons = GetMenuButtons();
-            _menuInputs = GetMenuInputs();
-            _menuNavigator = new MenuNavigator();
+            var startButton = _uiFactory.CreateStartGameButton(() => _game.ChangeScene(SceneNames.Battle));
+            var exitButton = _uiFactory.CreateExitButton(() => _game.Exit());
+            _menuButtons = [startButton, exitButton];
 
-            _menuNavigator.AddItem(_menuButtons[0]); // Start button
-            _menuNavigator.AddItem(_menuInputs[0]); // Username field
-            _menuNavigator.AddItem(_menuInputs[1]); // Password field
-            _menuNavigator.AddItem(_menuButtons[1]); // Login button
-            _menuNavigator.AddItem(_menuButtons[2]); // Exit button
+            _usernameField = _uiFactory.CreateUsernameField();
+            _passwordField = _uiFactory.CreatePasswordField();
         }
+    }
 
-        if (_usernameField != null)
+    private void SetupMenuNavigation()
+    {
+        if (_menuNavigator == null)
         {
-            // TODO: InputField doesn't have a Clear() method, would need to add one
-            // For now, text persists between scene changes
+            _menuNavigator = new MenuNavigator();
+            _menuNavigator.AddItem(_menuButtons[0]); // Start button
+            _menuNavigator.AddItem(_usernameField!); // Username field
+            _menuNavigator.AddItem(_passwordField!); // Password field
+            _menuNavigator.AddItem(_actionButton); // Action button (Login/Register)
+            _menuNavigator.AddItem(_menuButtons[1]); // Exit button
         }
+    }
+
+    public override void OnExit()
+    {
+        if (_modeToggleButton != null)
+        {
+            _modeToggleButton.OnClick -= OnModeToggleClicked;
+        }
+
+        if (_actionButton != null)
+        {
+            _actionButton.OnClick -= OnActionButtonClicked;
+        }
+
+        base.OnExit();
     }
 
     public override void Update(GameTime gameTime)
@@ -153,6 +268,9 @@ public class MenuScene : Scene
         _usernameField?.Update(gameTime, mouseState);
         _passwordField?.Update(gameTime, mouseState);
 
+        _modeToggleButton?.Update(mouseState);
+        _actionButton?.Update(mouseState);
+
         foreach (var button in _menuButtons)
         {
             button.Update(mouseState);
@@ -162,6 +280,8 @@ public class MenuScene : Scene
         {
             _menuNavigator?.Update(keyState);
         }
+
+        _feedbackDisplay.Update(gameTime);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -169,27 +289,31 @@ public class MenuScene : Scene
         spriteBatch.DrawString(
             _font,
             _title,
-            GetCenteredPosition(_title, TitleYPosition),
+            _uiFactory.GetCenteredPosition(_title, TitleYPosition),
             Color.Black
         );
 
-        foreach (var inputField in _menuInputs)
-        {
-            inputField.Draw(spriteBatch);
-        }
+        _modeToggleButton?.Draw(spriteBatch);
+
+        _usernameField?.Draw(spriteBatch);
+        _passwordField?.Draw(spriteBatch);
+
+        _actionButton?.Draw(spriteBatch);
 
         foreach (var button in _menuButtons)
         {
             button.Draw(spriteBatch);
         }
+
+        _feedbackDisplay.Draw(spriteBatch, _font, _screenWidth, FeedbackMessageYPosition);
     }
 
     protected override void Dispose(bool disposing)
     {
         if (disposing)
         {
-            // Note: We don't dispose _whiteTexture here as it's a shared resource
-            // owned by Game1 and will be disposed there
+            _modeToggleButton?.Dispose();
+            _actionButton?.Dispose();
 
             if (_menuButtons != null)
             {
@@ -199,13 +323,8 @@ public class MenuScene : Scene
                 }
             }
 
-            if (_menuInputs != null)
-            {
-                foreach (var inputField in _menuInputs)
-                {
-                    inputField.Dispose();
-                }
-            }
+            _usernameField?.Dispose();
+            _passwordField?.Dispose();
 
             _menuNavigator = null;
             _usernameField = null;
