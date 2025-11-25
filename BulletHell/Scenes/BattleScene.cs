@@ -1,4 +1,5 @@
 using System;
+using BulletHell.Graphics;
 using BulletHell.Helpers;
 using BulletHell.Inputs;
 using BulletHell.Interfaces;
@@ -25,6 +26,7 @@ public class BattleScene : Scene
     private Texture2D? _bulletTexture;
     private Texture2D? _enemyTexture;
     private Texture2D? _enemyBulletTexture;
+    private Camera? _camera;
 
     public BattleScene(Game1 game)
         : base(game)
@@ -50,7 +52,6 @@ public class BattleScene : Scene
         _enemyBulletManager = new EnemyBulletManager();
         _enemyManager = new EnemyManager(_enemyBulletManager);
 
-        // Add initial enemy
         _enemyManager.AddEnemy(new Enemy(
             new Vector2(400, 0),
             new SpriteHelper()
@@ -67,6 +68,9 @@ public class BattleScene : Scene
 
         _enemyBulletTexture = _game.Content.Load<Texture2D>("enemy_bullet");
         _enemyBulletManager.LoadContent(_enemyBulletTexture);
+
+        _camera = new Camera();
+        _camera.SetWorldBounds(_screenWidth * 2, _screenHeight * 2);
     }
 
     public override void Update(GameTime gameTime)
@@ -96,6 +100,11 @@ public class BattleScene : Scene
         _bulletManager.Update(gameTime, _screenWidth, _screenHeight);
         _enemyManager.Update(gameTime, _screenWidth, _screenHeight);
         _enemyBulletManager.Update(gameTime, _screenWidth, _screenHeight);
+
+        if (_camera != null && _player != null)
+        {
+            _camera.Follow(_player.Position, _game.GraphicsDevice.Viewport, 0.1f);
+        }
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -109,6 +118,18 @@ public class BattleScene : Scene
         _bulletManager.Draw(spriteBatch);
         _enemyManager.Draw(spriteBatch);
         _enemyBulletManager.Draw(spriteBatch);
+    }
+
+    public override Matrix? GetCameraTransform()
+    {
+        return _camera?.Transform;
+    }
+
+    public override void DrawHUD(SpriteBatch spriteBatch)
+    {
+        // Empty for now - HUD elements can be added later
+        // Example:
+        // spriteBatch.DrawString(font, "HP: " + _player.Health, new Vector2(20, 20), Color.White);
     }
 
     protected override void Dispose(bool disposing)
@@ -131,6 +152,8 @@ public class BattleScene : Scene
             _bulletTexture = null;
             _enemyTexture = null;
             _enemyBulletTexture = null;
+
+            _camera = null;
         }
 
         base.Dispose(disposing);

@@ -78,9 +78,29 @@ public class Game1 : Game
 
         if (_spriteBatch != null && _currentScene != null)
         {
-            _spriteBatch.Begin();
-            _currentScene.Draw(_spriteBatch);
-            _spriteBatch.End();
+            var cameraTransform = _currentScene.GetCameraTransform();
+
+            if (cameraTransform.HasValue)
+            {
+                // Two-pass rendering: World with camera, then HUD without
+
+                // Pass 1: Draw world with camera transform
+                _spriteBatch.Begin(transformMatrix: cameraTransform.Value);
+                _currentScene.Draw(_spriteBatch);
+                _spriteBatch.End();
+
+                // Pass 2: Draw HUD without camera (screen coordinates)
+                _spriteBatch.Begin();
+                _currentScene.DrawHUD(_spriteBatch);
+                _spriteBatch.End();
+            }
+            else
+            {
+                // Single-pass rendering (MenuScene or scenes without camera)
+                _spriteBatch.Begin();
+                _currentScene.Draw(_spriteBatch);
+                _spriteBatch.End();
+            }
         }
 
         base.Draw(gameTime);
