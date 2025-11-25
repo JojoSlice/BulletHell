@@ -86,7 +86,7 @@ public static class FakeHttpResponseBuilder
 
     public static HttpResponseMessage CreateLoginFailureResponse()
     {
-        var apiResponse = new { isSuccess = false, data = (object?)null };
+        var apiResponse = new { isSuccess = false, data = null };
 
         return new HttpResponseMessage(HttpStatusCode.OK)
         {
