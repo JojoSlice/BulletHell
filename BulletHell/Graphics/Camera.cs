@@ -9,9 +9,9 @@ namespace BulletHell.Graphics;
 /// </summary>
 public class Camera
 {
+    private const float Zoom = 1.5f;
     private float? _worldWidth;
     private float? _worldHeight;
-    private const float Zoom = 1.5f;
 
     /// <summary>
     /// Gets the transformation matrix for rendering.
