@@ -1,3 +1,6 @@
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+
 namespace BulletHell.UI.Components;
 
 public class HUD
@@ -23,5 +26,13 @@ public class HUD
             _Ammo = value;
             Message = $"Ammo: {value}";
         }
+    }
+
+    public void Draw(SpriteBatch spriteBatch, SpriteFont font)
+    {
+        if (Message == null)
+            return;
+
+        spriteBatch.DrawString(font, Message, new Vector2(10, 10), Color.White);
     }
 }
