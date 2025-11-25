@@ -190,10 +190,43 @@ public class MenuScene : Scene
         }
     }
 
-    private void HandleLogin()
+    private async void HandleLogin()
     {
-        // TODO: Implementera login senare om behövs
-        ShowMessage("Login ej implementerad än", Color.Yellow);
+        var username = _usernameField?.Text ?? "";
+        var password = _passwordField?.Text ?? "";
+
+        var validationResult = _validator.Validate(username, password);
+        if (!validationResult.IsValid)
+        {
+            ShowMessage(validationResult.ErrorMessage, Color.Red);
+            return;
+        }
+
+        var originalText = _actionButton.Text;
+        _actionButton.UpdateText("Loggar in...");
+        _actionButton.Enabled = false;
+
+        try
+        {
+            var passwordHash = _passwordHasher.HashPassword(password);
+            var result = await _userApiClient.LoginAsync(username, passwordHash);
+
+            if (result.Success)
+            {
+                ShowMessage($"Välkommen tillbaka {username}!", Color.Green);
+                // TODO: Store user session (UserId, Username)
+                // TODO: Optionally transition to game
+            }
+            else
+            {
+                ShowMessage(result.Message, Color.Red);
+            }
+        }
+        finally
+        {
+            _actionButton.UpdateText(originalText);
+            _actionButton.Enabled = true;
+        }
     }
 
     private void ShowMessage(string message, Color color)

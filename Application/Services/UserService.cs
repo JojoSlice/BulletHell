@@ -24,4 +24,29 @@ public class UserService(IRepository<User> repository) : IUserService<UserRespon
 
     public async Task<Response<string>> Delete(int id) =>
         (await repository.DeleteAsync(id)).MapToResponse();
+
+    public async Task<Response<UserResponse?>> Login(LoginRequest request)
+    {
+        var user = await repository.GetByUsernameAsync(request.UserName);
+
+        if (user == null)
+        {
+            return new Response<UserResponse?>
+            {
+                IsSuccess = false,
+                Data = null,
+            };
+        }
+
+        if (user.PasswordHash != request.PasswordHash)
+        {
+            return new Response<UserResponse?>
+            {
+                IsSuccess = false,
+                Data = null,
+            };
+        }
+
+        return user.MapToResponse();
+    }
 }

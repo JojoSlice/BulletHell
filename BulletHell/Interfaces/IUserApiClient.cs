@@ -15,4 +15,12 @@ public interface IUserApiClient
     /// <param name="passwordHash">Hashat lösenord (BCrypt).</param>
     /// <returns>RegistrationResult med status och meddelande.</returns>
     Task<RegistrationResult> RegisterUserAsync(string username, string passwordHash);
+
+    /// <summary>
+    /// Loggar in en användare.
+    /// </summary>
+    /// <param name="username">Användarnamn.</param>
+    /// <param name="passwordHash">Hashat lösenord (BCrypt).</param>
+    /// <returns>RegistrationResult med status och meddelande.</returns>
+    Task<RegistrationResult> LoginAsync(string username, string passwordHash);
 }

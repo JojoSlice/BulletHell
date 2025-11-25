@@ -11,6 +11,13 @@ public class HighScoreRepository(MyDbContext context) : IRepository<HighScore>
 
     public async Task<HighScore?> GetByIdAsync(int id) => await context.Highscores.FindAsync(id);
 
+    public async Task<HighScore?> GetByUsernameAsync(string username)
+    {
+        throw new NotImplementedException(
+            "GetByUsernameAsync is not applicable for HighScore entities"
+        );
+    }
+
     public async Task<HighScore> CreateAsync(HighScore highScore)
     {
         context.Highscores.Add(highScore);

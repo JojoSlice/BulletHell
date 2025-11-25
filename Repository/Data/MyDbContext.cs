@@ -50,6 +50,8 @@ public class MyDbContext : DbContext
         {
             entity.ToTable("user");
 
+            entity.HasIndex(e => e.UserName).IsUnique();
+
             entity.Property(e => e.Id)
                 .ValueGeneratedOnAdd()
                 .HasColumnName("id");

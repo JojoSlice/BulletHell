@@ -65,4 +65,36 @@ public static class FakeHttpResponseBuilder
             Content = new StringContent("Internal Server Error"),
         };
     }
+
+    public static HttpResponseMessage CreateLoginSuccessResponse(int userId, string username)
+    {
+        var apiResponse = new
+        {
+            isSuccess = true,
+            data = new { id = userId, userName = username },
+        };
+
+        return new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                JsonSerializer.Serialize(apiResponse),
+                Encoding.UTF8,
+                "application/json"
+            ),
+        };
+    }
+
+    public static HttpResponseMessage CreateLoginFailureResponse()
+    {
+        var apiResponse = new { isSuccess = false, data = (object?)null };
+
+        return new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                JsonSerializer.Serialize(apiResponse),
+                Encoding.UTF8,
+                "application/json"
+            ),
+        };
+    }
 }
