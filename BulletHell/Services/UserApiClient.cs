@@ -99,7 +99,7 @@ public class UserApiClient : IUserApiClient
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse>(content, _jsonOptions);
+                var apiResponse = JsonSerializer.Deserialize<ApiResponse<UserResponse>>(content, _jsonOptions);
 
                 if (apiResponse?.IsSuccess == true && apiResponse.Data != null)
                 {
@@ -161,9 +161,9 @@ public class UserApiClient : IUserApiClient
         public string UserName { get; init; } = string.Empty;
     }
 
-    private record ApiResponse
+    private record ApiResponse<T>
     {
         public bool IsSuccess { get; init; }
-        public UserResponse? Data { get; init; }
+        public T? Data { get; init; }
     }
 }
