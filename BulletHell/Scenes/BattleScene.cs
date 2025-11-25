@@ -5,6 +5,7 @@ using BulletHell.Inputs;
 using BulletHell.Interfaces;
 using BulletHell.Managers;
 using BulletHell.Models;
+using BulletHell.UI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -26,6 +27,7 @@ public class BattleScene : Scene
     private Texture2D? _bulletTexture;
     private Texture2D? _enemyTexture;
     private Texture2D? _enemyBulletTexture;
+    private HUD? _hud;
 
     public BattleScene(Game1 game)
         : base(game)
@@ -51,6 +53,10 @@ public class BattleScene : Scene
         _enemyBulletManager = new EnemyBulletManager();
         _enemyManager = new EnemyManager(_enemyBulletManager);
 
+        _hud = new HUD();
+        _hud.MaxHP = 100; // eller vad du vill
+        _hud.HP = _player.Health; // Koppla spelarens HP
+
         // Add initial enemy
         _enemyManager.AddEnemy(new Enemy(
             new Vector2(400, 0),
@@ -68,7 +74,6 @@ public class BattleScene : Scene
 
         _enemyBulletTexture = _game.Content.Load<Texture2D>("enemy_bullet");
         _enemyBulletManager.LoadContent(_enemyBulletTexture);
-
     }
 
     public override void Update(GameTime gameTime)
@@ -99,6 +104,10 @@ public class BattleScene : Scene
         _enemyManager.Update(gameTime, _screenWidth, _screenHeight);
         _enemyBulletManager.Update(gameTime, _screenWidth, _screenHeight);
 
+        if (_hud != null)
+        {
+            _hud.HP = _player.Health;
+        }
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -112,6 +121,11 @@ public class BattleScene : Scene
         _bulletManager.Draw(spriteBatch);
         _enemyManager.Draw(spriteBatch);
         _enemyBulletManager.Draw(spriteBatch);
+
+        if (_hud != null)
+        {
+            _hud.Draw(spriteBatch);
+        }
     }
 
     protected override void Dispose(bool disposing)

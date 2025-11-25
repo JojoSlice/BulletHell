@@ -1,3 +1,4 @@
+using BulletHell.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
@@ -5,34 +6,17 @@ namespace BulletHell.UI.Components;
 
 public class HUD
 {
-    public string Message { get; set; }
-    private int _hp;
-    private int _Ammo;
-    public int HP
-    {
-        get => _hp;
-        set
-        {
-            _hp = value;
-            Message = $"HP: {value}";
-        }
-    }
+    public int HP { get; set; }
+    public int MaxHP { get; set; } = 100;
 
-    public int Ammo
+    public void Draw(SpriteBatch spriteBatch)
     {
-        get => _Ammo;
-        set
-        {
-            _Ammo = value;
-            Message = $"Ammo: {value}";
-        }
-    }
+        // HP bar bakgrund
+        spriteBatch.Draw(TextureHelper.WhitePixel(spriteBatch.GraphicsDevice), new Rectangle(10, 10, 200, 20), Color.DarkRed);
 
-    public void Draw(SpriteBatch spriteBatch, SpriteFont font)
-    {
-        if (Message == null)
-            return;
+        // HP bar fylld
+        int hpWidth = (int)(200 * (HP / (float)MaxHP));
+        spriteBatch.Draw(TextureHelper.WhitePixel(spriteBatch.GraphicsDevice), new Rectangle(10, 10, hpWidth, 20), Color.LimeGreen);
 
-        spriteBatch.DrawString(font, Message, new Vector2(10, 10), Color.White);
     }
 }
