@@ -12,6 +12,7 @@ using BulletHell.UI.Components;
 using BulletHell.UI.Factories;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 
 namespace BulletHell.Scenes;
 
@@ -38,6 +39,9 @@ public class MenuScene : Scene
     private IMenuNavigator? _menuNavigator;
     private Button _modeToggleButton = null!;
     private Button _actionButton = null!;
+
+    private Texture2D? _backgroundTexture;
+    private Song? _menuMusic;
 
     private RegistrationMode _currentMode = RegistrationMode.Login;
 
@@ -203,6 +207,20 @@ public class MenuScene : Scene
 
     public override void OnEnter()
     {
+        _backgroundTexture = _game.Content.Load<Texture2D>("bullethellmenu");
+
+        try
+        {
+            _menuMusic = _game.Content.Load<Song>("Project_137");
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Volume = 0.5f;
+            MediaPlayer.Play(_menuMusic);
+        }
+        catch (Microsoft.Xna.Framework.Audio.NoAudioHardwareException)
+        {
+            _menuMusic = null;
+        }
+
         InitializeModeToggleButton();
         InitializeActionButton();
         InitializeMenuComponents();
@@ -247,6 +265,11 @@ public class MenuScene : Scene
 
     public override void OnExit()
     {
+        if (_menuMusic != null)
+        {
+            MediaPlayer.Stop();
+        }
+
         if (_modeToggleButton != null)
         {
             _modeToggleButton.OnClick -= OnModeToggleClicked;
@@ -286,6 +309,25 @@ public class MenuScene : Scene
 
     public override void Draw(SpriteBatch spriteBatch)
     {
+        // Draw background with aspect ratio preserved
+        if (_backgroundTexture != null)
+        {
+            float scaleX = (float)_screenWidth / _backgroundTexture.Width;
+            float scaleY = (float)_screenHeight / _backgroundTexture.Height;
+            float scale = Math.Min(scaleX, scaleY);
+
+            int drawWidth = (int)(_backgroundTexture.Width * scale);
+            int drawHeight = (int)(_backgroundTexture.Height * scale);
+            int drawX = (_screenWidth - drawWidth) / 2;
+            int drawY = (_screenHeight - drawHeight) / 2;
+
+            spriteBatch.Draw(
+                _backgroundTexture,
+                new Rectangle(drawX, drawY, drawWidth, drawHeight),
+                Color.White
+            );
+        }
+
         spriteBatch.DrawString(
             _font,
             _title,
