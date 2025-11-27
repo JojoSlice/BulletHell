@@ -1,10 +1,8 @@
 using BulletHell.Configurations;
-using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using BulletHell.Models;
 using BulletHell.test.TestUtilities;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using NSubstitute;
 
 namespace BulletHell.test.Models;
@@ -249,6 +247,23 @@ public class BulletTests
         Assert.Throws<ArgumentNullException>(() => bullet.LoadContent(null!));
     }
 
+    [Fact]
+    public void LoadContent_ShouldSetColliderRadius_BasedOnSpriteSize()
+    {
+        // Arrange
+        int frameWidth = 10;
+        int frameHeight = 6;
+        var mockSprite = MockFactories.CreateMockSpriteHelper(width: frameWidth, height: frameHeight);
+        using var bullet = TestDataBuilders.CreateTestBullet(sprite: mockSprite);
+
+        // Act
+        // Radius should be initialized in constructor based on sprite dimensions
+
+        // Assert
+        var expected = Math.Max(frameWidth, frameHeight) / 2f;
+        Assert.Equal(expected, bullet.Collider.Radius);
+    }
+
     // Note: Draw with valid SpriteBatch requires integration testing
     // due to MonoGame SpriteBatch being non-mockable
 
@@ -289,5 +304,53 @@ public class BulletTests
 
         // Assert
         mockSprite.Received(1).Dispose();
+    }
+
+    [Fact]
+    public void Constructor_ShouldInitializeCollider()
+    {
+        // Arrange
+        var startPosition = new Vector2(10, 20);
+        var mockSprite = Substitute.For<ISpriteHelper>();
+
+        // Act
+        using var bullet = new Bullet(startPosition, Vector2.UnitY, mockSprite);
+
+        // Assert
+        Assert.NotNull(bullet.Collider);
+        Assert.Equal(typeof(Bullet), bullet.Collider.ColliderType);
+        Assert.Equal(startPosition, bullet.Collider.Position);
+    }
+
+    [Fact]
+    public void Update_ShouldKeepColliderInSyncWithPosition()
+    {
+        // Arrange
+        var startPosition = new Vector2(100, 100);
+        var direction = Vector2.UnitY;
+        var mockSprite = Substitute.For<ISpriteHelper>();
+        using var bullet = new Bullet(startPosition, direction, mockSprite);
+
+        // Act
+        bullet.Update(TestDataBuilders.OneFrame);
+
+        // Assert
+        Assert.Equal(bullet.Position, bullet.Collider.Position);
+    }
+
+    [Fact]
+    public void Reset_ShouldUpdateColliderPosition()
+    {
+        // Arrange
+        var mockSprite = Substitute.For<ISpriteHelper>();
+        using var bullet = TestDataBuilders.CreateTestBullet(sprite: mockSprite);
+
+        var newPosition = new Vector2(250, 250);
+
+        // Act
+        bullet.Reset(newPosition, Vector2.UnitX);
+
+        // Assert
+        Assert.Equal(newPosition, bullet.Collider.Position);
     }
 }

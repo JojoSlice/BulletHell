@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 using NSubstitute;
 using Xunit;
 
-namespace BulletHell.test;
+namespace BulletHell.test.Managers;
 
 public class EnemyManagerTest
 {
@@ -17,7 +17,7 @@ public class EnemyManagerTest
     {
         _output = output;
     }
-    
+
     [Theory]
     [InlineData(-50, 100)]   // Left of screen
     [InlineData(900, 100)]   // Right of screen (800 wide)
@@ -51,7 +51,7 @@ public class EnemyManagerTest
         _output.WriteLine($"Actual count:     {actualCount}");
         _output.WriteLine("Result: Enemy removed ✔");
     }
-    
+
     [Theory]
     [InlineData(100, 100)]
     [InlineData(799, 599)]
@@ -93,9 +93,9 @@ public class EnemyManagerTest
         // Arrange
         var sprite = Substitute.For<ISpriteHelper>();
         var enemy = new Enemy(new Vector2(0, 0), sprite);
-        
+
         var startPosition = enemy.Position; // endast för output
-        
+
         var bulletManager = new EnemyBulletManager();
         var manager = new EnemyManager(bulletManager);
 
@@ -105,7 +105,7 @@ public class EnemyManagerTest
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(deltaTime));
         var expectedPosition = new Vector2(0, EnemyConfig.Speed * deltaTime);
         int precision = 4;
-        
+
         // Act
         manager.Update(gameTime, 800, 600);
         var actual = enemy.Position;
@@ -113,7 +113,7 @@ public class EnemyManagerTest
         // Assert
         Assert.Equal(expectedPosition.X, actual.X, precision);
         Assert.Equal(expectedPosition.Y, actual.Y, precision);
-        
+
         // output
         _output.WriteLine($"Start position:    {startPosition}");
         _output.WriteLine($"Expected position: {expectedPosition}");
@@ -121,7 +121,7 @@ public class EnemyManagerTest
         _output.WriteLine("Result: Enemy updated correctly ✔");
 
     }
-    
+
     [Fact]
     public void EnemyManager_TryShootEnemies_ShouldCreateBulletsViaBulletManager()
     {

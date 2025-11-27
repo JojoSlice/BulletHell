@@ -1,7 +1,6 @@
 using BulletHell.Managers;
 using BulletHell.test.TestUtilities;
 using Microsoft.Xna.Framework;
-using NSubstitute;
 
 namespace BulletHell.test.Managers;
 
