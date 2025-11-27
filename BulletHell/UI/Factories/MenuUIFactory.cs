@@ -16,7 +16,7 @@ public class MenuUIFactory
     private const int ModeToggleYPosition = 100;
     private const int UsernameFieldYOffset = 80;
     private const int PasswordFieldYOffset = 150;
-    private const int ActionButtonYPosition = 400;
+    private const int ActionButtonYOffset = 210;
     private const int StartButtonYOffset = 0;
     private const int ExitButtonYOffset = 300;
 
@@ -60,12 +60,15 @@ public class MenuUIFactory
 
     public Button CreateActionButton(string text, Action onAction)
     {
+        var centerX = (_screenWidth / 2) - (ButtonWidth / 2);
+        var centerY = _screenHeight / 2;
+
         var button = new Button(
             _font,
             text,
             new Rectangle(
-                _screenWidth / 2 - ButtonWidth / 2,
-                ActionButtonYPosition,
+                centerX,
+                centerY + ActionButtonYOffset,
                 ButtonWidth,
                 ButtonHeight
             ),
