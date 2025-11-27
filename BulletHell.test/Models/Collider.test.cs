@@ -29,13 +29,10 @@ public class ColliderTests
     }
 
     [Fact]
-    public void Can_Set_Radius()
+    public void Constructor_Sets_Radius()
     {
-        // Arrange
-        var collider = new Collider(Vector2.Zero, typeof(object));
-
-        // Act
-        collider.Radius = 5.5f;
+        // Arrange & Act
+        var collider = new Collider(Vector2.Zero, typeof(object), 5.5f);
 
         // Assert
         Assert.Equal(5.5f, collider.Radius);

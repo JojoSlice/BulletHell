@@ -257,11 +257,10 @@ public class BulletTests
         using var bullet = TestDataBuilders.CreateTestBullet(sprite: mockSprite);
 
         // Act
-        // Instead of calling LoadContent with a real Texture2D, update radius directly from sprite
-        bullet.UpdateColliderRadiusFromSprite();
+        // Radius should be initialized in constructor based on sprite dimensions
 
         // Assert
-        var expected = System.Math.Max(frameWidth, frameHeight) / 2f;
+        var expected = Math.Max(frameWidth, frameHeight) / 2f;
         Assert.Equal(expected, bullet.Collider.Radius);
     }
 
