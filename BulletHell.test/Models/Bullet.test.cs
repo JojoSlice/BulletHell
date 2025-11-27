@@ -1,10 +1,8 @@
 using BulletHell.Configurations;
-using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using BulletHell.Models;
 using BulletHell.test.TestUtilities;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using NSubstitute;
 
 namespace BulletHell.test.Models;
@@ -247,6 +245,24 @@ public class BulletTests
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => bullet.LoadContent(null!));
+    }
+
+    [Fact]
+    public void LoadContent_ShouldSetColliderRadius_BasedOnSpriteSize()
+    {
+        // Arrange
+        int frameWidth = 10;
+        int frameHeight = 6;
+        var mockSprite = MockFactories.CreateMockSpriteHelper(width: frameWidth, height: frameHeight);
+        using var bullet = TestDataBuilders.CreateTestBullet(sprite: mockSprite);
+
+        // Act
+        // Instead of calling LoadContent with a real Texture2D, update radius directly from sprite
+        bullet.UpdateColliderRadiusFromSprite();
+
+        // Assert
+        var expected = System.Math.Max(frameWidth, frameHeight) / 2f;
+        Assert.Equal(expected, bullet.Collider.Radius);
     }
 
     // Note: Draw with valid SpriteBatch requires integration testing

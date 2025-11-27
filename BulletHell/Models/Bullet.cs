@@ -86,6 +86,17 @@ public class Bullet : IDisposable
             BulletConfig.SpriteHeight,
             BulletConfig.AnimationSpeed
         );
+
+        UpdateColliderRadiusFromSprite();
+    }
+
+    /// <summary>
+    /// Updates the collider radius from the current sprite frame size.
+    /// Exposed to allow unit tests to set radius without requiring a real Texture2D.
+    /// </summary>
+    public void UpdateColliderRadiusFromSprite()
+    {
+        _collider.Radius = System.Math.Max(Width, Height) / 2f;
     }
 
     /// <summary>
