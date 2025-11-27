@@ -13,12 +13,14 @@ public class Bullet : IDisposable
 {
     private readonly float _speed = BulletConfig.Speed;
     private readonly ISpriteHelper _sprite;
+    private Collider _collider;
     private Vector2 _direction;
     private float _timeAlive;
     private bool _disposed;
 
     public Vector2 Position { get; private set; }
 
+    public Collider Collider => _collider;
     public bool IsAlive => _timeAlive < BulletConfig.Lifetime;
     public int Width => _sprite.Width;
     public int Height => _sprite.Height;
@@ -29,6 +31,7 @@ public class Bullet : IDisposable
 
         Position = startPosition;
         _sprite = sprite;
+        _collider = new Collider(Position, typeof(Bullet));
 
         if (direction != Vector2.Zero)
         {
@@ -83,7 +86,15 @@ public class Bullet : IDisposable
             BulletConfig.SpriteHeight,
             BulletConfig.AnimationSpeed
         );
+
+        UpdateColliderRadiusFromSprite();
     }
+
+    /// <summary>
+    /// Updates the collider radius from the current sprite frame size.
+    /// Exposed to allow unit tests to set radius without requiring a real Texture2D.
+    /// </summary>
+    public void UpdateColliderRadiusFromSprite() => _collider.Radius = Math.Max(Width, Height) / 2f;
 
     /// <summary>
     /// Updates bullet position and animation
@@ -95,6 +106,7 @@ public class Bullet : IDisposable
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
         Position += _direction * _speed * deltaTime;
+        _collider.Position = Position;
         _timeAlive += deltaTime;
 
         _sprite.Update(gameTime);
@@ -120,6 +132,7 @@ public class Bullet : IDisposable
         {
             direction.Normalize();
         }
+        _collider.Position = Position;
         _direction = direction;
         _timeAlive = 0f;
     }

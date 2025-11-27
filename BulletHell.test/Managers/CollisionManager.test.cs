@@ -17,8 +17,8 @@ public class CollisionManagerTests
     [InlineData(12,27)]
     public void CollisionManager_CheckObjectsDistance_ReturnsCorrect(int x, int y)
     {
-        var collider1 = new Collider(new Vector2(1, 1));
-        var collider2 = new Collider(new Vector2(x, y));
+        var collider1 = new Collider(new Vector2(1, 1), null);
+        var collider2 = new Collider(new Vector2(x, y), null);
         var expectedDistance = Vector2.Distance(collider1.Position, collider2.Position);
         var collMan = new CollisionManager(collider1, collider2);
         var actualDistance = collMan.Distance();
@@ -29,7 +29,7 @@ public class CollisionManagerTests
     [Fact]
     public void CollisionManager_CheckObjectsDistance_ReturnsZero_WhenObjectsAreSame()
     {
-        var collider = new Collider(new Vector2(1, 1));
+        var collider = new Collider(new Vector2(1, 1), null);
         var collMan = new CollisionManager(collider, collider);
         var actualDistance = collMan.Distance();
         Assert.Equal(0, actualDistance);
@@ -43,8 +43,8 @@ public class CollisionManagerTests
     [InlineData(10, 22, 6, 6)]
     public void CollisionManager_CheckCollision_ReturnsTrueIfTouching(int x, int y, int radius1, int radius2)
     {
-        var object1 = new Collider(new Vector2(1, 1));
-        var object2 = new Collider(new Vector2(x, y));
+        var object1 = new Collider(new Vector2(1, 1), null);
+        var object2 = new Collider(new Vector2(x, y), null);
         object1.Radius = radius1;
         object2.Radius = radius2;
 
@@ -59,7 +59,7 @@ public class CollisionManagerTests
     [Fact]
     public void CollisionManager_CheckCollision_ReturnsFalse_WhenObjectsAreSame()
     {
-        var collider = new Collider(new Vector2(1, 1));
+        var collider = new Collider(new Vector2(1, 1), null);
         var collMan = new CollisionManager(collider, collider);
 
         var actual = collMan.IsColliding();
@@ -80,8 +80,8 @@ public class CollisionManagerTests
     [Fact]
     public void Distance_IsSymmetric()
     {
-        var a = new Collider(new Vector2(0, 0));
-        var b = new Collider(new Vector2(3, 4));
+        var a = new Collider(new Vector2(0, 0), null);
+        var b = new Collider(new Vector2(3, 4), null);
 
         var ab = new CollisionManager(a, b);
         var ba = new CollisionManager(b, a);
@@ -92,8 +92,8 @@ public class CollisionManagerTests
     [Fact]
     public void IsColliding_IsSymmetric()
     {
-        var a = new Collider(new Vector2(0, 0)) { Radius = 2 };
-        var b = new Collider(new Vector2(3, 0)) { Radius = 2 };
+        var a = new Collider(new Vector2(0, 0), null) { Radius = 2 };
+        var b = new Collider(new Vector2(3, 0), null) { Radius = 2 };
 
         var ab = new CollisionManager(a, b);
         var ba = new CollisionManager(b, a);
@@ -105,8 +105,8 @@ public class CollisionManagerTests
     public void TouchingBoundary_IsConsideredCollision()
     {
         // place colliders on x axis so squared distance == (r1 + r2)^2
-        var a = new Collider(new Vector2(0, 0)) { Radius = 2 };
-        var b = new Collider(new Vector2(5, 0)) { Radius = 3 };
+        var a = new Collider(new Vector2(0, 0), null) { Radius = 2 };
+        var b = new Collider(new Vector2(5, 0), null) { Radius = 3 };
 
         var collMan = new CollisionManager(a, b);
 
@@ -117,8 +117,8 @@ public class CollisionManagerTests
     [Fact]
     public void FarApart_IsNotColliding()
     {
-        var a = new Collider(new Vector2(0, 0)) { Radius = 1 };
-        var b = new Collider(new Vector2(100, 100)) { Radius = 1 };
+        var a = new Collider(new Vector2(0, 0), null) { Radius = 1 };
+        var b = new Collider(new Vector2(100, 100), null) { Radius = 1 };
 
         var collMan = new CollisionManager(a, b);
         Assert.False(collMan.IsColliding());
@@ -127,8 +127,8 @@ public class CollisionManagerTests
     [Fact]
     public void ZeroRadius_InsideOther_IsColliding()
     {
-        var a = new Collider(new Vector2(0, 0)) { Radius = 0 };
-        var b = new Collider(new Vector2(0, 0)) { Radius = 5 };
+        var a = new Collider(new Vector2(0, 0), null) { Radius = 0 };
+        var b = new Collider(new Vector2(0, 0), null) { Radius = 5 };
 
         var collMan = new CollisionManager(a, b);
         Assert.True(collMan.IsColliding());
@@ -137,8 +137,8 @@ public class CollisionManagerTests
     [Fact]
     public void NullTypes_DoNotAffect_GeometryChecks()
     {
-        var a = new Collider(new Vector2(0, 0)) { Radius = 1, ColliderType = null };
-        var b = new Collider(new Vector2(10, 0)) { Radius = 1, ColliderType = null };
+        var a = new Collider(new Vector2(0, 0), null) { Radius = 1 };
+        var b = new Collider(new Vector2(10, 0), null) { Radius = 1 };
 
         var collMan = new CollisionManager(a, b);
 

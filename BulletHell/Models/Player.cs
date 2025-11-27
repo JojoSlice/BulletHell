@@ -15,6 +15,7 @@ public class Player : IDisposable
     private readonly ISpriteHelper _sprite;
     private readonly IInputProvider _input;
     private float _shootCooldown;
+    private Collider _collider;
     private int _screenWidth;
     private int _screenHeight;
     private bool _disposed;
@@ -22,6 +23,8 @@ public class Player : IDisposable
     public Vector2 Position { get; private set; }
     public int Width => _sprite.Width;
     public int Height => _sprite.Height;
+
+    public Collider Collider => _collider;
 
     public Player(Vector2 startPosition, IInputProvider input, ISpriteHelper sprite)
     {
@@ -31,6 +34,7 @@ public class Player : IDisposable
         Position = startPosition;
         _input = input;
         _sprite = sprite;
+        _collider = new Collider(Position, typeof(Player));
         _shootCooldown = 0f;
     }
 
@@ -77,7 +81,16 @@ public class Player : IDisposable
             PlayerConfig.SpriteHeight,
             PlayerConfig.AnimationSpeed
         );
+
+        // Set collider radius based on sprite size
+        UpdateColliderRadiusFromSprite();
     }
+
+    /// <summary>
+    /// Updates the collider radius from the current sprite frame size.
+    /// Exposed to allow unit tests to set radius without requiring a real Texture2D.
+    /// </summary>
+    public void UpdateColliderRadiusFromSprite() => _collider.Radius = Math.Max(Width, Height) / 2f;
 
     /// <summary>
     /// Updates player position and animation
@@ -114,6 +127,7 @@ public class Player : IDisposable
         }
 
         Position = newPosition;
+        _collider.Position = Position;
     }
 
     /// <summary>

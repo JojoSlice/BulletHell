@@ -277,4 +277,57 @@ public class PlayerTests
             mockSprite.Received(1).Dispose();
         }
     }
+
+    [Fact]
+    public void Constructor_ShouldInitializeCollider()
+    {
+        // Arrange
+        var startPosition = new Vector2(100, 100);
+        var mockInput = Substitute.For<IInputProvider>();
+        var mockSprite = Substitute.For<ISpriteHelper>();
+
+        // Act
+        var player = new Player(startPosition, mockInput, mockSprite);
+
+        // Assert
+        Assert.NotNull(player.Collider);
+        Assert.Equal(typeof(Player), player.Collider.ColliderType);
+        Assert.Equal(startPosition, player.Collider.Position);
+    }
+
+    [Fact]
+    public void Update_ShouldKeepColliderInSyncWithPosition()
+    {
+        // Arrange
+        var mockSprite = Substitute.For<ISpriteHelper>();
+        mockSprite.Width.Returns(32);
+        mockSprite.Height.Returns(32);
+        var mockInput = MockFactories.CreateMockInputProvider(new Vector2(1, 0));
+        var player = new Player(new Vector2(50, 50), mockInput, mockSprite);
+        player.SetScreenBounds(800, 600);
+
+        // Act
+        player.Update(TestDataBuilders.OneFrame);
+
+        // Assert
+        Assert.Equal(player.Position, player.Collider.Position);
+    }
+
+    [Fact]
+    public void UpdateColliderRadiusFromSprite_ShouldSetRadiusBasedOnSprite()
+    {
+        // Arrange
+        var mockSprite = Substitute.For<ISpriteHelper>();
+        mockSprite.Width.Returns(24);
+        mockSprite.Height.Returns(16);
+        var mockInput = Substitute.For<IInputProvider>();
+        var player = new Player(Vector2.Zero, mockInput, mockSprite);
+
+        // Act
+        player.UpdateColliderRadiusFromSprite();
+
+        // Assert
+        var expected = System.Math.Max(24, 16) / 2f;
+        Assert.Equal(expected, player.Collider.Radius);
+    }
 }
