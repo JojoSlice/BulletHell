@@ -7,12 +7,11 @@ public class CollisionManager(Collider colliderA, Collider colliderB)
 {
     public bool IsColliding()
     {
-        if (colliderA.Equals(colliderB)
-            || (colliderA.ColliderType == colliderB.ColliderType
-                && colliderA.ColliderType != null)
-            || (colliderA.ColliderType == typeof(Player) && colliderB.ColliderType == typeof(Bullet))
-            || (colliderA.ColliderType == typeof(Enemy) && colliderB.ColliderType == typeof(EnemyBullet))
-            || (colliderA.ColliderType == typeof(Bullet) && colliderB.ColliderType == typeof(EnemyBullet)))
+        if (AreSameCollider()
+            || AreCollidersOfSameTypeAndNotNull()
+            || IsPlayerBulletExclusion()
+            || IsEnemyEnemyBulletExclusion()
+            || IsBulletEnemyBulletExclusion())
         {
             return false;
         }
@@ -23,7 +22,7 @@ public class CollisionManager(Collider colliderA, Collider colliderB)
 
     public float Distance()
     {
-        if (colliderA.Equals(colliderB))
+        if (Equals(colliderA, colliderB))
         {
             return 0;
         }
@@ -33,4 +32,18 @@ public class CollisionManager(Collider colliderA, Collider colliderB)
 
     private float RadiiSquared(Collider collider1, Collider collider2) =>
         (collider1.Radius + collider2.Radius) * (collider1.Radius + collider2.Radius);
+
+    private bool AreSameCollider() => Equals(colliderA, colliderB);
+
+    private bool AreCollidersOfSameTypeAndNotNull() => colliderA.ColliderType == colliderB.ColliderType
+                                                       && colliderA.ColliderType != null;
+
+    private bool IsPlayerBulletExclusion() => colliderA.ColliderType == typeof(Player)
+                                              && colliderB.ColliderType == typeof(Bullet);
+
+    private bool IsEnemyEnemyBulletExclusion() => colliderA.ColliderType == typeof(Enemy)
+                                                  && colliderB.ColliderType == typeof(EnemyBullet);
+
+    private bool IsBulletEnemyBulletExclusion() => colliderA.ColliderType == typeof(Bullet)
+                                                   && colliderB.ColliderType == typeof(EnemyBullet);
 }
