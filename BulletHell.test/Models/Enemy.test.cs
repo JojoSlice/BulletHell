@@ -125,7 +125,7 @@ public class EnemyTest(ITestOutputHelper output)
         var enemy = new Enemy(Vector2.Zero, mockSprite);
 
         // Act
-        enemy.UpdateColliderRadiusFromSprite();
+        // Radius should be initialized in constructor based on sprite dimensions
 
         // Assert
         var expected = Math.Max(20, 12) / 2f;

@@ -2,15 +2,16 @@ using BulletHell.Configurations;
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace BulletHell.Models;
 
 public class Enemy
 {
     private readonly ISpriteHelper _sprite;
+    private readonly Collider _collider;
     private Vector2 _velocity;
     private float _shootCooldown = 0f;
-    private Collider _collider;
 
     public Vector2 Position { get; private set; }
 
@@ -27,7 +28,9 @@ public class Enemy
         Position = startPosition;
         _sprite = sprite;
         _velocity = Vector2.Zero;
-        _collider = new Collider(Position, typeof(Enemy));
+
+        var initialRadius = Math.Max(_sprite.Width, _sprite.Height) / 2f;
+        _collider = new Collider(Position, typeof(Enemy), initialRadius);
     }
 
     public bool IsOutOfBounds(int screenWidth, int screenHeight)
@@ -53,17 +56,6 @@ public class Enemy
             SpriteDefaults.FrameHeight,
             SpriteDefaults.AnimationSpeed);
 
-        // After loading sprite we can set a reasonable collider radius
-        UpdateColliderRadiusFromSprite();
-    }
-
-    /// <summary>
-    /// Updates the collider radius from the current sprite frame size.
-    /// Exposed to allow unit tests to set radius without requiring a real Texture2D.
-    /// </summary>
-    public void UpdateColliderRadiusFromSprite()
-    {
-        _collider.Radius = System.Math.Max(Width, Height) / 2f;
     }
 
     public void Update(GameTime gameTime)

@@ -1,4 +1,4 @@
-﻿using BulletHell.Interfaces;
+using BulletHell.Interfaces;
 using BulletHell.Models;
 using BulletHell.test.TestUtilities;
 using Microsoft.Xna.Framework;
@@ -83,7 +83,7 @@ public class EnemyBulletTest
         var bullet = new EnemyBullet(Vector2.Zero, Vector2.UnitY, mockSprite);
 
         // Act
-        bullet.UpdateColliderRadiusFromSprite();
+        // Radius should be initialized in constructor based on sprite dimensions
 
         // Assert
         var expected = Math.Max(9, 15) / 2f;

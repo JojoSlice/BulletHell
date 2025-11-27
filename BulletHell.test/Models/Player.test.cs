@@ -324,7 +324,7 @@ public class PlayerTests
         var player = new Player(Vector2.Zero, mockInput, mockSprite);
 
         // Act
-        player.UpdateColliderRadiusFromSprite();
+        // Radius should be initialized in constructor based on sprite dimensions
 
         // Assert
         var expected = System.Math.Max(24, 16) / 2f;

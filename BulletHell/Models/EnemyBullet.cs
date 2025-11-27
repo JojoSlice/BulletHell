@@ -9,9 +9,9 @@ namespace BulletHell.Models;
 public class EnemyBullet : IDisposable
 {
     private readonly ISpriteHelper _sprite;
+    private readonly Collider _collider;
     private float _timeAlive = 0f;
     private Vector2 _velocity;
-    private Collider _collider;
 
     public Vector2 Position { get; private set; }
     public int Width => _sprite.Width;
@@ -24,7 +24,9 @@ public class EnemyBullet : IDisposable
         Position = startPosition;
         _velocity = velocity;
         _sprite = sprite;
-        _collider = new Collider(Position, typeof(EnemyBullet));
+
+        var initialRadius = Math.Max(_sprite.Width, _sprite.Height) / 2f;
+        _collider = new Collider(Position, typeof(EnemyBullet), initialRadius);
     }
 
     public bool ShouldBeRemoved(int screenWidth, int screenHeight)
@@ -39,16 +41,7 @@ public class EnemyBullet : IDisposable
             EnemyBulletConfig.SpriteWidth,
             EnemyBulletConfig.SpriteHeight,
             EnemyBulletConfig.AnimationSpeed);
-
-        // Set collider radius based on sprite size
-        UpdateColliderRadiusFromSprite();
     }
-
-    /// <summary>
-    /// Updates the collider radius from the current sprite frame size.
-    /// Exposed to allow unit tests to set radius without requiring a real Texture2D.
-    /// </summary>
-    public void UpdateColliderRadiusFromSprite() => _collider.Radius = Math.Max(Width, Height) / 2f;
 
     public void Update(GameTime gameTime)
     {
