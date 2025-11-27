@@ -12,7 +12,7 @@ public class ColliderTests
         var pos = new Vector2(10f, 20f);
 
         // Act
-        var collider = new Collider(pos);
+        var collider = new Collider(pos, typeof(object));
 
         // Assert
         Assert.Equal(pos, collider.Position);
@@ -22,7 +22,7 @@ public class ColliderTests
     public void Default_Radius_IsZero()
     {
         // Arrange & Act
-        var collider = new Collider(Vector2.Zero);
+        var collider = new Collider(Vector2.Zero, typeof(object));
 
         // Assert
         Assert.Equal(0f, collider.Radius);
@@ -32,7 +32,7 @@ public class ColliderTests
     public void Can_Set_Radius()
     {
         // Arrange
-        var collider = new Collider(Vector2.Zero);
+        var collider = new Collider(Vector2.Zero, typeof(object));
 
         // Act
         collider.Radius = 5.5f;
@@ -42,18 +42,12 @@ public class ColliderTests
     }
 
     [Fact]
-    public void Default_ColliderType_IsNull_And_CanBeSet()
+    public void ColliderType_IsSetByConstructor()
     {
-        // Arrange
-        var collider = new Collider(Vector2.Zero);
+        // Arrange & Act
+        var collider = new Collider(Vector2.Zero, typeof(object));
 
-        // Assert default
-        Assert.Null(collider.ColliderType);
-
-        // Act - set type
-        collider.ColliderType = typeof(object);
-
-        // Assert set
+        // Assert
         Assert.Equal(typeof(object), collider.ColliderType);
     }
 
@@ -61,7 +55,7 @@ public class ColliderTests
     public void Position_IsMutable()
     {
         // Arrange
-        var collider = new Collider(new Vector2(1, 2));
+        var collider = new Collider(new Vector2(1, 2), typeof(object));
 
         // Act
         collider.Position = new Vector2(3, 4);
