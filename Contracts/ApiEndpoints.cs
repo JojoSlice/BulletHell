@@ -20,5 +20,6 @@ public class ApiEndpoints
         public const string Create = _base;
         public const string Update = _base;
         public const string Delete = $"{_base}/{{id}}";
+        public const string Login = $"{_base}/login";
     }
 }

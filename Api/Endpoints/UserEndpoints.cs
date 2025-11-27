@@ -29,5 +29,9 @@ public static class UserEndpoints
         // DELETE User
         app.MapDelete(ApiEndpoints.User.Delete, async (int id, [FromServices] IUserService<UserResponse> us) => await us.Delete(id))
             .WithName("DeleteUser").Produces<Response<string>>();
+
+        // LOGIN User
+        app.MapPost(ApiEndpoints.User.Login, async (LoginRequest loginRequest, [FromServices] IUserService<UserResponse> us) =>
+        await us.Login(loginRequest)).WithName("LoginUser").Produces<Response<UserResponse?>>();
     }
 }

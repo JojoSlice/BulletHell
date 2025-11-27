@@ -11,6 +11,9 @@ public class UserRepository(MyDbContext context) : IRepository<User>
 
     public async Task<User?> GetByIdAsync(int id) => await context.Users.FindAsync(id);
 
+    public async Task<User?> GetByUsernameAsync(string username) =>
+        await context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+
     public async Task<User> CreateAsync(User user)
     {
         context.Users.Add(user);

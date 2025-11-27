@@ -11,4 +11,5 @@ public interface IUserService<T>
     Task<Response<T>> Create(CreateUserRequest user);
     Task<Response<T>> Update(UpdateUserRequest user);
     Task<Response<string>> Delete(int id);
+    Task<Response<T?>> Login(LoginRequest request);
 }
