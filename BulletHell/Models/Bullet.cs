@@ -13,6 +13,7 @@ public class Bullet : IDisposable
 {
     private readonly float _speed = BulletConfig.Speed;
     private readonly ISpriteHelper _sprite;
+    private Collider _collider;
     private Vector2 _direction;
     private float _timeAlive;
     private bool _disposed;
@@ -29,6 +30,7 @@ public class Bullet : IDisposable
 
         Position = startPosition;
         _sprite = sprite;
+        _collider = new Collider(Position) { ColliderType = typeof(Bullet), Position = Position };
 
         if (direction != Vector2.Zero)
         {
@@ -95,6 +97,7 @@ public class Bullet : IDisposable
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
         Position += _direction * _speed * deltaTime;
+        _collider.Position = Position;
         _timeAlive += deltaTime;
 
         _sprite.Update(gameTime);
@@ -120,6 +123,7 @@ public class Bullet : IDisposable
         {
             direction.Normalize();
         }
+        _collider.Position = Position;
         _direction = direction;
         _timeAlive = 0f;
     }
