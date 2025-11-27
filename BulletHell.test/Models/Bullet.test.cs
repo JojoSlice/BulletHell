@@ -290,4 +290,52 @@ public class BulletTests
         // Assert
         mockSprite.Received(1).Dispose();
     }
+
+    [Fact]
+    public void Constructor_ShouldInitializeCollider()
+    {
+        // Arrange
+        var startPosition = new Vector2(10, 20);
+        var mockSprite = Substitute.For<ISpriteHelper>();
+
+        // Act
+        using var bullet = new Bullet(startPosition, Vector2.UnitY, mockSprite);
+
+        // Assert
+        Assert.NotNull(bullet.Collider);
+        Assert.Equal(typeof(Bullet), bullet.Collider.ColliderType);
+        Assert.Equal(startPosition, bullet.Collider.Position);
+    }
+
+    [Fact]
+    public void Update_ShouldKeepColliderInSyncWithPosition()
+    {
+        // Arrange
+        var startPosition = new Vector2(100, 100);
+        var direction = Vector2.UnitY;
+        var mockSprite = Substitute.For<ISpriteHelper>();
+        using var bullet = new Bullet(startPosition, direction, mockSprite);
+
+        // Act
+        bullet.Update(TestDataBuilders.OneFrame);
+
+        // Assert
+        Assert.Equal(bullet.Position, bullet.Collider.Position);
+    }
+
+    [Fact]
+    public void Reset_ShouldUpdateColliderPosition()
+    {
+        // Arrange
+        var mockSprite = Substitute.For<ISpriteHelper>();
+        using var bullet = TestDataBuilders.CreateTestBullet(sprite: mockSprite);
+
+        var newPosition = new Vector2(250, 250);
+
+        // Act
+        bullet.Reset(newPosition, Vector2.UnitX);
+
+        // Assert
+        Assert.Equal(newPosition, bullet.Collider.Position);
+    }
 }

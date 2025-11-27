@@ -20,6 +20,7 @@ public class Bullet : IDisposable
 
     public Vector2 Position { get; private set; }
 
+    public Collider Collider => _collider;
     public bool IsAlive => _timeAlive < BulletConfig.Lifetime;
     public int Width => _sprite.Width;
     public int Height => _sprite.Height;
