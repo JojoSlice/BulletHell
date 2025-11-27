@@ -1,9 +1,9 @@
-﻿using BulletHell.Configurations;
+using BulletHell.Configurations;
 using BulletHell.Models;
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
 using NSubstitute;
-using Xunit;
+using BulletHell.test.TestUtilities;
 
 namespace BulletHell.test.Models;
 
@@ -78,5 +78,57 @@ public class EnemyTest(ITestOutputHelper output)
         Assert.Equal(expected, actual);
     }
 
+    // --- collider related tests ---
 
+    [Fact]
+    public void Constructor_ShouldInitializeCollider()
+    {
+        // Arrange
+        var startPosition = new Vector2(10, 20);
+        var mockSprite = Substitute.For<ISpriteHelper>();
+
+        // Act
+        var enemy = new Enemy(startPosition, mockSprite);
+
+        // Assert
+        Assert.NotNull(enemy.Collider);
+        Assert.Equal(typeof(Enemy), enemy.Collider.ColliderType);
+        Assert.Equal(startPosition, enemy.Collider.Position);
+    }
+
+    [Fact]
+    public void Update_ShouldKeepColliderInSyncWithPosition()
+    {
+        // Arrange
+        var startPosition = new Vector2(0, 0);
+        var mockSprite = Substitute.For<ISpriteHelper>();
+        mockSprite.Width.Returns(16);
+        mockSprite.Height.Returns(16);
+        var enemy = new Enemy(startPosition, mockSprite);
+
+        var gameTime = TestDataBuilders.OneFrame;
+
+        // Act
+        enemy.Update(gameTime);
+
+        // Assert
+        Assert.Equal(enemy.Position, enemy.Collider.Position);
+    }
+
+    [Fact]
+    public void UpdateColliderRadiusFromSprite_ShouldSetRadiusBasedOnSprite()
+    {
+        // Arrange
+        var mockSprite = Substitute.For<ISpriteHelper>();
+        mockSprite.Width.Returns(20);
+        mockSprite.Height.Returns(12);
+        var enemy = new Enemy(Vector2.Zero, mockSprite);
+
+        // Act
+        enemy.UpdateColliderRadiusFromSprite();
+
+        // Assert
+        var expected = Math.Max(20, 12) / 2f;
+        Assert.Equal(expected, enemy.Collider.Radius);
+    }
 }
