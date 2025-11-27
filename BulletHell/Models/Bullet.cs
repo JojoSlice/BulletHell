@@ -31,7 +31,7 @@ public class Bullet : IDisposable
 
         Position = startPosition;
         _sprite = sprite;
-        _collider = new Collider(Position) { ColliderType = typeof(Bullet), Position = Position };
+        _collider = new Collider(Position, typeof(Bullet));
 
         if (direction != Vector2.Zero)
         {
