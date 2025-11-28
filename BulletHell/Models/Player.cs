@@ -24,6 +24,8 @@ public class Player : IDisposable
     public int Width => _sprite.Width;
     public int Height => _sprite.Height;
     public int Health { get; private set; } = PlayerConfig.StartingHealth;
+    public int MaxLives => PlayerConfig.Lives;
+    public int Lives { get; private set; } = PlayerConfig.Lives;
 
     public Collider Collider => _collider;
 
