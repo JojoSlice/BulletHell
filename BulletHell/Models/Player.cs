@@ -27,7 +27,6 @@ public class Player : IDisposable
     public int Lives { get; private set; } = PlayerConfig.Lives;
     public int Health { get; private set; } = PlayerConfig.MaxHealth;
 
-
     public Collider Collider => _collider;
 
     public Player(Vector2 startPosition, IInputProvider input, ISpriteHelper sprite)
