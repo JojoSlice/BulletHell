@@ -1,10 +1,11 @@
-using System;
 using BulletHell.Graphics;
+using System;
 using BulletHell.Helpers;
 using BulletHell.Inputs;
 using BulletHell.Interfaces;
 using BulletHell.Managers;
 using BulletHell.Models;
+using BulletHell.UI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -26,7 +27,7 @@ public class BattleScene : Scene
     private Texture2D? _bulletTexture;
     private Texture2D? _enemyTexture;
     private Texture2D? _enemyBulletTexture;
-    private Camera? _camera;
+    private HUD? _hud;
 
     public BattleScene(Game1 game)
         : base(game)
@@ -52,6 +53,11 @@ public class BattleScene : Scene
         _enemyBulletManager = new EnemyBulletManager();
         _enemyManager = new EnemyManager(_enemyBulletManager);
 
+        _hud = new HUD();
+        _hud.MaxHP = 100;
+        _hud.HP = _player.Health;
+
+        // Add initial enemy
         _enemyManager.AddEnemy(new Enemy(
             new Vector2(400, 0),
             new SpriteHelper()
@@ -68,9 +74,6 @@ public class BattleScene : Scene
 
         _enemyBulletTexture = _game.Content.Load<Texture2D>("enemy_bullet");
         _enemyBulletManager.LoadContent(_enemyBulletTexture);
-
-        _camera = new Camera();
-        _camera.SetWorldBounds((float)_screenWidth * 2, (float)_screenHeight * 2);
     }
 
     public override void Update(GameTime gameTime)
@@ -101,9 +104,9 @@ public class BattleScene : Scene
         _enemyManager.Update(gameTime, _screenWidth, _screenHeight);
         _enemyBulletManager.Update(gameTime, _screenWidth, _screenHeight);
 
-        if (_camera != null && _player != null)
+        if (_hud != null)
         {
-            _camera.Follow(_player.Position, _game.GraphicsDevice.Viewport, 0.1f);
+            _hud.HP = _player.Health;
         }
     }
 
@@ -118,18 +121,11 @@ public class BattleScene : Scene
         _bulletManager.Draw(spriteBatch);
         _enemyManager.Draw(spriteBatch);
         _enemyBulletManager.Draw(spriteBatch);
-    }
 
-    public override Matrix? GetCameraTransform()
-    {
-        return _camera?.Transform;
-    }
-
-    public override void DrawHUD(SpriteBatch spriteBatch)
-    {
-        // Empty for now - HUD elements can be added later
-        // Example:
-        // spriteBatch.DrawString(font, "HP: " + _player.Health, new Vector2(20, 20), Color.White);
+        if (_hud != null)
+        {
+            _hud.Draw(spriteBatch);
+        }
     }
 
     protected override void Dispose(bool disposing)
@@ -152,8 +148,6 @@ public class BattleScene : Scene
             _bulletTexture = null;
             _enemyTexture = null;
             _enemyBulletTexture = null;
-
-            _camera = null;
         }
 
         base.Dispose(disposing);
