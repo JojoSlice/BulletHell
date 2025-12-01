@@ -24,6 +24,7 @@ public class Player : IDisposable
     public int Height => _sprite.Height;
     public int MaxLives => PlayerConfig.Lives;
     public int Lives { get; private set; } = PlayerConfig.Lives;
+    public int Health { get; set; } = PlayerConfig.MaxHealth;
 
     public Player(Vector2 startPosition, IInputProvider input, ISpriteHelper sprite)
     {
@@ -133,6 +134,17 @@ public class Player : IDisposable
             return (bulletStartPosition, bulletDirection);
         }
         return null;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        Health -= damage;
+
+        if (Health <= 0)
+        {
+            Lives--;
+            Health = PlayerConfig.MaxHealth;
+        }
     }
 
     /// <summary>
