@@ -22,6 +22,5 @@ public class DebugOverlay
     {
         if (!IsVisible)
             return;
-
     }
 }
