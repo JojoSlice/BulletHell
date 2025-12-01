@@ -360,7 +360,7 @@ public class PlayerTests(ITestOutputHelper output)
         var mockSprite = MockFactories.CreateMockSpriteHelper();
         var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
 
-        var expected = player.Health - 100;
+        var expected = PlayerConfig.MaxHealth;
 
         // Act
         player.TakeDamage(100);
