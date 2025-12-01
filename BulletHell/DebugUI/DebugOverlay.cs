@@ -20,7 +20,8 @@ public class DebugOverlay
 
     public void Draw(SpriteBatch spriteBatch, BattleScene scene)
     {
-        if (!IsVisible) return;
+        if (!IsVisible)
+            return;
 
     }
 }
