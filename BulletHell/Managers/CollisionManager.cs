@@ -12,7 +12,7 @@ public class CollisionManager(Player player, BulletManager bm, EnemyManager em, 
         {
             foreach (var enemy in em.Enemies)
             {
-                if (!(bullet.Collider.Distance(enemy.Collider) <= 10))
+                if (bullet.Collider.Distance(enemy.Collider) > 10)
                 {
                     continue;
                 }
