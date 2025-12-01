@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace BulletHell.Models;
 
 /// <summary>
-/// Represents the player character
+/// Represents the player character.
 /// </summary>
 public class Player : IDisposable
 {
@@ -16,9 +16,13 @@ public class Player : IDisposable
     private readonly IInputProvider _input;
     private readonly Collider _collider;
     private float _shootCooldown;
-    private int _screenWidth;
     private int _screenHeight;
+    private int _screenWidth;
     private bool _disposed;
+
+    // Knockback state
+    private Vector2 _knockbackVelocity = Vector2.Zero;
+    private float _knockbackTimer = 0f;
 
     public Vector2 Position { get; private set; }
     public int Width => _sprite.Width;
@@ -38,10 +42,10 @@ public class Player : IDisposable
         _input = input;
         _sprite = sprite;
 
-        var initialRadius = Math.Max(_sprite.Width, _sprite.Height) / 2f;
-        _collider = new Collider(Position, typeof(Player), initialRadius);
-
         _shootCooldown = 0f;
+
+        var initialRadius = Math.Max(Width, Height) / 2f;
+        _collider = new Collider(Position, typeof(Player), initialRadius);
     }
 
     /// <summary>
@@ -87,6 +91,8 @@ public class Player : IDisposable
             PlayerConfig.SpriteHeight,
             PlayerConfig.AnimationSpeed
         );
+
+        _collider.Radius = Math.Max(Width, Height) / 2f;
     }
 
     /// <summary>
@@ -98,8 +104,38 @@ public class Player : IDisposable
 
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        Vector2 direction = _input.GetDirection();
-        Move(direction, deltaTime);
+        if (_knockbackTimer > 0f)
+        {
+            // Apply smooth knockback over time
+            Position += _knockbackVelocity * deltaTime;
+            _knockbackTimer -= deltaTime;
+
+            if (_knockbackTimer <= 0f)
+            {
+                _knockbackTimer = 0f;
+                _knockbackVelocity = Vector2.Zero;
+            }
+
+            // Clamp to screen bounds if set
+            if (_screenWidth > 0 && _screenHeight > 0)
+            {
+                float halfWidth = Width / 2f;
+                float halfHeight = Height / 2f;
+
+                Position = Position with
+                {
+                    X = Math.Clamp(Position.X, halfWidth, _screenWidth - halfWidth),
+                    Y = Math.Clamp(Position.Y, halfHeight, _screenHeight - halfHeight),
+                };
+            }
+
+            _collider.Position = Position;
+        }
+        else
+        {
+            Vector2 direction = _input.GetDirection();
+            Move(direction, deltaTime);
+        }
 
         if (_shootCooldown > 0)
             _shootCooldown -= deltaTime;
@@ -182,5 +218,30 @@ public class Player : IDisposable
     {
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    public void TakeDamage()
+    {
+        // Reduce health by one; clamp at zero
+        Health = Math.Max(0, Health - 1);
+        // Additional effects (invulnerability frames, sound, particles) can be added here.
+    }
+
+    /// <summary>
+    /// Applies a smooth knockback over the given duration. The provided force is interpreted as
+    /// initial speed (pixels per second). The knockback will move the player by
+    /// approximately force * duration pixels over the duration.
+    /// </summary>
+    public void ApplyKnockback(Vector2 direction, float force, float duration)
+    {
+        if (duration <= 0f || force <= 0f)
+            return;
+
+        if (direction == Vector2.Zero)
+            direction = -Vector2.UnitY;
+
+        direction.Normalize();
+        _knockbackVelocity = direction * force;
+        _knockbackTimer = duration;
     }
 }

@@ -19,6 +19,8 @@ public class BulletManager : IBulletManager, IDisposable
     private Texture2D? _bulletTexture;
     private bool _disposed;
 
+    public IReadOnlyList<Bullet> Bullets => _activeBullets;
+
     public BulletManager()
     {
         _bulletPool = new ObjectPool<Bullet>(

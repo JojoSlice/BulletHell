@@ -21,8 +21,9 @@ public class BattleScene : Scene
     private int _screenHeight;
     private Player? _player;
     private BulletManager? _bulletManager;
-    private IEnemyManager? _enemyManager;
+    private EnemyManager? _enemyManager;
     private EnemyBulletManager? _enemyBulletManager;
+    private CollisionManager? _collisionManager;
     private Texture2D? _playerTexture;
     private Texture2D? _bulletTexture;
     private Texture2D? _enemyTexture;
@@ -75,6 +76,8 @@ public class BattleScene : Scene
 
         _enemyBulletTexture = _game.Content.Load<Texture2D>("enemy_bullet");
         _enemyBulletManager.LoadContent(_enemyBulletTexture);
+
+        _collisionManager = new CollisionManager(_player, _bulletManager, _enemyManager, _enemyBulletManager);
         _camera = new Camera();
         _camera.SetWorldBounds((float)_screenWidth * 2, (float)_screenHeight * 2);
     }
@@ -95,6 +98,7 @@ public class BattleScene : Scene
         if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null)
             return;
 
+        _collisionManager?.CheckCollisions();
         _player.Update(gameTime);
         _camera?.Follow(_player.Position, _game.GraphicsDevice.Viewport, 0.1f);
 

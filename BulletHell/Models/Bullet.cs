@@ -15,6 +15,7 @@ public class Bullet : IDisposable
     private readonly ISpriteHelper _sprite;
     private readonly Collider _collider;
     private Vector2 _direction;
+    private bool _hitEnemy;
     private float _timeAlive;
     private bool _disposed;
 
@@ -32,15 +33,16 @@ public class Bullet : IDisposable
         Position = startPosition;
         _sprite = sprite;
 
-        var initialRadius = Math.Max(_sprite.Width, _sprite.Height) / 2f;
-        _collider = new Collider(Position, typeof(Bullet), initialRadius);
-
         if (direction != Vector2.Zero)
         {
             direction.Normalize();
         }
         _direction = direction;
         _timeAlive = 0f;
+
+        // Initialize collider radius based on sprite dimensions (if available)
+        var initialRadius = Math.Max(Width, Height) / 2f;
+        _collider = new Collider(Position, typeof(Bullet), initialRadius);
     }
 
     public bool IsOutOfBounds(int screenWidth, int screenHeight)
@@ -53,9 +55,10 @@ public class Bullet : IDisposable
 
     public bool ShouldBeRemoved(int screenWidth, int screenHeight)
     {
-        return !IsAlive || IsOutOfBounds(screenWidth, screenHeight);
+        return !IsAlive || IsOutOfBounds(screenWidth, screenHeight) || _hitEnemy;
     }
 
+    public void HitEnemy() => _hitEnemy = true;
     /// <summary>
     /// Loads the bullet texture and initializes the sprite
     /// </summary>
@@ -88,6 +91,8 @@ public class Bullet : IDisposable
             BulletConfig.SpriteHeight,
             BulletConfig.AnimationSpeed
         );
+
+        _collider.Radius = Math.Max(Width, Height) / 2f;
     }
 
     /// <summary>
