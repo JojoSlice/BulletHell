@@ -26,6 +26,7 @@ public class Player : IDisposable
     public int Health { get; private set; } = PlayerConfig.StartingHealth;
     public int MaxLives => PlayerConfig.Lives;
     public int Lives { get; private set; } = PlayerConfig.Lives;
+    public int Health { get; set; } = PlayerConfig.MaxHealth;
 
     public Collider Collider => _collider;
 
@@ -142,6 +143,17 @@ public class Player : IDisposable
             return (bulletStartPosition, bulletDirection);
         }
         return null;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        Health -= damage;
+
+        if (Health <= 0)
+        {
+            Lives--;
+            Health = PlayerConfig.MaxHealth;
+        }
     }
 
     /// <summary>

@@ -351,4 +351,49 @@ public class PlayerTests(ITestOutputHelper output)
         var expected = System.Math.Max(24, 16) / 2f;
         Assert.Equal(expected, player.Collider.Radius);
     }
+
+    [Fact]
+    public void TakeDame_ShouldReduceHealth()
+    {
+        // Arrange
+        var mockInput = MockFactories.CreateMockInputProvider();
+        var mockSprite = MockFactories.CreateMockSpriteHelper();
+        var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
+
+        var expected = player.Health - 100;
+
+        // Act
+        player.TakeDamage(100);
+
+
+        // Assert
+        Assert.Equal(expected, player.Health);
+
+        // Output
+        _output.WriteLine("Health reduced correctly to " + player.Health + "✔️");
+    }
+
+    [Fact]
+    public void TakeDamage_WhenHealthDropsToZero_ShouldReduceLifeAndResetHealth()
+    {
+        // Arrange
+        var player = TestDataBuilders.CreateTestPlayer();
+
+        var damage = 100;
+        var expectedLives =  player.Lives - 1;
+
+        // Act
+        player.TakeDamage(damage);
+        var actualLives = player.Lives;
+
+        // Assert
+        Assert.Equal(expectedLives, actualLives);
+        Assert.Equal(PlayerConfig.MaxHealth, player.Health);
+
+        // Output
+        _output.WriteLine("Expected Lives reduced from 3 to " + player.Lives + "✔️");
+        _output.WriteLine("Actual lives reduced from 3 to " + actualLives + "✔️");
+
+    }
+
 }
