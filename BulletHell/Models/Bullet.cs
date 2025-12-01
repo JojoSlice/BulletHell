@@ -13,7 +13,7 @@ public class Bullet : IDisposable
 {
     private readonly float _speed = BulletConfig.Speed;
     private readonly ISpriteHelper _sprite;
-    private Collider _collider;
+    private readonly Collider _collider;
     private Vector2 _direction;
     private bool _hitEnemy;
     private float _timeAlive;

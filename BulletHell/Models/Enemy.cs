@@ -9,7 +9,7 @@ namespace BulletHell.Models;
 public class Enemy
 {
     private readonly ISpriteHelper _sprite;
-    private Collider _collider;
+    private readonly Collider _collider;
     private Vector2 _velocity;
     private float _shootCooldown = 0f;
 

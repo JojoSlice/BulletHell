@@ -14,8 +14,8 @@ public class Player : IDisposable
     private readonly float _speed = PlayerConfig.Speed;
     private readonly ISpriteHelper _sprite;
     private readonly IInputProvider _input;
+    private readonly Collider _collider;
     private float _shootCooldown;
-    private Collider _collider;
     private int _screenHeight;
     private int _screenWidth;
     private bool _disposed;

@@ -9,8 +9,8 @@ namespace BulletHell.Models;
 public class EnemyBullet : IDisposable
 {
     private readonly ISpriteHelper _sprite;
+    private readonly Collider _collider;
     private float _timeAlive = 0f;
-    private Collider _collider;
     private Vector2 _velocity;
     private bool _hitPlayer;
 
