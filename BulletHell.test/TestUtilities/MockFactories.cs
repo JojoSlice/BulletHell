@@ -1,12 +1,13 @@
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NSubstitute;
+using Moq;
 
 namespace BulletHell.test.TestUtilities;
 
 /// <summary>
-/// Provides factory methods for creating mock objects with common configurations
+/// Provides factory methods for creating Moq-based mock objects
+/// with common configurations
 /// </summary>
 public static class MockFactories
 {
@@ -14,55 +15,42 @@ public static class MockFactories
         Vector2? direction = null,
         bool isShootPressed = false)
     {
-        var mock = Substitute.For<IInputProvider>();
-        mock.GetDirection().Returns(direction ?? Vector2.Zero);
-        mock.IsShootPressed().Returns(isShootPressed);
-        return mock;
+        var mock = new Mock<IInputProvider>();
+
+        mock.Setup(i => i.GetDirection())
+            .Returns(direction ?? Vector2.Zero);
+
+        mock.Setup(i => i.IsShootPressed())
+            .Returns(isShootPressed);
+
+        return mock.Object;
     }
 
     public static ISpriteHelper CreateMockSpriteHelper(
         int width = 32,
         int height = 32)
     {
-        var mock = Substitute.For<ISpriteHelper>();
-        mock.Width.Returns(width);
-        mock.Height.Returns(height);
-        return mock;
+        var mock = new Mock<ISpriteHelper>();
+
+        mock.SetupGet(s => s.Width).Returns(width);
+        mock.SetupGet(s => s.Height).Returns(height);
+
+        return mock.Object;
     }
 
     /// <summary>
-    /// Note: Cannot mock SpriteFont directly due to MonoGame limitations.
-    /// This returns null as a placeholder for tests that check for null handling.
+    /// Cannot mock SpriteFont directly with Moq (sealed type).
+    /// Tests requiring it should use real instances or integration tests.
     /// </summary>
-    public static SpriteFont? CreateMockSpriteFont()
-    {
-        // Cannot mock SpriteFont - it's sealed
-        return null;
-    }
+    public static SpriteFont? CreateMockSpriteFont() => null;
 
     /// <summary>
-    /// Note: Cannot mock Texture2D directly due to MonoGame limitations.
-    /// Tests requiring real textures should use integration tests or skip.
-    /// This returns null as a placeholder for tests that check for null handling.
+    /// Cannot mock Texture2D (requires GraphicsDevice).
     /// </summary>
-    public static Texture2D? CreateMockTexture2D(
-        int width = 64,
-        int height = 64)
-    {
-        // Cannot mock Texture2D/GraphicsDevice with NSubstitute
-        // Tests that need real textures should be integration tests
-        return null;
-    }
+    public static Texture2D? CreateMockTexture2D(int width = 64, int height = 64) => null;
 
     /// <summary>
-    /// Note: Cannot mock SpriteBatch directly due to MonoGame limitations.
-    /// Tests requiring real SpriteBatch should use integration tests or skip.
-    /// This returns null as a placeholder for tests that check for null handling.
+    /// Cannot mock SpriteBatch (requires GraphicsDevice).
     /// </summary>
-    public static SpriteBatch? CreateMockSpriteBatch()
-    {
-        // Cannot mock SpriteBatch/GraphicsDevice with NSubstitute
-        // Tests that need real SpriteBatch should be integration tests
-        return null;
-    }
+    public static SpriteBatch? CreateMockSpriteBatch() => null;
 }
