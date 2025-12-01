@@ -9,7 +9,7 @@ namespace BulletHell.Models;
 public class Enemy
 {
     private readonly ISpriteHelper _sprite;
-    private readonly Collider _collider;
+    private Collider _collider;
     private Vector2 _velocity;
     private float _shootCooldown = 0f;
 
@@ -29,7 +29,7 @@ public class Enemy
         _sprite = sprite;
         _velocity = Vector2.Zero;
 
-        var initialRadius = Math.Max(_sprite.Width, _sprite.Height) / 2f;
+        var initialRadius = Math.Max(Width, Height) / 2f;
         _collider = new Collider(Position, typeof(Enemy), initialRadius);
     }
 
@@ -55,6 +55,8 @@ public class Enemy
             SpriteDefaults.FrameWidth,
             SpriteDefaults.FrameHeight,
             SpriteDefaults.AnimationSpeed);
+
+        _collider.Radius = Math.Max(Width, Height) / 2f;
     }
 
     public void Update(GameTime gameTime)

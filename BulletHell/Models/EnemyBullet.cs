@@ -9,9 +9,10 @@ namespace BulletHell.Models;
 public class EnemyBullet : IDisposable
 {
     private readonly ISpriteHelper _sprite;
-    private readonly Collider _collider;
     private float _timeAlive = 0f;
+    private Collider _collider;
     private Vector2 _velocity;
+    private bool _hitPlayer;
 
     public Vector2 Position { get; private set; }
     public int Width => _sprite.Width;
@@ -25,14 +26,16 @@ public class EnemyBullet : IDisposable
         _velocity = velocity;
         _sprite = sprite;
 
-        var initialRadius = Math.Max(_sprite.Width, _sprite.Height) / 2f;
+        var initialRadius = Math.Max(Width, Height) / 2f;
         _collider = new Collider(Position, typeof(EnemyBullet), initialRadius);
     }
 
     public bool ShouldBeRemoved(int screenWidth, int screenHeight)
     {
-        return IsOutOfBounds(screenWidth, screenHeight);
+        return IsOutOfBounds(screenWidth, screenHeight) || _hitPlayer;
     }
+
+    public void HitPlayer() => _hitPlayer = true;
 
     public void LoadContent(Texture2D bulletTexture)
     {
@@ -41,6 +44,8 @@ public class EnemyBullet : IDisposable
             EnemyBulletConfig.SpriteWidth,
             EnemyBulletConfig.SpriteHeight,
             EnemyBulletConfig.AnimationSpeed);
+
+        _collider.Radius = Math.Max(Width, Height) / 2f;
     }
 
     public void Update(GameTime gameTime)
