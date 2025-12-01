@@ -3,23 +3,24 @@ using BulletHell.Interfaces;
 using BulletHell.Models;
 using BulletHell.test.TestUtilities;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using NSubstitute;
+using Moq;
 
 namespace BulletHell.test.Models;
 
-public class PlayerTests
+public class PlayerTests(ITestOutputHelper output)
 {
+    private readonly ITestOutputHelper _output = output;
+
     [Fact]
     public void Update_WithZeroDirection_ShouldNotMovePlayer()
     {
         // Arrange
         var startPosition = new Vector2(100, 100);
-        var mockInput = Substitute.For<IInputProvider>();
-        var mockSprite = Substitute.For<ISpriteHelper>();
-        mockInput.GetDirection().Returns(Vector2.Zero);
+        var mockInput = new Mock<IInputProvider>();
+        var mockSprite = new Mock<ISpriteHelper>();
+        mockInput.Setup(i => i.GetDirection()).Returns(Vector2.Zero);
 
-        var player = new Player(startPosition, mockInput, mockSprite);
+        var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(1.0 / 60.0));
 
         // Act
@@ -38,11 +39,11 @@ public class PlayerTests
     {
         // Arrange
         var startPosition = new Vector2(100, 100);
-        var mockInput = Substitute.For<IInputProvider>();
-        var mockSprite = Substitute.For<ISpriteHelper>();
-        mockInput.GetDirection().Returns(new Vector2(x, y));
+        var mockInput = new Mock<IInputProvider>();
+        var mockSprite = new Mock<ISpriteHelper>();
+        mockInput.Setup(i => i.GetDirection()).Returns(new Vector2(x, y));
 
-        var player = new Player(startPosition, mockInput, mockSprite);
+        var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
         var deltaTime = 1.0f / 60.0f;
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(deltaTime));
 
@@ -62,18 +63,18 @@ public class PlayerTests
     {
         // Arrange
         var startPosition = new Vector2(100, 100);
-        var mockInput = Substitute.For<IInputProvider>();
-        var mockSprite = Substitute.For<ISpriteHelper>();
-        mockInput.GetDirection().Returns(Vector2.Zero);
+        var mockInput = new Mock<IInputProvider>();
+        var mockSprite = new Mock<ISpriteHelper>();
+        mockInput.Setup(i => i.GetDirection()).Returns(Vector2.Zero);
 
-        var player = new Player(startPosition, mockInput, mockSprite);
+        var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(1.0 / 60.0));
 
         // Act
         player.Update(gameTime);
 
         // Assert
-        mockSprite.Received(1).Update(gameTime);
+        mockSprite.Verify(s => s.Update(gameTime), Times.Once);
     }
 
     [Theory]
@@ -85,12 +86,12 @@ public class PlayerTests
     {
         // Arrange
         var startPosition = new Vector2(startPos, startPos);
-        var mockInput = Substitute.For<IInputProvider>();
-        var mockSprite = Substitute.For<ISpriteHelper>();
+        var mockInput = new Mock<IInputProvider>();
+        var mockSprite = new Mock<ISpriteHelper>();
         var direction = new Vector2(x, y);
-        mockInput.GetDirection().Returns(direction);
+        mockInput.Setup(i => i.GetDirection()).Returns(direction);
 
-        var player = new Player(startPosition, mockInput, mockSprite);
+        var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
         var deltaTime = 1.0f / 60.0f;
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(deltaTime));
 
@@ -254,28 +255,48 @@ public class PlayerTests
     public void Dispose_ShouldDisposeSprite()
     {
         // Arrange
-        var mockSprite = Substitute.For<ISpriteHelper>();
-        using var player = TestDataBuilders.CreateTestPlayer(sprite: mockSprite);
+        var mockSprite = new Mock<ISpriteHelper>();
+        using var player = TestDataBuilders.CreateTestPlayer(sprite: mockSprite.Object);
 
         // Act
         player.Dispose();
 
         // Assert
-        mockSprite.Received(1).Dispose();
+        mockSprite.Verify(s => s.Dispose(), Times.Once);
     }
 
     [Fact]
     public void Dispose_CalledMultipleTimes_ShouldOnlyDisposeOnce()
     {
         // Arrange
-        var mockSprite = Substitute.For<ISpriteHelper>();
-        using (var player = TestDataBuilders.CreateTestPlayer(sprite: mockSprite))
+        var mockSprite = new Mock<ISpriteHelper>();
+        using (var player = TestDataBuilders.CreateTestPlayer(sprite: mockSprite.Object))
         {
             // Act & Assert
             player.Dispose();
             player.Dispose();
-            mockSprite.Received(1).Dispose();
+            mockSprite.Verify(s => s.Dispose(), Times.Once);
         }
+    }
+
+    [Fact]
+    public void Player_ShouldStartWithThreeLives()
+    {
+        // Arrange
+        var mockInput = MockFactories.CreateMockInputProvider();
+        var mockSprite = MockFactories.CreateMockSpriteHelper();
+        var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
+
+        var expectedLives = 3;
+
+        // Act
+        var actualLives = player.Lives;
+
+        // Assert
+        Assert.Equal(expectedLives, actualLives);
+
+        // Output
+        _output.WriteLine("Player starts with " + actualLives + " lives ✔");
     }
 
     [Fact]
@@ -283,11 +304,11 @@ public class PlayerTests
     {
         // Arrange
         var startPosition = new Vector2(100, 100);
-        var mockInput = Substitute.For<IInputProvider>();
-        var mockSprite = Substitute.For<ISpriteHelper>();
+        var mockInput = new Mock<IInputProvider>();
+        var mockSprite = new Mock<ISpriteHelper>();
 
         // Act
-        var player = new Player(startPosition, mockInput, mockSprite);
+        var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
 
         // Assert
         Assert.NotNull(player.Collider);
@@ -299,11 +320,11 @@ public class PlayerTests
     public void Update_ShouldKeepColliderInSyncWithPosition()
     {
         // Arrange
-        var mockSprite = Substitute.For<ISpriteHelper>();
-        mockSprite.Width.Returns(32);
-        mockSprite.Height.Returns(32);
+        var mockSprite = new Mock<ISpriteHelper>();
+        mockSprite.Setup(s => s.Width).Returns(32);
+        mockSprite.Setup(s => s.Height).Returns(32);
         var mockInput = MockFactories.CreateMockInputProvider(new Vector2(1, 0));
-        var player = new Player(new Vector2(50, 50), mockInput, mockSprite);
+        var player = new Player(new Vector2(50, 50), mockInput, mockSprite.Object);
         player.SetScreenBounds(800, 600);
 
         // Act
@@ -317,11 +338,11 @@ public class PlayerTests
     public void UpdateColliderRadiusFromSprite_ShouldSetRadiusBasedOnSprite()
     {
         // Arrange
-        var mockSprite = Substitute.For<ISpriteHelper>();
-        mockSprite.Width.Returns(24);
-        mockSprite.Height.Returns(16);
-        var mockInput = Substitute.For<IInputProvider>();
-        var player = new Player(Vector2.Zero, mockInput, mockSprite);
+        var mockSprite = new Mock<ISpriteHelper>();
+        mockSprite.Setup(s => s.Width).Returns(24);
+        mockSprite.Setup(s => s.Height).Returns(16);
+        var mockInput = new Mock<IInputProvider>();
+        var player = new Player(Vector2.Zero, mockInput.Object, mockSprite.Object);
 
         // Act
         // Radius should be initialized in constructor based on sprite dimensions
@@ -330,4 +351,49 @@ public class PlayerTests
         var expected = System.Math.Max(24, 16) / 2f;
         Assert.Equal(expected, player.Collider.Radius);
     }
+
+    [Fact]
+    public void TakeDame_ShouldReduceHealth()
+    {
+        // Arrange
+        var mockInput = MockFactories.CreateMockInputProvider();
+        var mockSprite = MockFactories.CreateMockSpriteHelper();
+        var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
+
+        var expected = PlayerConfig.MaxHealth;
+
+        // Act
+        player.TakeDamage(100);
+
+
+        // Assert
+        Assert.Equal(expected, player.Health);
+
+        // Output
+        _output.WriteLine("Health reduced correctly to " + player.Health + "✔️");
+    }
+
+    [Fact]
+    public void TakeDamage_WhenHealthDropsToZero_ShouldReduceLifeAndResetHealth()
+    {
+        // Arrange
+        var player = TestDataBuilders.CreateTestPlayer();
+
+        var damage = 100;
+        var expectedLives =  player.Lives - 1;
+
+        // Act
+        player.TakeDamage(damage);
+        var actualLives = player.Lives;
+
+        // Assert
+        Assert.Equal(expectedLives, actualLives);
+        Assert.Equal(PlayerConfig.MaxHealth, player.Health);
+
+        // Output
+        _output.WriteLine("Expected Lives reduced from 3 to " + player.Lives + "✔️");
+        _output.WriteLine("Actual lives reduced from 3 to " + actualLives + "✔️");
+
+    }
+
 }
