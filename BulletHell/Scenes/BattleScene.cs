@@ -28,6 +28,7 @@ public class BattleScene : Scene
     private Texture2D? _enemyTexture;
     private Texture2D? _enemyBulletTexture;
     private HUD? _hud;
+    private Camera? _camera;
 
     public BattleScene(Game1 game)
         : base(game)
@@ -74,6 +75,8 @@ public class BattleScene : Scene
 
         _enemyBulletTexture = _game.Content.Load<Texture2D>("enemy_bullet");
         _enemyBulletManager.LoadContent(_enemyBulletTexture);
+        _camera = new Camera();
+        _camera.SetWorldBounds((float)_screenWidth * 2, (float)_screenHeight * 2);
     }
 
     public override void Update(GameTime gameTime)
@@ -93,6 +96,7 @@ public class BattleScene : Scene
             return;
 
         _player.Update(gameTime);
+        _camera?.Follow(_player.Position, _game.GraphicsDevice.Viewport, 0.1f);
 
         var shootInfo = _player.TryShoot();
         if (shootInfo.HasValue)
@@ -121,11 +125,16 @@ public class BattleScene : Scene
         _bulletManager.Draw(spriteBatch);
         _enemyManager.Draw(spriteBatch);
         _enemyBulletManager.Draw(spriteBatch);
+    }
+    public override Matrix? GetCameraTransform()
+    {
+        return _camera?.Transform;
+    }
 
+    public override void DrawHUD(SpriteBatch spriteBatch)
+    {
         if (_hud != null)
-        {
             _hud.Draw(spriteBatch);
-        }
     }
 
     protected override void Dispose(bool disposing)
@@ -148,6 +157,7 @@ public class BattleScene : Scene
             _bulletTexture = null;
             _enemyTexture = null;
             _enemyBulletTexture = null;
+            _camera = null;
         }
 
         base.Dispose(disposing);
