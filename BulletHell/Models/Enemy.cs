@@ -55,7 +55,6 @@ public class Enemy
             SpriteDefaults.FrameWidth,
             SpriteDefaults.FrameHeight,
             SpriteDefaults.AnimationSpeed);
-
     }
 
     public void Update(GameTime gameTime)
