@@ -15,7 +15,7 @@ public class DebugOverlayTest
     public void Toggle_ShouldFlipVisibility()
     {
         // Arrange
-        var overlay = new DebugOverlay(font: null, bgTexture: null);
+        var overlay = new DebugOverlay(font: null!, bgTexture: null!);
 
         // Act
         var initial = overlay.IsVisible;
