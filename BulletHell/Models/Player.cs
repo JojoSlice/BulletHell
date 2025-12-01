@@ -14,6 +14,7 @@ public class Player : IDisposable
     private readonly float _speed = PlayerConfig.Speed;
     private readonly ISpriteHelper _sprite;
     private readonly IInputProvider _input;
+    private readonly Collider _collider;
     private float _shootCooldown;
     private int _screenWidth;
     private int _screenHeight;
@@ -23,6 +24,8 @@ public class Player : IDisposable
     public int Width => _sprite.Width;
     public int Height => _sprite.Height;
 
+    public Collider Collider => _collider;
+
     public Player(Vector2 startPosition, IInputProvider input, ISpriteHelper sprite)
     {
         ArgumentNullException.ThrowIfNull(input, nameof(input));
@@ -31,6 +34,10 @@ public class Player : IDisposable
         Position = startPosition;
         _input = input;
         _sprite = sprite;
+
+        var initialRadius = Math.Max(_sprite.Width, _sprite.Height) / 2f;
+        _collider = new Collider(Position, typeof(Player), initialRadius);
+
         _shootCooldown = 0f;
     }
 
@@ -114,6 +121,7 @@ public class Player : IDisposable
         }
 
         Position = newPosition;
+        _collider.Position = Position;
     }
 
     /// <summary>

@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using BulletHell.Configurations;
-using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,6 +9,7 @@ namespace BulletHell.Models;
 public class EnemyBullet : IDisposable
 {
     private readonly ISpriteHelper _sprite;
+    private readonly Collider _collider;
     private float _timeAlive = 0f;
     private Vector2 _velocity;
 
@@ -17,11 +17,16 @@ public class EnemyBullet : IDisposable
     public int Width => _sprite.Width;
     public int Height => _sprite.Height;
 
+    public Collider Collider => _collider;
+
     public EnemyBullet(Vector2 startPosition, Vector2 velocity, ISpriteHelper sprite)
     {
         Position = startPosition;
         _velocity = velocity;
         _sprite = sprite;
+
+        var initialRadius = Math.Max(_sprite.Width, _sprite.Height) / 2f;
+        _collider = new Collider(Position, typeof(EnemyBullet), initialRadius);
     }
 
     public bool ShouldBeRemoved(int screenWidth, int screenHeight)
@@ -44,6 +49,9 @@ public class EnemyBullet : IDisposable
         Position += _velocity * deltaTime;
         _timeAlive += deltaTime;
 
+        // Keep collider position in sync
+        _collider.Position = Position;
+
         _sprite.Update(gameTime);
     }
 
@@ -65,6 +73,7 @@ public class EnemyBullet : IDisposable
         Position = position;
         _velocity = velocity;
         _timeAlive = 0f;
+        _collider.Position = Position;
     }
 
     public void Dispose()

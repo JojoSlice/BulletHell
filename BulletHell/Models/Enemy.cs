@@ -1,13 +1,15 @@
-﻿using BulletHell.Configurations;
+using BulletHell.Configurations;
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace BulletHell.Models;
 
 public class Enemy
 {
     private readonly ISpriteHelper _sprite;
+    private readonly Collider _collider;
     private Vector2 _velocity;
     private float _shootCooldown = 0f;
 
@@ -19,11 +21,16 @@ public class Enemy
 
     public bool IsAlive { get; private set; } = true;
 
+    public Collider Collider => _collider;
+
     public Enemy(Vector2 startPosition, ISpriteHelper sprite)
     {
         Position = startPosition;
         _sprite = sprite;
         _velocity = Vector2.Zero;
+
+        var initialRadius = Math.Max(_sprite.Width, _sprite.Height) / 2f;
+        _collider = new Collider(Position, typeof(Enemy), initialRadius);
     }
 
     public bool IsOutOfBounds(int screenWidth, int screenHeight)
@@ -56,6 +63,9 @@ public class Enemy
         var movement = Vector2.UnitY * EnemyConfig.Speed * deltaTime;
         var newPosition = Position + movement;
         Position = newPosition;
+
+        // Keep collider in sync with logical position
+        _collider.Position = Position;
 
         if (_shootCooldown > 0)
         {
