@@ -1,5 +1,6 @@
 using BulletHell.Models;
 using Microsoft.Xna.Framework;
+using System.Linq;
 
 namespace BulletHell.Managers;
 
@@ -28,7 +29,7 @@ public class CollisionManager(Player player, BulletManager bm, EnemyManager em, 
     {
         foreach (var enemyBullet in ebm.Bullets)
         {
-            if (!(enemyBullet.Collider.Distance(player.Collider) <= 10))
+            if (enemyBullet.Collider.Distance(player.Collider) > 10)
             {
                 continue;
             }
@@ -38,13 +39,11 @@ public class CollisionManager(Player player, BulletManager bm, EnemyManager em, 
             }
         }
 
-        foreach (var enemy in em.Enemies)
+        foreach (var enemy in em.Enemies.Where(enemy =>
+                     player.Collider.IsCollidingWith(enemy.Collider)))
         {
-            if (player.Collider.IsCollidingWith(enemy.Collider))
-            {
                 player.TakeDamage();
                 PushBack(enemy.Collider.Position);
-            }
         }
     }
 
