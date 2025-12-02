@@ -7,6 +7,13 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using BulletHell.Interfaces;
 using BulletHell.Models;
+using Contracts;
+using Contracts.Requests.HighScore;
+using Contracts.Requests.User;
+using Contracts.Responses.Common;
+using Contracts.Responses.HighScore;
+using Contracts.Responses.User;
+using UserResponse = Contracts.Responses.User.UserResponse;
 
 namespace BulletHell.Services;
 
@@ -31,9 +38,9 @@ public class ApiClient : IApiClient
 
         try
         {
-            var request = new { userName = username, passwordHash = passwordHash };
+            var request = new CreateUserRequest { UserName = username, PasswordHash = passwordHash };
 
-            var response = await _httpClient.PostAsJsonAsync("/api/users", request);
+            var response = await _httpClient.PostAsJsonAsync(ApiEndpoints.User.Create, request);
 
             if (response.IsSuccessStatusCode)
             {
@@ -94,14 +101,14 @@ public class ApiClient : IApiClient
 
         try
         {
-            var request = new { userName = username, passwordHash = passwordHash };
+            var request = new LoginRequest { UserName = username, PasswordHash = passwordHash };
 
-            var response = await _httpClient.PostAsJsonAsync("/api/users/login", request);
+            var response = await _httpClient.PostAsJsonAsync(ApiEndpoints.User.Login, request);
 
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse<UserResponse>>(
+                var apiResponse = JsonSerializer.Deserialize<Response<UserResponse>>(
                     content,
                     _jsonOptions
                 );
@@ -160,35 +167,16 @@ public class ApiClient : IApiClient
         }
     }
 
-    private record UserResponse
-    {
-        public int Id { get; init; }
-        public string UserName { get; init; } = string.Empty;
-    }
-
-    private record ApiResponse<T>
-    {
-        public bool IsSuccess { get; init; }
-        public T? Data { get; init; }
-    }
-
-    private record HighScoreResponse
-    {
-        public int Id { get; init; }
-        public int Score { get; init; }
-        public int UserId { get; init; }
-    }
-
     public async Task<HighScoreListResult> GetAllHighScoresAsync()
     {
         try
         {
-            var response = await _httpClient.GetAsync("/api/highscores");
+            var response = await _httpClient.GetAsync(ApiEndpoints.HighScore.GetAll);
 
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<HighScoreResponse>>>(
+                var apiResponse = JsonSerializer.Deserialize<Response<List<HighScoreResponse>>>(
                     content,
                     _jsonOptions
                 );
@@ -253,12 +241,12 @@ public class ApiClient : IApiClient
     {
         try
         {
-            var response = await _httpClient.GetAsync($"/api/highscores/{id}");
+            var response = await _httpClient.GetAsync(ApiEndpoints.HighScore.GetById.Replace("{id}", id.ToString()));
 
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse<HighScoreResponse>>(
+                var apiResponse = JsonSerializer.Deserialize<Response<HighScoreResponse>>(
                     content,
                     _jsonOptions
                 );
@@ -327,14 +315,14 @@ public class ApiClient : IApiClient
     {
         try
         {
-            var request = new { score, userId };
+            var request = new CreateHighScoreRequest { Score = score, UserId = userId };
 
-            var response = await _httpClient.PostAsJsonAsync("/api/highscores", request);
+            var response = await _httpClient.PostAsJsonAsync(ApiEndpoints.HighScore.Create, request);
 
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse<HighScoreResponse>>(
+                var apiResponse = JsonSerializer.Deserialize<Response<HighScoreResponse>>(
                     content,
                     _jsonOptions
                 );
@@ -405,14 +393,14 @@ public class ApiClient : IApiClient
     {
         try
         {
-            var request = new { id, score, userId };
+            var request = new UpdateHighScoreRequest { Id = id, Score = score, UserId = userId };
 
-            var response = await _httpClient.PutAsJsonAsync("/api/highscores", request);
+            var response = await _httpClient.PutAsJsonAsync(ApiEndpoints.HighScore.Update, request);
 
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse<HighScoreResponse>>(
+                var apiResponse = JsonSerializer.Deserialize<Response<HighScoreResponse>>(
                     content,
                     _jsonOptions
                 );
@@ -484,12 +472,12 @@ public class ApiClient : IApiClient
     {
         try
         {
-            var response = await _httpClient.DeleteAsync($"/api/highscores/{id}");
+            var response = await _httpClient.DeleteAsync(ApiEndpoints.HighScore.Delete.Replace("{id}", id.ToString()));
 
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(
+                var apiResponse = JsonSerializer.Deserialize<Response<string>>(
                     content,
                     _jsonOptions
                 );
