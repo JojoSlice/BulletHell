@@ -79,6 +79,7 @@ public class EnemyBullet : IDisposable
         _velocity = velocity;
         _timeAlive = 0f;
         _collider.Position = Position;
+        _hitPlayer = false;
     }
 
     public void Dispose()

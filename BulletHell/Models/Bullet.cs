@@ -134,6 +134,7 @@ public class Bullet : IDisposable
         _collider.Position = Position;
         _direction = direction;
         _timeAlive = 0f;
+        _hitEnemy = false;
     }
 
     protected virtual void Dispose(bool disposing)
