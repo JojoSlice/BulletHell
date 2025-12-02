@@ -97,4 +97,71 @@ public static class FakeHttpResponseBuilder
             ),
         };
     }
+
+    public static HttpResponseMessage CreateHighScoreListResponse(
+        List<(int id, int score, int userId)> highScores
+    )
+    {
+        var data = highScores.Select(hs => new { id = hs.id, score = hs.score, userId = hs.userId });
+        var apiResponse = new { isSuccess = true, data };
+
+        return new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                JsonSerializer.Serialize(apiResponse),
+                Encoding.UTF8,
+                "application/json"
+            ),
+        };
+    }
+
+    public static HttpResponseMessage CreateHighScoreResponse(int id, int score, int userId)
+    {
+        var apiResponse = new { isSuccess = true, data = new { id, score, userId } };
+
+        return new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                JsonSerializer.Serialize(apiResponse),
+                Encoding.UTF8,
+                "application/json"
+            ),
+        };
+    }
+
+    public static HttpResponseMessage CreateHighScoreCreatedResponse(int id, int score, int userId)
+    {
+        var apiResponse = new { isSuccess = true, data = new { id, score, userId } };
+
+        return new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                JsonSerializer.Serialize(apiResponse),
+                Encoding.UTF8,
+                "application/json"
+            ),
+        };
+    }
+
+    public static HttpResponseMessage CreateHighScoreDeletedResponse()
+    {
+        var apiResponse = new { isSuccess = true, data = "High score deleted" };
+
+        return new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                JsonSerializer.Serialize(apiResponse),
+                Encoding.UTF8,
+                "application/json"
+            ),
+        };
+    }
+
+    public static HttpResponseMessage CreateNotFoundResponse()
+    {
+        return new HttpResponseMessage(HttpStatusCode.NotFound)
+        {
+            Content = new StringContent("Not found"),
+        };
+    }
 }

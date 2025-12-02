@@ -4,15 +4,15 @@ using BulletHell.test.TestUtilities;
 
 namespace BulletHell.test.Services;
 
-public class UserApiClientLoginTests
+public class ApiClientLoginTests
 {
-    private readonly IUserApiClient _apiClient;
+    private readonly IApiClient _apiClient;
     private readonly HttpClient _httpClient;
 
-    public UserApiClientLoginTests()
+    public ApiClientLoginTests()
     {
         _httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5000") };
-        _apiClient = new UserApiClient(_httpClient);
+        _apiClient = new ApiClient(_httpClient);
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class UserApiClientLoginTests
             BaseAddress = new Uri("http://localhost:5000"),
         };
 
-        var apiClient = new UserApiClient(httpClient);
+        var apiClient = new ApiClient(httpClient);
 
         // Act
         var result = await apiClient.LoginAsync("testuser", "$2a$12$hash");
@@ -59,7 +59,7 @@ public class UserApiClientLoginTests
             BaseAddress = new Uri("http://localhost:5000"),
         };
 
-        var apiClient = new UserApiClient(httpClient);
+        var apiClient = new ApiClient(httpClient);
 
         // Act
         var result = await apiClient.LoginAsync("testuser", "$2a$12$wronghash");
@@ -83,7 +83,7 @@ public class UserApiClientLoginTests
             BaseAddress = new Uri("http://localhost:5000"),
         };
 
-        var apiClient = new UserApiClient(httpClient);
+        var apiClient = new ApiClient(httpClient);
 
         // Act
         var result = await apiClient.LoginAsync("testuser", "$2a$12$hash");
@@ -106,7 +106,7 @@ public class UserApiClientLoginTests
             BaseAddress = new Uri("http://localhost:5000"),
         };
 
-        var apiClient = new UserApiClient(httpClient);
+        var apiClient = new ApiClient(httpClient);
 
         // Act
         var result = await apiClient.LoginAsync("testuser", "$2a$12$hash");
@@ -155,7 +155,7 @@ public class UserApiClientLoginTests
             BaseAddress = new Uri("http://localhost:5000"),
         };
 
-        var apiClient = new UserApiClient(httpClient);
+        var apiClient = new ApiClient(httpClient);
 
         // Act
         var result = await apiClient.LoginAsync("testuser", "$2a$12$hash");
@@ -178,7 +178,7 @@ public class UserApiClientLoginTests
             BaseAddress = new Uri("http://localhost:5000"),
         };
 
-        var apiClient = new UserApiClient(httpClient);
+        var apiClient = new ApiClient(httpClient);
 
         // Act
         var result = await apiClient.LoginAsync("testuser", "$2a$12$hash");
