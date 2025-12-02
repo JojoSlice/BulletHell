@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace BulletHell.Managers;
 
-public class CollisionManager(Player player, BulletManager bm, EnemyManager em, EnemyBulletManager ebm)
+public class CollisionManager(Player player, BulletManager<Player> pbm, EnemyManager em, BulletManager<Enemy> ebm)
 {
     public void CheckCollisions()
     {
         CheckPlayerCollisions();
-        foreach (var bullet in bm.Bullets)
+        foreach (var bullet in pbm.Bullets)
         {
             foreach (var enemy in em.Enemies)
             {
@@ -20,7 +20,7 @@ public class CollisionManager(Player player, BulletManager bm, EnemyManager em, 
 
                 if (bullet.Collider.IsCollidingWith(enemy.Collider))
                 {
-                    bullet.HitEnemy();
+                    bullet.MarkHit();
                 }
             }
         }
@@ -35,15 +35,15 @@ public class CollisionManager(Player player, BulletManager bm, EnemyManager em, 
             }
             if (enemyBullet.Collider.IsCollidingWith(player.Collider))
             {
-                enemyBullet.HitPlayer();
+                enemyBullet.MarkHit();
             }
         }
 
         foreach (var enemy in em.Enemies.Where(enemy =>
                      player.Collider.IsCollidingWith(enemy.Collider)))
         {
-                player.TakeDamage();
-                PushBack(enemy.Collider.Position);
+            player.TakeDamage();
+            PushBack(enemy.Collider.Position);
         }
     }
 

@@ -170,7 +170,7 @@ public class Player : IDisposable
     {
         if (_shootCooldown <= 0 && _input.IsShootPressed())
         {
-            _shootCooldown = BulletConfig.FireCooldown;
+            _shootCooldown = BulletConfig.Player.FireCooldown;
 
             Vector2 bulletDirection = -Vector2.UnitY;
             Vector2 bulletStartPosition = Position;

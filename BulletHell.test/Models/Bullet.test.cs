@@ -7,7 +7,7 @@ using NSubstitute;
 
 namespace BulletHell.test.Models;
 
-public class BulletTests
+public class PlayerBulletTests
 {
     [Theory]
     [InlineData(-5, 5, true)]
@@ -22,7 +22,7 @@ public class BulletTests
         Vector2 direction = new(x, y);
         ISpriteHelper bulletSprite = Substitute.For<ISpriteHelper>();
 
-        using var bullet = new Bullet(startPosition, direction, bulletSprite);
+        using var bullet = new Bullet<Player>(startPosition, direction, bulletSprite);
 
         // Act
         var actual = bullet.IsOutOfBounds(100, 100);
@@ -44,7 +44,7 @@ public class BulletTests
         bullet.Update(gameTime);
 
         // Assert
-        var expectedPosition = startPosition + direction * BulletConfig.Speed * (1.0f / 60.0f);
+        var expectedPosition = startPosition + direction * BulletConfig.Player.Speed * (1.0f / 60.0f);
         Assert.Equal(expectedPosition.X, bullet.Position.X, 2);
         Assert.Equal(expectedPosition.Y, bullet.Position.Y, 2);
     }
@@ -97,11 +97,11 @@ public class BulletTests
         var mockSprite = Substitute.For<ISpriteHelper>();
 
         // Act
-        using var bullet = new Bullet(startPosition, direction, mockSprite);
+        using var bullet = new Bullet<Player>(startPosition, direction, mockSprite);
         bullet.Update(TestDataBuilders.OneFrame);
 
         // Assert - if direction is normalized, movement should be based on unit vector
-        var expectedMovement = Vector2.Normalize(direction) * BulletConfig.Speed * (1.0f / 60.0f);
+        var expectedMovement = Vector2.Normalize(direction) * BulletConfig.Player.Speed * (1.0f / 60.0f);
         var expectedPosition = startPosition + expectedMovement;
         Assert.Equal(expectedPosition.X, bullet.Position.X, 2);
         Assert.Equal(expectedPosition.Y, bullet.Position.Y, 2);
@@ -154,7 +154,7 @@ public class BulletTests
         bullet.Update(TestDataBuilders.OneFrame);
 
         // Assert
-        var expectedMovement = Vector2.Normalize(newDirection) * BulletConfig.Speed * (1.0f / 60.0f);
+        var expectedMovement = Vector2.Normalize(newDirection) * BulletConfig.Player.Speed * (1.0f / 60.0f);
         var expectedPosition = startPosition + expectedMovement;
         Assert.Equal(expectedPosition.X, bullet.Position.X, 2);
         Assert.Equal(expectedPosition.Y, bullet.Position.Y, 2);
@@ -314,11 +314,11 @@ public class BulletTests
         var mockSprite = Substitute.For<ISpriteHelper>();
 
         // Act
-        using var bullet = new Bullet(startPosition, Vector2.UnitY, mockSprite);
+        using var bullet = new Bullet<Player>(startPosition, Vector2.UnitY, mockSprite);
 
         // Assert
         Assert.NotNull(bullet.Collider);
-        Assert.Equal(typeof(Bullet), bullet.Collider.ColliderType);
+        Assert.Equal(typeof(Bullet<Player>), bullet.Collider.ColliderType);
         Assert.Equal(startPosition, bullet.Collider.Position);
     }
 
@@ -329,7 +329,7 @@ public class BulletTests
         var startPosition = new Vector2(100, 100);
         var direction = Vector2.UnitY;
         var mockSprite = Substitute.For<ISpriteHelper>();
-        using var bullet = new Bullet(startPosition, direction, mockSprite);
+        using var bullet = new Bullet<Player>(startPosition, direction, mockSprite);
 
         // Act
         bullet.Update(TestDataBuilders.OneFrame);

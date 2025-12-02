@@ -1,10 +1,6 @@
-﻿using BulletHell.Configurations;
-using BulletHell.Helpers;
-using BulletHell.Interfaces;
 using BulletHell.Managers;
 using BulletHell.Models;
 using Microsoft.Xna.Framework;
-using NSubstitute;
 
 namespace BulletHell.test.Managers;
 
@@ -14,7 +10,7 @@ public class EnemyBulletManagerTest(ITestOutputHelper output)
     public void EnemyBulletManager_ShouldCreateBulletAndAddToList()
     {
         // Arrange
-        var bulletManager = new EnemyBulletManager();
+        var bulletManager = new BulletManager<Enemy>();
         var startPosition = new Vector2(10, 10);
         var velocity = new Vector2(10, 10);
 
@@ -39,7 +35,7 @@ public class EnemyBulletManagerTest(ITestOutputHelper output)
         (int x, int y)
     {
         // Arrange
-        var manager = new EnemyBulletManager();
+        var manager = new BulletManager<Enemy>();
         var startPosition = new Vector2(x, y);
         var velocity = new Vector2(10, 10);
         manager.CreateBullet(startPosition, velocity);
@@ -60,7 +56,7 @@ public class EnemyBulletManagerTest(ITestOutputHelper output)
     public void EnemyBulletManager_ShouldUpdateAllBullets()
     {
         // Arrange
-        var manager = new EnemyBulletManager();
+        var manager = new BulletManager<Enemy>();
         var startingPosition = new Vector2(10, 10);
         var velocity = new Vector2(10, 10);
 
@@ -68,7 +64,7 @@ public class EnemyBulletManagerTest(ITestOutputHelper output)
 
         var deltaTime = 1 / 60f;
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(deltaTime));
-        var expectedPos =  startingPosition + velocity * deltaTime;
+        var expectedPos = startingPosition + velocity * deltaTime;
 
         // Act
         manager.Update(gameTime, 800, 600);

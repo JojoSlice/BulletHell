@@ -1,22 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using BulletHell.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BulletHell.Managers;
 
 public class EnemyManager : IEnemyManager
 {
-    private readonly EnemyBulletManager _enemyBulletManager;
+    private readonly BulletManager<Enemy> _enemyBulletManager;
     private readonly List<Enemy> _enemies = new();
     private readonly Random _rand = new();
     private Texture2D? _enemyTexture;
 
-    public EnemyManager(EnemyBulletManager bulletManager)
+    public EnemyManager(BulletManager<Enemy> bulletManager)
     {
         _enemyBulletManager = bulletManager;
     }

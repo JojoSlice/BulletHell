@@ -63,12 +63,12 @@ public class ColliderTests
     }
 
     [Theory]
-    [InlineData(2,2)]
-    [InlineData(4,7)]
-    [InlineData(6,12)]
-    [InlineData(8,17)]
-    [InlineData(10,22)]
-    [InlineData(12,27)]
+    [InlineData(2, 2)]
+    [InlineData(4, 7)]
+    [InlineData(6, 12)]
+    [InlineData(8, 17)]
+    [InlineData(10, 22)]
+    [InlineData(12, 27)]
     public void DistanceMethod_ReturnsCorrect(int x, int y)
     {
         var collider1 = new Collider(new Vector2(1, 1), null, 0f);

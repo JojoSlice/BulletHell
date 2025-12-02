@@ -1,11 +1,9 @@
-﻿using System.Runtime.InteropServices.Marshalling;
 using BulletHell.Configurations;
-using BulletHell.Models;
 using BulletHell.Interfaces;
 using BulletHell.Managers;
+using BulletHell.Models;
 using Microsoft.Xna.Framework;
 using NSubstitute;
-using Xunit;
 
 namespace BulletHell.test.Managers;
 
@@ -28,7 +26,7 @@ public class EnemyManagerTest
         var sprite = Substitute.For<ISpriteHelper>();
         var enemy = new Enemy(new Vector2(x, y), sprite);
 
-        var bulletManager = new EnemyBulletManager();
+        var bulletManager = new BulletManager<Enemy>();
         var manager = new EnemyManager(bulletManager);
 
         manager.AddEnemy(enemy);
@@ -63,7 +61,7 @@ public class EnemyManagerTest
         var sprite = Substitute.For<ISpriteHelper>();
         var enemy = new Enemy(new Vector2(x, y), sprite);
 
-        var bulletManager = new EnemyBulletManager();
+        var bulletManager = new BulletManager<Enemy>();
         var manager = new EnemyManager(bulletManager);
 
         manager.AddEnemy(enemy);
@@ -96,7 +94,7 @@ public class EnemyManagerTest
 
         var startPosition = enemy.Position; // endast för output
 
-        var bulletManager = new EnemyBulletManager();
+        var bulletManager = new BulletManager<Enemy>();
         var manager = new EnemyManager(bulletManager);
 
         manager.AddEnemy(enemy);
@@ -126,7 +124,7 @@ public class EnemyManagerTest
     public void EnemyManager_TryShootEnemies_ShouldCreateBulletsViaBulletManager()
     {
         // Arrange
-        var bulletManager = new EnemyBulletManager();
+        var bulletManager = new BulletManager<Enemy>();
         var manager = new EnemyManager(bulletManager);
 
         var sprite = Substitute.For<ISpriteHelper>();
