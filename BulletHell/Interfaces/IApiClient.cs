@@ -6,7 +6,7 @@ namespace BulletHell.Interfaces;
 /// <summary>
 /// Interface för kommunikation med User API.
 /// </summary>
-public interface IUserApiClient
+public interface IApiClient
 {
     /// <summary>
     /// Registrerar en ny användare.

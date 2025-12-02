@@ -8,7 +8,7 @@ using BulletHell.Models;
 
 namespace BulletHell.Services;
 
-public class UserApiClient : IUserApiClient
+public class ApiClient : IApiClient
 {
     private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
     {
@@ -17,7 +17,7 @@ public class UserApiClient : IUserApiClient
 
     private readonly HttpClient _httpClient;
 
-    public UserApiClient(HttpClient httpClient)
+    public ApiClient(HttpClient httpClient)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     }
@@ -99,7 +99,10 @@ public class UserApiClient : IUserApiClient
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse<UserResponse>>(content, _jsonOptions);
+                var apiResponse = JsonSerializer.Deserialize<ApiResponse<UserResponse>>(
+                    content,
+                    _jsonOptions
+                );
 
                 if (apiResponse?.IsSuccess == true && apiResponse.Data != null)
                 {
