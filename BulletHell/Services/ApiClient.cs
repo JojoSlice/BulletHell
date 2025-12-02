@@ -66,7 +66,7 @@ public class ApiClient : IApiClient
             return new RegistrationResult
             {
                 Success = false,
-                Message = $"Could not connetct to server: {ex.Message}",
+                Message = $"Could not connect to server: {ex.Message}",
             };
         }
         catch (TaskCanceledException ex)
