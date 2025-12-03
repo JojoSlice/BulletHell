@@ -396,4 +396,39 @@ public class PlayerTests(ITestOutputHelper output)
 
     }
 
+    [Fact]
+    public void TakeDamage_WhenHealthReachesZero_ShouldReduceLivesAndResetHealth()
+    {
+        // Arrange
+        var mockInput = MockFactories.CreateMockInputProvider();
+        var mockSprite = MockFactories.CreateMockSpriteHelper();
+        var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
+
+        var startingLives = player.Lives;
+
+        // Sänker hälsan till ett värde som inte klarar av kommande skada
+        player.TakeDamage(PlayerConfig.MaxHealth - 50);
+        var startingHealth = player.Health;
+
+        var expectedLives = startingLives - 1;
+        var expectedHealth = PlayerConfig.MaxHealth;
+
+        // Act
+        player.TakeDamage(100); // detta ska döda och resetta
+        var actualLives = player.Lives;
+        var actualHealth = player.Health;
+
+        // Assert
+        Assert.Equal(expectedLives, actualLives);
+        Assert.Equal(expectedHealth, actualHealth);
+
+        // Output (Debug info)
+        _output.WriteLine($"Starting Lives: {startingLives}");
+        _output.WriteLine($"Expected Lives after death: {expectedLives}");
+        _output.WriteLine($"Actual Lives: {actualLives} ✔️");
+
+        _output.WriteLine($"Health before lethal damage: {startingHealth}");
+        _output.WriteLine($"Expected reset Health:       {expectedHealth}");
+        _output.WriteLine($"Actual reset Health:         {actualHealth} ✔️");
+    }
 }

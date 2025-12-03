@@ -131,4 +131,55 @@ public class EnemyTest(ITestOutputHelper output)
         var expected = Math.Max(20, 12) / 2f;
         Assert.Equal(expected, enemy.Collider.Radius);
     }
+
+    [Fact]
+    public void TakeDamage_WhenHealthReachesZero_ShouldSetIsAliveFalse()
+    {
+        // Arrange
+        var sprite = Substitute.For<ISpriteHelper>();
+        var enemy = new Enemy(new Vector2(0, 0), sprite);
+
+        int startingHealth = enemy.Health;
+        int lethalDamage = startingHealth; // Enough to kill
+
+        var expectedHealth = 0;
+
+        // Act
+        enemy.TakeDamage(lethalDamage);
+        var actualHealth = enemy.Health;
+
+        // Assert
+        Assert.False(enemy.IsAlive);
+        Assert.Equal(expectedHealth, actualHealth);
+
+        //Output
+        output.WriteLine($"Starting Health: {startingHealth}");
+        output.WriteLine($"Expected Health after death: {expectedHealth}");
+        output.WriteLine($"Actual Health: {actualHealth} ✔️");
+        output.WriteLine($"Enemy alive status correctly false ✔️");
+    }
+
+    [Fact]
+    public void ShouldBeRemoved_WhenEnemyIsDead_ShouldReturnTrue()
+    {
+        // Arrange
+        var sprite = Substitute.For<ISpriteHelper>();
+        var enemy = new Enemy(new Vector2(100, 100), sprite);
+
+        var startingHealth = enemy.Health;
+
+        // dödar fienden
+        enemy.TakeDamage(enemy.Health);
+
+        // Act
+        bool removed = enemy.ShouldBeRemoved(800, 600);
+
+        // Assert
+        Assert.True(removed);
+
+        // Output
+        output.WriteLine($"Enemy health before death: {startingHealth}");
+        output.WriteLine($"Enemy is alive after damage: {enemy.IsAlive}");
+        output.WriteLine($"ShouldBeRemoved returned: {removed} ✔️");
+    }
 }

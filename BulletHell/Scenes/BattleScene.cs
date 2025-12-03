@@ -30,6 +30,7 @@ public class BattleScene : Scene
     private Texture2D? _enemyBulletTexture;
     private HUD? _hud;
     private Camera? _camera;
+    private Texture2D? _lifeTexture;
 
     public BattleScene(Game1 game)
         : base(game)
@@ -58,6 +59,9 @@ public class BattleScene : Scene
         _hud = new HUD();
         _hud.MaxHP = 100;
         _hud.HP = _player.Health;
+
+        _lifeTexture = _game.Content.Load<Texture2D>("player_life");
+        _hud.LifeTexture = _lifeTexture;
 
         // Add initial enemy
         _enemyManager.AddEnemy(new Enemy(
@@ -115,6 +119,7 @@ public class BattleScene : Scene
         if (_hud != null)
         {
             _hud.HP = _player.Health;
+            _hud.Lives = _player.Lives;
         }
     }
 

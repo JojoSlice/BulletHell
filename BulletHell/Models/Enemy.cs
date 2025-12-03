@@ -18,8 +18,10 @@ public class Enemy
     public int Width => _sprite.Width;
 
     public int Height => _sprite.Height;
+    public int Health { get; private set; } = EnemyConfig.MaxHealth;
 
     public bool IsAlive { get; private set; } = true;
+    public int CollisionDamage { get; set; } = 25;
 
     public Collider Collider => _collider;
 
@@ -42,7 +44,7 @@ public class Enemy
 
     public bool ShouldBeRemoved(int screenWidth, int screenHeight)
     {
-        return IsOutOfBounds(screenWidth, screenHeight);
+        return !IsAlive || IsOutOfBounds(screenWidth, screenHeight);
     }
 
     public void LoadContent(Texture2D enemyTexture)
@@ -94,5 +96,16 @@ public class Enemy
         // NOTE: Draw anropas endast grafiskt och enhetstestas inte.
         // Renderingen verifieras visuellt i spelet.
         _sprite.Draw(spriteBatch, Position, 0f, 1f);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        Health -= damage;
+
+        if (Health <= 0)
+        {
+            Health = 0;
+            IsAlive = false;
+        }
     }
 }

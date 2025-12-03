@@ -36,8 +36,4 @@
     <ProjectReference Include="..\BulletHell\BulletHell.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="UI\" />
-  </ItemGroup>
-
 </Project>
