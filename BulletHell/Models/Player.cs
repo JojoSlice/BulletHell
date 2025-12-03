@@ -220,13 +220,6 @@ public class Player : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public void TakeDamage()
-    {
-        // Reduce health by one; clamp at zero
-        Health = Math.Max(0, Health - 1);
-        // Additional effects (invulnerability frames, sound, particles) can be added here.
-    }
-
     /// <summary>
     /// Applies a smooth knockback over the given duration. The provided force is interpreted as
     /// initial speed (pixels per second). The knockback will move the player by

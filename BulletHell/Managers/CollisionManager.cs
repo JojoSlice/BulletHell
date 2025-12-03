@@ -42,8 +42,8 @@ public class CollisionManager(Player player, BulletManager<Player> pbm, EnemyMan
         foreach (var enemy in em.Enemies.Where(enemy =>
                      player.Collider.IsCollidingWith(enemy.Collider)))
         {
-            player.TakeDamage();
-            PushBack(enemy.Collider.Position);
+                player.TakeDamage(10); // ändra till enemy.Damage eller något senare
+                PushBack(enemy.Collider.Position);
         }
     }
 
