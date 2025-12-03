@@ -53,7 +53,7 @@ public class BulletManager<T> : IBulletManager, IDisposable
     public void CreateBullet(Vector2 position, Vector2 direction)
     {
         // Kommenterar ut för att kunna köra tester.
-        //if (_bulletTexture == null)
+        // if (_bulletTexture == null)
         //    throw new InvalidOperationException(
         //        "LoadContent must be called before creating bullets"
         //    );
