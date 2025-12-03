@@ -32,6 +32,7 @@ public class Bullet<T> : IDisposable
 
     public int Width => _sprite.Width;
     public int Height => _sprite.Height;
+    public int Damage { get; private set; } = 1;
 
     public Bullet(Vector2 startPosition, Vector2 direction, ISpriteHelper sprite)
     {
@@ -133,9 +134,13 @@ public class Bullet<T> : IDisposable
         _sprite.Draw(spriteBatch, Position, 0f, 1f);
     }
 
-    public void Reset(Vector2 position, Vector2 directionOrVelocity)
+    public void Reset(Vector2 position, Vector2 directionOrVelocity, int damage = 1)
     {
         Position = position;
+
+        Damage = typeof(T) == typeof(Player)
+            ? BulletConfig.Player.Damage
+            : BulletConfig.Enemy.Damage;
 
         if (typeof(T) == typeof(Player))
         {
@@ -143,13 +148,15 @@ public class Bullet<T> : IDisposable
             if (dir != Vector2.Zero)
                 dir.Normalize();
             _direction = dir * BulletConfig.Player.Speed;
+            Damage = BulletConfig.Player.Damage;
         }
         else
         {
             _direction = directionOrVelocity;
+            Damage = BulletConfig.Enemy.Damage;
         }
 
-        _timeAlive = 0f;
+        _timeAlive = 1f;
         _collider.Position = Position;
         _hitTarget = false;
     }

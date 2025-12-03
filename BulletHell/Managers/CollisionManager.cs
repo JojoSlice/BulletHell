@@ -20,6 +20,7 @@ public class CollisionManager(Player player, BulletManager<Player> pbm, EnemyMan
 
                 if (bullet.Collider.IsCollidingWith(enemy.Collider))
                 {
+                    enemy.TakeDamage(bullet.Damage);
                     bullet.MarkHit();
                 }
             }
@@ -35,6 +36,7 @@ public class CollisionManager(Player player, BulletManager<Player> pbm, EnemyMan
             }
             if (enemyBullet.Collider.IsCollidingWith(player.Collider))
             {
+                player.TakeDamage(enemyBullet.Damage);
                 enemyBullet.MarkHit();
             }
         }
@@ -42,7 +44,7 @@ public class CollisionManager(Player player, BulletManager<Player> pbm, EnemyMan
         foreach (var enemy in em.Enemies.Where(enemy =>
                      player.Collider.IsCollidingWith(enemy.Collider)))
         {
-                player.TakeDamage(10); // ändra till enemy.Damage eller något senare
+                player.TakeDamage(enemy.CollisionDamage);
                 PushBack(enemy.Collider.Position);
         }
     }
