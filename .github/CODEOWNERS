@@ -1,0 +1,5 @@
+# CODEOWNERS
+# Denna rad säkerställer att alla Pull Requests (PRs) som berör *någon* fil
+# i repot kommer att kräva granskning från alla tre användare.
+
+* @JojoSlice @Hilden202 @Slay-Stina
