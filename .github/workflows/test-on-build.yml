@@ -85,12 +85,18 @@ jobs:
         with:
           files: 'TestResults/**/*.trx'
 
-      - name: Publish coverage (cobertura) - optional
-        uses: turing85/publish-report@v2
+      - name: Code Coverage Report
+        uses: irongut/CodeCoverageSummary@v1
         with:
-          comment-header: coverage-header
-          comment-message-success: 'Coverage uploaded: {4}'
-          report-name: Coverage
-          report-path: 'TestResults/**/coverage.cobertura.xml'
-          report-reporter: cobertura
-          report-fail-on-error: false
+          filename: TestResults/**/coverage.cobertura.xml
+          badge: true
+          format: markdown
+          output: both
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event.workflow_run.event == 'pull_request'
+        with:
+          recreate: true
+          path: code-coverage-results.md
+          number: ${{ github.event.workflow_run.pull_requests[0].number }}
