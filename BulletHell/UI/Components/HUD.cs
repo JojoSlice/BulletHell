@@ -1,3 +1,4 @@
+using BulletHell.Configurations;
 using BulletHell.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
@@ -8,6 +9,13 @@ public class HUD
 {
     public int HP { get; set; }
     public int MaxHP { get; set; } = 100;
+
+    public int Lives { get; set; } = PlayerConfig.Lives;
+
+    public void UpdateLives(int lives)
+    {
+        Lives = lives;
+    }
 
     public void Draw(SpriteBatch spriteBatch)
     {
