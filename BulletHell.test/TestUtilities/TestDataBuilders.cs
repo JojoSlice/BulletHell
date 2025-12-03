@@ -23,12 +23,12 @@ public static class TestDataBuilders
         );
     }
 
-    public static Bullet CreateTestBullet(
+    public static Bullet<Player> CreateTestBullet(
         Vector2? position = null,
         Vector2? direction = null,
         ISpriteHelper? sprite = null)
     {
-        return new Bullet(
+        return new Bullet<Player>(
             position ?? Vector2.Zero,
             direction ?? Vector2.UnitY,
             sprite ?? Substitute.For<ISpriteHelper>()
