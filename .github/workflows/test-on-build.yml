@@ -1,4 +1,4 @@
-name: Test on Build (recommended)
+name: Test on Build
 
 on:
   workflow_run:
@@ -13,7 +13,6 @@ permissions:
   actions: write
 
 jobs:
-  # Run tests and produce TestResults (TRX) + cobertura coverage
   run-tests:
     runs-on: ubuntu-latest
 
@@ -24,7 +23,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '9.0.x'
 
@@ -64,38 +63,27 @@ jobs:
         if: ${{ always() }}
         with:
           name: test-results
-          path: TestResults/**    # Capture TRX + coverage outputs produced by dotnet test
+          path: TestResults/**
           if-no-files-found: error
           retention-days: 2
 
-  # Publish test report (vstest) and coverage (cobertura)
   publish-report:
     needs: run-tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code (required by publish-report)
+      - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Publish TRX test report
-        uses: turing85/publish-report@v2
+      - name: Download TestResults artifact
+        uses: actions/download-artifact@v6
         with:
-          comment-header: my-comment-header
-          comment-message-success: |
-            🎉 {0} passed!  
-            
-            {1} tests passed, {2} tests failed, {3} tests skipped.
-            
-            Report: {4}
-          comment-message-failure: |
-            💔 {0} failed!  
-            
-            {1} tests passed, {2} tests failed, {3} tests skipped.
-            
-            Report: {4}
-          report-fail-on-error: true
-          report-name: Tests
-          report-path: 'TestResults/**/*.trx'     # TRX test results
-          report-reporter: vstest                 # Use vstest reporter for TRX
+          name: test-results
+          path: TestResults
+
+      - name: Publish TRX test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: 'TestResults/**/*.trx'
 
       - name: Publish coverage (cobertura) - optional
         uses: turing85/publish-report@v2
@@ -103,21 +91,6 @@ jobs:
           comment-header: coverage-header
           comment-message-success: 'Coverage uploaded: {4}'
           report-name: Coverage
-          report-path: 'TestResults/**/coverage.cobertura.xml'  # coverage file produced by XPlat Code Coverage
+          report-path: 'TestResults/**/coverage.cobertura.xml'
           report-reporter: cobertura
           report-fail-on-error: false
-
-  # Optional: recreate or update PR comment (depends on publish-report if it needs published links)
-  recreate-comment:
-    needs: publish-report
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code (publish-report recommends checkout)
-        uses: actions/checkout@v6
-
-      - name: Recreate comment
-        uses: turing85/publish-report@v2
-        with:
-          recreate-comment: true
-          comment-header: my-comment-header
-          comment-message-recreate: Hello
