@@ -13,7 +13,6 @@ public class HUD
     public int Lives { get; set; } = PlayerConfig.Lives;
     public Texture2D? LifeTexture { get; set; }
 
-
     public void UpdateLives(int lives)
     {
         Lives = lives;
@@ -35,7 +34,7 @@ public class HUD
             {
                 spriteBatch.Draw(
                     LifeTexture,
-                    new Vector2(10 + i * (LifeTexture.Width + 5), 40),
+                    new Vector2(10f + i * (LifeTexture.Width + 5f), 40f),
                     Color.White
                 );
             }
