@@ -45,7 +45,6 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --results-directory ./TestResults \
             --logger "trx" \
-            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
 
       - name: List TestResults
         if: always()
@@ -85,12 +84,17 @@ jobs:
         with:
           files: 'TestResults/**/*.trx'
 
-      - name: Publish coverage (cobertura) - optional
-        uses: turing85/publish-report@v2
+      - name: Code Coverage Report
+        uses: irongut/CodeCoverageSummary@v1
         with:
-          comment-header: coverage-header
-          comment-message-success: 'Coverage uploaded: {4}'
-          report-name: Coverage
-          report-path: 'TestResults/**/coverage.cobertura.xml'
-          report-reporter: cobertura
-          report-fail-on-error: false
+          filename: TestResults/**/coverage.cobertura.xml
+          badge: true
+          format: markdown
+          output: both
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: code-coverage-results.md
