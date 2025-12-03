@@ -1,9 +1,9 @@
 using BulletHell.Configurations;
-using BulletHell.Models;
 using BulletHell.Interfaces;
+using BulletHell.Models;
+using BulletHell.test.TestUtilities;
 using Microsoft.Xna.Framework;
 using NSubstitute;
-using BulletHell.test.TestUtilities;
 
 namespace BulletHell.test.Models;
 
@@ -16,7 +16,7 @@ public class EnemyTest(ITestOutputHelper output)
         var startPosition = new Vector2(10, 10);
         var spriteMock = Substitute.For<ISpriteHelper>();
         var enemy = new Enemy(startPosition, spriteMock);
-        var deltaTime = 1/60f;
+        var deltaTime = 1 / 60f;
         var totalTime = TimeSpan.Zero;
         var elapsedTime = TimeSpan.FromSeconds(deltaTime);
         var gameTime = new GameTime(totalTime, elapsedTime);

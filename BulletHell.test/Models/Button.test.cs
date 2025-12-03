@@ -1,5 +1,3 @@
-using BulletHell.Models;
-
 namespace BulletHell.test.Models;
 
 /// <summary>

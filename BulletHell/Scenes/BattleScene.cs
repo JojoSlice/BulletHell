@@ -1,5 +1,4 @@
 using BulletHell.Graphics;
-using System;
 using BulletHell.Helpers;
 using BulletHell.Inputs;
 using BulletHell.Interfaces;
@@ -9,6 +8,7 @@ using BulletHell.UI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace BulletHell.Scenes;
 
@@ -20,9 +20,9 @@ public class BattleScene : Scene
     private int _screenWidth;
     private int _screenHeight;
     private Player? _player;
-    private BulletManager? _bulletManager;
+    private BulletManager<Player>? _bulletManager;
     private EnemyManager? _enemyManager;
-    private EnemyBulletManager? _enemyBulletManager;
+    private BulletManager<Enemy>? _enemyBulletManager;
     private CollisionManager? _collisionManager;
     private Texture2D? _playerTexture;
     private Texture2D? _bulletTexture;
@@ -51,8 +51,8 @@ public class BattleScene : Scene
         _player = new Player(startPosition, input, sprite);
         _player.SetScreenBounds(_screenWidth, _screenHeight);
 
-        _bulletManager = new BulletManager();
-        _enemyBulletManager = new EnemyBulletManager();
+        _bulletManager = new BulletManager<Player>();
+        _enemyBulletManager = new BulletManager<Enemy>();
         _enemyManager = new EnemyManager(_enemyBulletManager);
 
         _hud = new HUD();

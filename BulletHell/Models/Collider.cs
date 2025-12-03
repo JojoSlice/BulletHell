@@ -1,5 +1,5 @@
-using System;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace BulletHell.Models;
 
@@ -43,11 +43,11 @@ public class Collider(Vector2 position, Type? colliderType, float radius = 0f)
                                                                      && ColliderType != null;
 
     private bool IsPlayerBulletExclusion(Collider other) => ColliderType == typeof(Player)
-                                                            && other.ColliderType == typeof(Bullet);
+                                                            && other.ColliderType == typeof(Bullet<Player>);
 
     private bool IsEnemyEnemyBulletExclusion(Collider other) => ColliderType == typeof(Enemy)
-                                                                && other.ColliderType == typeof(EnemyBullet);
+                                                                && other.ColliderType == typeof(Bullet<Enemy>);
 
-    private bool IsBulletEnemyBulletExclusion(Collider other) => ColliderType == typeof(Bullet)
-                                                                 && other.ColliderType == typeof(EnemyBullet);
+    private bool IsBulletEnemyBulletExclusion(Collider other) => ColliderType == typeof(Bullet<Player>)
+                                                                 && other.ColliderType == typeof(Bullet<Enemy>);
 }

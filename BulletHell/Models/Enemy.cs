@@ -81,8 +81,8 @@ public class Enemy
     {
         if (_shootCooldown <= 0)
         {
-            _shootCooldown = EnemyBulletConfig.FireCooldown;
-            Vector2 bulletVelocity = new Vector2(0, 1) * EnemyBulletConfig.Speed;
+            _shootCooldown = BulletConfig.Enemy.FireCooldown;
+            Vector2 bulletVelocity = new Vector2(0, 1) * BulletConfig.Enemy.Speed;
             Vector2 bulletStartPosition = Position;
             return (bulletStartPosition, bulletVelocity);
         }

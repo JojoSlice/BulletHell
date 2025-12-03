@@ -380,7 +380,7 @@ public class PlayerTests(ITestOutputHelper output)
         var player = TestDataBuilders.CreateTestPlayer();
 
         var damage = 100;
-        var expectedLives =  player.Lives - 1;
+        var expectedLives = player.Lives - 1;
 
         // Act
         player.TakeDamage(damage);
