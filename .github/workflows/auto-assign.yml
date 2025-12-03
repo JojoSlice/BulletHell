@@ -2,7 +2,7 @@ name: Auto assign author to PR and issue
 on:
   issues:
     types: [ opened, reopened ]
-  pull_request_target:
+  pull_request:
     types: [ opened, reopened ]
 
 permissions:
