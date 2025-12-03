@@ -1,0 +1,96 @@
+name: Test on Build
+
+on:
+  workflow_run:
+    workflows: ["Build on PR"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  actions: write
+
+jobs:
+  recreate-comment:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Publish Report
+          uses: turing85/publish-report@v2
+          with:
+            checkout: 'true'
+            comment-header: my-comment-header
+            comment-message-recreate: Hello
+            recreate-comment: true
+            
+  on-success:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          
+      - name: Run tests
+        id: test
+        env:
+          DISPLAY: :99
+        continue-on-error: true
+        run: |
+          # Start virtual display for MonoGame tests
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          sleep 2
+          dotnet test BulletHellSpaceShooter.sln \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults \
+            --logger "trx" \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+
+      - name: List test results (debug)
+        if: always()
+        run: |
+          echo "Contents of TestResults directory:"
+          ls -laR TestResults/ || echo "TestResults directory not found"
+          echo ""
+          echo "Looking for TRX files:"
+          find TestResults -name "*.trx" -type f 2>/dev/null || echo "No TRX files found"
+          
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v5
+        if: ${{ always() }}
+        with:
+          name: test-report
+          path: '**/target/*-reports/TEST*.xml'
+          if-no-files-found: error
+          retention-days: 2
+          
+      - name: Publish Report
+        uses: turing85/publish-report@v2
+        if: ${{ always() }}
+        with:
+          # cancel-workflow-on-error: 'false' # If we do not want to cancel the whole workflow execution on error
+          comment-header: my-comment-header
+          comment-message-success: |
+            🎉 {0} gick igenom!  
+            
+            {1} tester lyckades, {2} tester misslyckades, {3} tester skippades.
+            
+            Rapporten kan hittas [här]({4}).
+
+          comment-message-failure: |
+            💔 {0} gick inte igenom!  
+
+            {1} tester lyckades, {2} tester misslyckades, {3} tester skippades.
+
+            Rapporten kan hittas [här]({4}).
+          report-fail-on-error: true # to fail when tests failed
+          report-name: Tests
+          report-path: '**/target/surefire-reports/TEST*.xml'
+          report-reporter: java-junit
+        
