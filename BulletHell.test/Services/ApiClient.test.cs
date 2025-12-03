@@ -4,15 +4,15 @@ using BulletHell.test.TestUtilities;
 
 namespace BulletHell.test.Services;
 
-public class UserApiClientTests
+public class ApiClientTests
 {
-    private readonly IUserApiClient _apiClient;
+    private readonly IApiClient _apiClient;
     private readonly HttpClient _httpClient;
 
-    public UserApiClientTests()
+    public ApiClientTests()
     {
         _httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5000") };
-        _apiClient = new UserApiClient(_httpClient);
+        _apiClient = new ApiClient(_httpClient);
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public class UserApiClientTests
             BaseAddress = new Uri("http://localhost:5000"),
         };
 
-        var apiClient = new UserApiClient(httpClient);
+        var apiClient = new ApiClient(httpClient);
 
         // Act
         var result = await apiClient.RegisterUserAsync("testuser", "$2a$12$hash");
@@ -56,7 +56,7 @@ public class UserApiClientTests
             BaseAddress = new Uri("http://localhost:5000"),
         };
 
-        var apiClient = new UserApiClient(httpClient);
+        var apiClient = new ApiClient(httpClient);
 
         // Act
         var result = await apiClient.RegisterUserAsync("", "$2a$12$hash");
@@ -80,7 +80,7 @@ public class UserApiClientTests
             BaseAddress = new Uri("http://localhost:5000"),
         };
 
-        var apiClient = new UserApiClient(httpClient);
+        var apiClient = new ApiClient(httpClient);
 
         // Act
         var result = await apiClient.RegisterUserAsync("testuser", "$2a$12$hash");

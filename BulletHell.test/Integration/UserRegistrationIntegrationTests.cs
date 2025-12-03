@@ -9,13 +9,13 @@ namespace BulletHell.test.Integration;
 
 public class UserRegistrationIntegrationTests
 {
-    private readonly IUserApiClient _apiClient;
+    private readonly IApiClient _apiClient;
     private readonly IPasswordHasher _passwordHasher;
 
     public UserRegistrationIntegrationTests()
     {
         var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5000") };
-        _apiClient = new UserApiClient(httpClient);
+        _apiClient = new ApiClient(httpClient);
         _passwordHasher = new BCryptPasswordHasher();
     }
 

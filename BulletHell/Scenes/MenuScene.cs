@@ -27,7 +27,7 @@ public class MenuScene : Scene
     private readonly int _screenWidth;
     private readonly int _screenHeight;
     private readonly IMenuInputProvider _inputProvider;
-    private readonly IUserApiClient _userApiClient;
+    private readonly IApiClient _apiClient;
     private readonly IPasswordHasher _passwordHasher;
     private readonly UserCredentialsValidator _validator;
     private readonly FeedbackMessageDisplay _feedbackDisplay;
@@ -53,7 +53,7 @@ public class MenuScene : Scene
             whiteTexture,
             new MouseKeyboardInputProvider(),
             new KeyboardTextInputHandler(),
-            new UserApiClient(new HttpClient { BaseAddress = new Uri("http://localhost:5000") }),
+            new ApiClient(new HttpClient { BaseAddress = new Uri("http://localhost:5000") }),
             new BCryptPasswordHasher()
         ) { }
 
@@ -62,7 +62,7 @@ public class MenuScene : Scene
         Texture2D whiteTexture,
         IMenuInputProvider inputProvider,
         ITextInputHandler textInputHandler,
-        IUserApiClient userApiClient,
+        IApiClient apiClient,
         IPasswordHasher passwordHasher
     )
         : base(game)
@@ -71,11 +71,17 @@ public class MenuScene : Scene
         _font = game.Content.Load<SpriteFont>("Font");
         _screenWidth = game.GraphicsDevice.Viewport.Width;
         _screenHeight = game.GraphicsDevice.Viewport.Height;
-        _userApiClient = userApiClient;
+        _apiClient = apiClient;
         _passwordHasher = passwordHasher;
         _validator = new UserCredentialsValidator();
         _feedbackDisplay = new FeedbackMessageDisplay();
-        _uiFactory = new MenuUIFactory(_font, whiteTexture, textInputHandler, _screenWidth, _screenHeight);
+        _uiFactory = new MenuUIFactory(
+            _font,
+            whiteTexture,
+            textInputHandler,
+            _screenWidth,
+            _screenHeight
+        );
         _menuButtons = [];
     }
 
@@ -88,7 +94,7 @@ public class MenuScene : Scene
         int screenHeight,
         IMenuInputProvider inputProvider,
         ITextInputHandler textInputHandler,
-        IUserApiClient userApiClient,
+        IApiClient apiClient,
         IPasswordHasher passwordHasher
     )
         : base(game)
@@ -97,11 +103,17 @@ public class MenuScene : Scene
         _screenWidth = screenWidth;
         _screenHeight = screenHeight;
         _inputProvider = inputProvider;
-        _userApiClient = userApiClient;
+        _apiClient = apiClient;
         _passwordHasher = passwordHasher;
         _validator = new UserCredentialsValidator();
         _feedbackDisplay = new FeedbackMessageDisplay();
-        _uiFactory = new MenuUIFactory(font, whiteTexture, textInputHandler, screenWidth, screenHeight);
+        _uiFactory = new MenuUIFactory(
+            font,
+            whiteTexture,
+            textInputHandler,
+            screenWidth,
+            screenHeight
+        );
         _menuButtons = [];
     }
 
@@ -145,7 +157,7 @@ public class MenuScene : Scene
         }
 
         var passwordHash = _passwordHasher.HashPassword(password);
-        return await _userApiClient.RegisterUserAsync(username, passwordHash);
+        return await _apiClient.RegisterUserAsync(username, passwordHash);
     }
 
     private async void OnActionButtonClicked()
@@ -213,7 +225,7 @@ public class MenuScene : Scene
         try
         {
             var passwordHash = _passwordHasher.HashPassword(password);
-            var result = await _userApiClient.LoginAsync(username, passwordHash);
+            var result = await _apiClient.LoginAsync(username, passwordHash);
 
             if (result.Success)
             {
@@ -274,7 +286,9 @@ public class MenuScene : Scene
     {
         if (_menuButtons == null || _menuButtons.Length == 0)
         {
-            var startButton = _uiFactory.CreateStartGameButton(() => _game.ChangeScene(SceneNames.Battle));
+            var startButton = _uiFactory.CreateStartGameButton(() =>
+                _game.ChangeScene(SceneNames.Battle)
+            );
             var exitButton = _uiFactory.CreateExitButton(() => _game.Exit());
             _menuButtons = [startButton, exitButton];
 

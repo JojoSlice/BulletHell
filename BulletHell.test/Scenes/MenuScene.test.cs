@@ -78,7 +78,7 @@ public class MenuSceneTests
     public async Task RegisterUser_ShouldCallApiWithHashedPassword()
     {
         // Arrange
-        var apiClient = Substitute.For<IUserApiClient>();
+        var apiClient = Substitute.For<IApiClient>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
         var menuScene = CreateMenuSceneWithMocks(apiClient, passwordHasher);
 
@@ -133,7 +133,7 @@ public class MenuSceneTests
     public async Task RegisterUser_ShouldReturnFailure_WhenApiCallFails()
     {
         // Arrange
-        var apiClient = Substitute.For<IUserApiClient>();
+        var apiClient = Substitute.For<IApiClient>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
         var menuScene = CreateMenuSceneWithMocks(apiClient, passwordHasher);
 
@@ -157,7 +157,7 @@ public class MenuSceneTests
         SpriteFont? font = null; // SpriteFont cannot be mocked either, but we don't need it for these tests
         var inputProvider = Substitute.For<IMenuInputProvider>();
         var textInputHandler = Substitute.For<ITextInputHandler>();
-        var apiClient = Substitute.For<IUserApiClient>();
+        var apiClient = Substitute.For<IApiClient>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
 
         return new MenuScene(
@@ -174,7 +174,7 @@ public class MenuSceneTests
     }
 
     private MenuScene CreateMenuSceneWithMocks(
-        IUserApiClient apiClient,
+        IApiClient apiClient,
         IPasswordHasher passwordHasher
     )
     {

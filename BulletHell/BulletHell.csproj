@@ -37,6 +37,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Contracts\Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
 </Project>
