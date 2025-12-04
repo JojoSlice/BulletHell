@@ -61,7 +61,7 @@ public class BattleScene : Scene
         _hud.MaxHP = 100;
         _hud.HP = _player.Health;
 
-        _lifeTexture = _game.Content.Load<Texture2D>("player_life");
+        _lifeTexture = _game.Content.Load<Texture2D>("player_Life");
         _hud.LifeTexture = _lifeTexture;
 
         // Add initial enemy

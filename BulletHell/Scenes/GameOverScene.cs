@@ -64,20 +64,9 @@ public class GameOverScene : Scene
 
     public override void OnExit()
     {
-        if (_restartButton != null)
-        {
-            _restartButton.OnClick -= OnRestartClicked;
-        }
-
-        if (_menuButton != null)
-        {
-            _menuButton.OnClick -= OnMenuClicked;
-        }
-
-        if (_exitButton != null)
-        {
-            _exitButton.OnClick -= OnExitClicked;
-        }
+        _restartButton.OnClick -= OnRestartClicked;
+        _menuButton.OnClick -= OnMenuClicked;
+        _exitButton.OnClick -= OnExitClicked;
 
         base.OnExit();
     }
