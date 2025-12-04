@@ -23,10 +23,10 @@ public class Bullet<T> : IDisposable
     {
         get
         {
-            var lifetime = typeof(T) == typeof(Player)
-                ? BulletConfig.Player.Lifetime
-                : BulletConfig.Enemy.Lifetime;
-            return _timeAlive < lifetime;
+            if (typeof(T) == typeof(Player))
+                return _timeAlive < BulletConfig.Player.Lifetime;
+
+            return true;
         }
     }
 
@@ -156,7 +156,7 @@ public class Bullet<T> : IDisposable
             Damage = BulletConfig.Enemy.Damage;
         }
 
-        _timeAlive = 1f;
+        _timeAlive = 0f;
         _collider.Position = Position;
         _hitTarget = false;
     }
