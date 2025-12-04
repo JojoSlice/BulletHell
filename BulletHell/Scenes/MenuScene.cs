@@ -317,6 +317,8 @@ public class MenuScene : Scene
             MediaPlayer.Stop();
         }
 
+        _menuNavigator?.Clear();
+
         if (_modeToggleButton != null)
         {
             _modeToggleButton.OnClick -= OnModeToggleClicked;

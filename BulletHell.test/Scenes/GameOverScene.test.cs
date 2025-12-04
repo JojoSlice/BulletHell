@@ -69,20 +69,17 @@ public class GameOverSceneTests
         // Arrange
         var mockNavigator = new Mock<IMenuNavigator>();
         var scene = CreateGameOverScene(navigator: mockNavigator.Object);
-        try
+
+        using (scene)
         {
             scene.OnEnter();
-        }
-        finally
-        {
-            scene.Dispose();
-        }
 
-        // Act
-        scene.OnExit();
+            // Act
+            scene.OnExit();
 
-        // Assert
-        mockNavigator.Verify(m => m.Clear(), Times.Once);
+            // Assert
+            mockNavigator.Verify(m => m.Clear(), Times.Once);
+        }
     }
 
     [Fact]
