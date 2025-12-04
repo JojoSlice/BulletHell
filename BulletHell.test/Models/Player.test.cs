@@ -431,4 +431,30 @@ public class PlayerTests(ITestOutputHelper output)
         _output.WriteLine($"Expected reset Health:       {expectedHealth}");
         _output.WriteLine($"Actual reset Health:         {actualHealth} ✔️");
     }
+    [Fact]
+    public void AddScore_ShouldIncreasePlayerScore()
+    {
+        // Arrange
+        var mockInput = MockFactories.CreateMockInputProvider();
+        var mockSprite = MockFactories.CreateMockSpriteHelper();
+        var player = new Player(new Vector2(0, 0), mockInput, mockSprite);
+
+        int startingScore = player.Score;
+        int pointsToAdd = 1;
+        int expected = startingScore + pointsToAdd;
+
+        // Act
+        player.AddScore(pointsToAdd);
+        var actual = player.Score;
+
+        // Assert
+        Assert.Equal(expected, actual);
+        actual = player.Score;
+
+        // Output (debug info)
+        _output.WriteLine($"Starting Score: {startingScore}");
+        _output.WriteLine($"Points added: {pointsToAdd}");
+        _output.WriteLine($"Expected Score: {expected}");
+        _output.WriteLine($"Actual Score: {actual} ✔️");
+    }
 }
