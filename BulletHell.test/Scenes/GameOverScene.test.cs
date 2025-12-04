@@ -38,8 +38,14 @@ public class GameOverSceneTests
     {
         // Arrange
         var scene = CreateGameOverScene();
-        scene.OnEnter();
-        scene.Dispose();
+        try
+        {
+            scene.OnEnter();
+        }
+        finally
+        {
+            scene.Dispose();
+        }
 
         // Act & Assert
         Assert.Throws<ObjectDisposedException>(() => scene.Update(new GameTime()));
@@ -50,11 +56,15 @@ public class GameOverSceneTests
     {
         // Arrange
         var scene = CreateGameOverScene();
-        scene.OnEnter();
-
-        // Act & Assert - Should not throw
-        var exception = Record.Exception(() => scene.Dispose());
-        Assert.Null(exception);
+        try
+        {
+            scene.OnEnter();
+        }
+        finally
+        {
+            var exception = Record.Exception(() => scene.Dispose());
+            Assert.Null(exception);
+        }
     }
 
     [Fact]
@@ -63,7 +73,14 @@ public class GameOverSceneTests
         // Arrange
         var mockNavigator = new Mock<IMenuNavigator>();
         var scene = CreateGameOverScene(navigator: mockNavigator.Object);
-        scene.OnEnter();
+        try
+        {
+            scene.OnEnter();
+        }
+        finally
+        {
+            scene.Dispose();
+        }
 
         // Act
         scene.OnExit();
