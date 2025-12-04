@@ -53,15 +53,9 @@ public class GameOverSceneTests
         // Arrange
         using (var scene = CreateGameOverScene())
         {
-            try
-            {
-                scene.OnEnter();
-            }
-            finally
-            {
-                var exception = Record.Exception(() => scene.Dispose());
-                Assert.Null(exception);
-            }
+            scene.OnEnter();
+            // The using statement will automatically call Dispose()
+            // If Dispose() throws an exception, the test will fail
         }
     }
 
