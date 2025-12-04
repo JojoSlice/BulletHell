@@ -18,4 +18,19 @@ public class HUDtests
         // Assert
         Assert.Equal(expectedLives, actualLives);
     }
+
+    [Fact]
+    public void HUD_UpdateScore_ShouldStoreCorrectValue()
+    {
+        // Arrange
+        var hud = new HUD();
+        int expected = 123;
+
+        // Act
+        hud.UpdateScore(expected);
+        int actual = hud.Score;
+
+        // Assert
+        Assert.Equal(expected, actual);
+    }
 }

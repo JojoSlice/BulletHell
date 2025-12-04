@@ -30,6 +30,11 @@ public class Player : IDisposable
     public int MaxLives => PlayerConfig.Lives;
     public int Lives { get; private set; } = PlayerConfig.Lives;
     public int Health { get; private set; } = PlayerConfig.MaxHealth;
+    public int Score { get; private set; }
+    public void AddScore(int value)
+    {
+        Score += value;
+    }
 
     public Collider Collider => _collider;
 
@@ -177,6 +182,7 @@ public class Player : IDisposable
 
             return (bulletStartPosition, bulletDirection);
         }
+
         return null;
     }
 

@@ -121,6 +121,7 @@ public class BattleScene : Scene
         {
             _hud.HP = _player.Health;
             _hud.Lives = _player.Lives;
+            _hud.UpdateScore(_player.Score);
         }
 
         if (_player.Lives <= 0)

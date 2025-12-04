@@ -12,10 +12,16 @@ public class HUD
 
     public int Lives { get; set; } = PlayerConfig.Lives;
     public Texture2D? LifeTexture { get; set; }
+    public int Score { get; private set; }
 
     public void UpdateLives(int lives)
     {
         Lives = lives;
+    }
+
+    public void UpdateScore(int value)
+    {
+        Score = value;
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -39,5 +45,12 @@ public class HUD
                 );
             }
         }
+        // Draw Score
+        spriteBatch.DrawString(
+            TextureHelper.DefaultFont,
+            $"Score: {Score}",
+            new Vector2(15f, 85f),
+            Color.White
+        );
     }
 }
