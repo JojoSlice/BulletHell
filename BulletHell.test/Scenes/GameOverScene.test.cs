@@ -37,7 +37,8 @@ public class GameOverSceneTests
     public void Update_AfterDispose_ShouldThrowObjectDisposedException()
     {
         // Arrange
-        using (var scene = CreateGameOverScene())
+        var scene = CreateGameOverScene();
+        using (scene)
         {
             scene.OnEnter();
         }
