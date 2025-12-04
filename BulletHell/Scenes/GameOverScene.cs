@@ -1,5 +1,6 @@
 using System;
 using BulletHell.Constants;
+using BulletHell.Inputs;
 using BulletHell.Interfaces;
 using BulletHell.Managers;
 using BulletHell.Models;
@@ -22,6 +23,7 @@ public class GameOverScene : Scene
     private readonly Texture2D _whiteTexture;
     private readonly int _screenWidth;
     private readonly int _screenHeight;
+    private readonly IMenuInputProvider _inputProvider;
 
     private Button _restartButton = null!;
     private Button _menuButton = null!;
@@ -30,12 +32,35 @@ public class GameOverScene : Scene
     private IMenuNavigator? _menuNavigator;
 
     public GameOverScene(Game1 game, Texture2D whiteTexture)
+        : this(
+            game,
+            whiteTexture,
+            game.Content.Load<SpriteFont>("Font"),
+            game.GraphicsDevice.Viewport.Width,
+            game.GraphicsDevice.Viewport.Height,
+            new MouseKeyboardInputProvider()
+        )
+    {
+    }
+
+    // Constructor for testing - doesn't require Game1.Content or GraphicsDevice
+    internal GameOverScene(
+        Game1 game,
+        Texture2D whiteTexture,
+        SpriteFont font,
+        int screenWidth,
+        int screenHeight,
+        IMenuInputProvider inputProvider,
+        IMenuNavigator? menuNavigator = null
+    )
         : base(game)
     {
         _whiteTexture = whiteTexture;
-        _font = game.Content.Load<SpriteFont>("Font");
-        _screenWidth = game.GraphicsDevice.Viewport.Width;
-        _screenHeight = game.GraphicsDevice.Viewport.Height;
+        _font = font;
+        _screenWidth = screenWidth;
+        _screenHeight = screenHeight;
+        _inputProvider = inputProvider;
+        _menuNavigator = menuNavigator;
     }
 
     public override void OnEnter()
@@ -128,8 +153,8 @@ public class GameOverScene : Scene
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        var mouseState = Mouse.GetState();
-        var keyboardState = Keyboard.GetState();
+        var mouseState = _inputProvider.GetMouseState();
+        var keyboardState = _inputProvider.GetKeyboardState();
 
         _restartButton.Update(mouseState);
         _menuButton.Update(mouseState);
