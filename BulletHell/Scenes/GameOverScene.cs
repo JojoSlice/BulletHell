@@ -3,6 +3,7 @@ using BulletHell.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 
 namespace BulletHell.Scenes;
 
@@ -22,6 +23,7 @@ public class GameOverScene : Scene
     private Button _restartButton = null!;
     private Button _menuButton = null!;
     private Button _exitButton = null!;
+    private Song? _gameOverMusic;
 
     public GameOverScene(Game1 game, Texture2D whiteTexture)
         : base(game)
@@ -34,6 +36,18 @@ public class GameOverScene : Scene
 
     public override void OnEnter()
     {
+        try
+        {
+            _gameOverMusic = _game.Content.Load<Song>("Project_137");
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Volume = 0.5f;
+            MediaPlayer.Play(_gameOverMusic);
+        }
+        catch (Microsoft.Xna.Framework.Audio.NoAudioHardwareException)
+        {
+            _gameOverMusic = null;
+        }
+
         int startY = 300;
         int centerX = _screenWidth / 2 - ButtonWidth / 2;
 
@@ -64,6 +78,11 @@ public class GameOverScene : Scene
 
     public override void OnExit()
     {
+        if (_gameOverMusic != null)
+        {
+            MediaPlayer.Stop();
+        }
+
         _restartButton.OnClick -= OnRestartClicked;
         _menuButton.OnClick -= OnMenuClicked;
         _exitButton.OnClick -= OnExitClicked;
