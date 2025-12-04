@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BulletHell.Constants;
+using BulletHell.Helpers;
 using BulletHell.Scenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -54,6 +55,7 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        TextureHelper.LoadDefaultFont(Content.Load<SpriteFont>("Font"));
     }
 
     public void ChangeScene(string sceneName)

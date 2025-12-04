@@ -51,7 +51,7 @@ public class HUD
         spriteBatch.DrawString(
             TextureHelper.DefaultFont,
             $"Score: {Score}",
-            new Vector2(10f, 70f),
+            new Vector2(15f, 85f),
             Color.White
         );
     }

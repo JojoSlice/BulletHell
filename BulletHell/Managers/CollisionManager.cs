@@ -1,6 +1,7 @@
 using BulletHell.Models;
 using Microsoft.Xna.Framework;
 using System.Linq;
+using BulletHell.Configurations;
 
 namespace BulletHell.Managers;
 
@@ -20,7 +21,12 @@ public class CollisionManager(Player player, BulletManager<Player> pbm, EnemyMan
 
                 if (bullet.Collider.IsCollidingWith(enemy.Collider))
                 {
+                    var wasAlive = enemy.IsAlive;
                     enemy.TakeDamage(bullet.Damage);
+                    if (wasAlive && !enemy.IsAlive)
+                    {
+                        player.AddScore(EnemyConfig.ScoreValue);
+                    }
                     bullet.MarkHit();
                 }
             }

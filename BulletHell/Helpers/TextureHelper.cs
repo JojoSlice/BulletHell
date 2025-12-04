@@ -6,6 +6,7 @@ namespace BulletHell.Helpers;
 public static class TextureHelper
 {
     private static Texture2D? _whitePixel;
+    public static SpriteFont? DefaultFont { get; private set; }
 
     public static Texture2D WhitePixel(GraphicsDevice graphicsDevice)
     {
@@ -14,6 +15,11 @@ public static class TextureHelper
             _whitePixel = new Texture2D(graphicsDevice, 1, 1);
             _whitePixel.SetData(new[] { Color.White });
         }
+
         return _whitePixel;
+    }
+    public static void LoadDefaultFont(SpriteFont font)
+    {
+        DefaultFont = font;
     }
 }
