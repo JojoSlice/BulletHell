@@ -1,3 +1,4 @@
+using System;
 using BulletHell.Constants;
 using BulletHell.Models;
 using Microsoft.Xna.Framework;
@@ -107,15 +108,19 @@ public class GameOverScene : Scene
 
     public override void Update(GameTime gameTime)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
         var mouseState = Mouse.GetState();
 
-        _restartButton?.Update(mouseState);
-        _menuButton?.Update(mouseState);
-        _exitButton?.Update(mouseState);
+        _restartButton.Update(mouseState);
+        _menuButton.Update(mouseState);
+        _exitButton.Update(mouseState);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
         _game.GraphicsDevice.Clear(Color.Black);
 
         var titleSize = _font.MeasureString(GameOverText);
@@ -126,18 +131,18 @@ public class GameOverScene : Scene
 
         spriteBatch.DrawString(_font, GameOverText, titlePosition, Color.Red);
 
-        _restartButton?.Draw(spriteBatch);
-        _menuButton?.Draw(spriteBatch);
-        _exitButton?.Draw(spriteBatch);
+        _restartButton.Draw(spriteBatch);
+        _menuButton.Draw(spriteBatch);
+        _exitButton.Draw(spriteBatch);
     }
 
     protected override void Dispose(bool disposing)
     {
         if (disposing)
         {
-            _restartButton?.Dispose();
-            _menuButton?.Dispose();
-            _exitButton?.Dispose();
+            _restartButton.Dispose();
+            _menuButton.Dispose();
+            _exitButton.Dispose();
         }
 
         base.Dispose(disposing);
