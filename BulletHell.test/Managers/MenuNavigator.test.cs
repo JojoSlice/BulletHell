@@ -11,7 +11,7 @@ public class MenuNavigatorTests
     public void Constructor_ShouldCreateInstance()
     {
         // Act
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
 
         // Assert
         Assert.NotNull(navigator);
@@ -22,7 +22,7 @@ public class MenuNavigatorTests
     public void AddItem_FirstItem_ShouldSelectIt()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var mockItem = Substitute.For<INavigable>();
 
         // Act
@@ -37,7 +37,7 @@ public class MenuNavigatorTests
     public void AddItem_SecondItem_ShouldNotSelectIt()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var firstItem = Substitute.For<INavigable>();
         var secondItem = Substitute.For<INavigable>();
 
@@ -55,7 +55,7 @@ public class MenuNavigatorTests
     public void AddItem_MultipleItems_ShouldOnlySelectFirst()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var items = new[]
         {
             Substitute.For<INavigable>(),
@@ -80,7 +80,7 @@ public class MenuNavigatorTests
     public void NavigateDown_WithMultipleItems_ShouldMoveToNextItem()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item1 = Substitute.For<INavigable>();
         var item2 = Substitute.For<INavigable>();
 
@@ -100,7 +100,7 @@ public class MenuNavigatorTests
     public void NavigateDown_AtLastItem_ShouldWrapToFirst()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item1 = Substitute.For<INavigable>();
         var item2 = Substitute.For<INavigable>();
         var item3 = Substitute.For<INavigable>();
@@ -126,7 +126,7 @@ public class MenuNavigatorTests
     public void NavigateDown_WithEmptyList_ShouldNotThrow()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
 
         // Act & Assert
         var exception = Record.Exception(() => navigator.NavigateDown());
@@ -137,7 +137,7 @@ public class MenuNavigatorTests
     public void NavigateUp_WithMultipleItems_ShouldMoveToPreviousItem()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item1 = Substitute.For<INavigable>();
         var item2 = Substitute.For<INavigable>();
 
@@ -160,7 +160,7 @@ public class MenuNavigatorTests
     public void NavigateUp_AtFirstItem_ShouldWrapToLast()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item1 = Substitute.For<INavigable>();
         var item2 = Substitute.For<INavigable>();
         var item3 = Substitute.For<INavigable>();
@@ -182,7 +182,7 @@ public class MenuNavigatorTests
     public void NavigateUp_WithEmptyList_ShouldNotThrow()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
 
         // Act & Assert
         var exception = Record.Exception(() => navigator.NavigateUp());
@@ -193,7 +193,7 @@ public class MenuNavigatorTests
     public void NavigateUp_WithSingleItem_ShouldStayOnSameItem()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item = Substitute.For<INavigable>();
         navigator.AddItem(item);
 
@@ -210,7 +210,7 @@ public class MenuNavigatorTests
     public void ActivateSelected_WithItems_ShouldCallActivateOnSelectedItem()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item1 = Substitute.For<INavigable>();
         var item2 = Substitute.For<INavigable>();
 
@@ -229,7 +229,7 @@ public class MenuNavigatorTests
     public void ActivateSelected_AfterNavigation_ShouldActivateCorrectItem()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item1 = Substitute.For<INavigable>();
         var item2 = Substitute.For<INavigable>();
 
@@ -249,7 +249,7 @@ public class MenuNavigatorTests
     public void ActivateSelected_WithEmptyList_ShouldNotThrow()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
 
         // Act & Assert
         var exception = Record.Exception(() => navigator.ActivateSelected());
@@ -260,7 +260,7 @@ public class MenuNavigatorTests
     public void Update_WithWKey_ShouldNavigateUp()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item1 = Substitute.For<INavigable>();
         var item2 = Substitute.For<INavigable>();
 
@@ -284,7 +284,7 @@ public class MenuNavigatorTests
     public void Update_WithUpArrowKey_ShouldNavigateUp()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item1 = Substitute.For<INavigable>();
         var item2 = Substitute.For<INavigable>();
 
@@ -306,7 +306,7 @@ public class MenuNavigatorTests
     public void Update_WithSKey_ShouldNavigateDown()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item1 = Substitute.For<INavigable>();
         var item2 = Substitute.For<INavigable>();
 
@@ -325,7 +325,7 @@ public class MenuNavigatorTests
     public void Update_WithDownArrowKey_ShouldNavigateDown()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item1 = Substitute.For<INavigable>();
         var item2 = Substitute.For<INavigable>();
 
@@ -344,7 +344,7 @@ public class MenuNavigatorTests
     public void Update_WithEnterKey_ShouldActivateSelected()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item = Substitute.For<INavigable>();
         navigator.AddItem(item);
 
@@ -360,7 +360,7 @@ public class MenuNavigatorTests
     public void Update_WithSpaceKey_ShouldActivateSelected()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item = Substitute.For<INavigable>();
         navigator.AddItem(item);
 
@@ -376,7 +376,7 @@ public class MenuNavigatorTests
     public void Update_WithHeldKey_ShouldNotRepeatAction()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item1 = Substitute.For<INavigable>();
         var item2 = Substitute.For<INavigable>();
         var item3 = Substitute.For<INavigable>();
@@ -399,7 +399,7 @@ public class MenuNavigatorTests
     public void Update_WithNoKeys_ShouldDoNothing()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item = Substitute.For<INavigable>();
         navigator.AddItem(item);
 
@@ -416,7 +416,7 @@ public class MenuNavigatorTests
     public void Clear_ShouldRemoveAllItems()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
         var item1 = Substitute.For<INavigable>();
         var item2 = Substitute.For<INavigable>();
 
@@ -437,7 +437,7 @@ public class MenuNavigatorTests
     public void Clear_OnEmptyNavigator_ShouldNotThrow()
     {
         // Arrange
-        var navigator = new MenuNavigator();
+        using var navigator = new MenuNavigator();
 
         // Act & Assert
         var exception = Record.Exception(() => navigator.Clear());

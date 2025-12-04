@@ -1,3 +1,4 @@
+using BulletHell.Constants;
 using BulletHell.Graphics;
 using BulletHell.Helpers;
 using BulletHell.Inputs;
@@ -60,7 +61,7 @@ public class BattleScene : Scene
         _hud.MaxHP = 100;
         _hud.HP = _player.Health;
 
-        _lifeTexture = _game.Content.Load<Texture2D>("player_life");
+        _lifeTexture = _game.Content.Load<Texture2D>("player_Life");
         _hud.LifeTexture = _lifeTexture;
 
         // Add initial enemy
@@ -120,6 +121,11 @@ public class BattleScene : Scene
         {
             _hud.HP = _player.Health;
             _hud.Lives = _player.Lives;
+        }
+
+        if (_player.Lives <= 0)
+        {
+            _game.ChangeScene(SceneNames.GameOver);
         }
     }
 

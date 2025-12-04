@@ -18,7 +18,7 @@ public class EnemyBulletTest
         mockSprite.Width.Returns(32);
         mockSprite.Height.Returns(32);
 
-        var enemyBullet = new Bullet<Enemy>(startPosition, velocity, mockSprite);
+        using var enemyBullet = new Bullet<Enemy>(startPosition, velocity, mockSprite);
 
         var deltaTime = 1 / 60f;
         var gameTime = new GameTime(
@@ -46,7 +46,7 @@ public class EnemyBulletTest
         var mockSprite = Substitute.For<ISpriteHelper>();
 
         // Act
-        var bullet = new Bullet<Enemy>(startPosition, Vector2.UnitY, mockSprite);
+        using var bullet = new Bullet<Enemy>(startPosition, Vector2.UnitY, mockSprite);
 
         // Assert
         Assert.NotNull(bullet.Collider);
@@ -64,7 +64,7 @@ public class EnemyBulletTest
         mockSprite.Width.Returns(8);
         mockSprite.Height.Returns(8);
 
-        var bullet = new Bullet<Enemy>(startPosition, velocity, mockSprite);
+        using var bullet = new Bullet<Enemy>(startPosition, velocity, mockSprite);
 
         // Act
         bullet.Update(TestDataBuilders.OneFrame);
@@ -80,7 +80,7 @@ public class EnemyBulletTest
         var mockSprite = Substitute.For<ISpriteHelper>();
         mockSprite.Width.Returns(9);
         mockSprite.Height.Returns(15);
-        var bullet = new Bullet<Enemy>(Vector2.Zero, Vector2.UnitY, mockSprite);
+        using var bullet = new Bullet<Enemy>(Vector2.Zero, Vector2.UnitY, mockSprite);
 
         // Act
         // Radius should be initialized in constructor based on sprite dimensions

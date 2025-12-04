@@ -12,7 +12,7 @@ public class PlayerBulletManagerTests
     public void Constructor_ShouldCreateInstance()
     {
         // Act
-        var bulletManager = new BulletManager<Player>();
+        using var bulletManager = new BulletManager<Player>();
 
         // Assert
         Assert.NotNull(bulletManager);
@@ -25,7 +25,7 @@ public class PlayerBulletManagerTests
     public void LoadContent_WithNullTexture_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var bulletManager = new BulletManager<Player>();
+        using var bulletManager = new BulletManager<Player>();
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => bulletManager.LoadContent(null!));
@@ -57,7 +57,7 @@ public class PlayerBulletManagerTests
     public void Update_WithNullGameTime_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var bulletManager = new BulletManager<Player>();
+        using var bulletManager = new BulletManager<Player>();
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => bulletManager.Update(null!, 800, 600));
@@ -67,7 +67,7 @@ public class PlayerBulletManagerTests
     public void Update_WithNoBullets_ShouldNotThrow()
     {
         // Arrange
-        var bulletManager = new BulletManager<Player>();
+        using var bulletManager = new BulletManager<Player>();
         var gameTime = TestDataBuilders.OneFrame;
 
         // Act & Assert
@@ -79,7 +79,7 @@ public class PlayerBulletManagerTests
     public void Update_CalledMultipleTimes_ShouldNotThrow()
     {
         // Arrange
-        var bulletManager = new BulletManager<Player>();
+        using var bulletManager = new BulletManager<Player>();
         var gameTime = TestDataBuilders.OneFrame;
 
         // Act & Assert
@@ -96,7 +96,7 @@ public class PlayerBulletManagerTests
     public void Draw_WithNullSpriteBatch_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var bulletManager = new BulletManager<Player>();
+        using var bulletManager = new BulletManager<Player>();
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => bulletManager.Draw(null!));
@@ -113,7 +113,7 @@ public class PlayerBulletManagerTests
     public void Dispose_CalledMultipleTimes_ShouldNotThrow()
     {
         // Arrange
-        var bulletManager = new BulletManager<Player>();
+        using var bulletManager = new BulletManager<Player>();
 
         // Act & Assert
         bulletManager.Dispose();
