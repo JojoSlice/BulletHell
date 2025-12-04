@@ -7,4 +7,5 @@ public static class EnemyConfig
     public const int SpriteHeight = 32;
     public const float AnimationSpeed = 0f;
     public const int MaxHealth = 20;
+    public const int ScoreValue = 1;
 }
