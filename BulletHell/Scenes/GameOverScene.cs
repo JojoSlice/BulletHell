@@ -171,7 +171,7 @@ public class GameOverScene : Scene
 
         var titleSize = _font.MeasureString(GameOverText);
         var titlePosition = new Vector2(
-            _screenWidth / 2 - titleSize.X / 2,
+            (float)_screenWidth / 2 - titleSize.X / 2,
             GameOverYPosition
         );
 
