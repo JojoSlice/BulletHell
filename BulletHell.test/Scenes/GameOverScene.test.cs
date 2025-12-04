@@ -91,13 +91,17 @@ public class GameOverSceneTests
         mockInputProvider.Setup(m => m.GetKeyboardState()).Returns(new KeyboardState());
 
         var scene = CreateGameOverScene(inputProvider: mockInputProvider.Object);
-        scene.OnEnter();
 
-        // Act
-        scene.Update(new GameTime());
+        using (scene)
+        {
+            scene.OnEnter();
 
-        // Assert
-        mockInputProvider.Verify(m => m.GetMouseState(), Times.Once);
+            // Act
+            scene.Update(new GameTime());
+
+            // Assert
+            mockInputProvider.Verify(m => m.GetMouseState(), Times.Once);
+        }
     }
 
     [Fact]
@@ -109,13 +113,17 @@ public class GameOverSceneTests
         mockInputProvider.Setup(m => m.GetKeyboardState()).Returns(new KeyboardState());
 
         var scene = CreateGameOverScene(inputProvider: mockInputProvider.Object);
-        scene.OnEnter();
 
-        // Act
-        scene.Update(new GameTime());
+        using (scene)
+        {
+            scene.OnEnter();
 
-        // Assert
-        mockInputProvider.Verify(m => m.GetKeyboardState(), Times.Once);
+            // Act
+            scene.Update(new GameTime());
+
+            // Assert
+            mockInputProvider.Verify(m => m.GetKeyboardState(), Times.Once);
+        }
     }
 
     [Fact]
@@ -133,31 +141,39 @@ public class GameOverSceneTests
             inputProvider: mockInputProvider.Object,
             navigator: mockNavigator.Object
         );
-        scene.OnEnter();
 
-        // Act
-        scene.Update(new GameTime());
+        using (scene)
+        {
+            scene.OnEnter();
 
-        // Assert
-        mockNavigator.Verify(m => m.Update(keyboardState), Times.Once);
+            // Act
+            scene.Update(new GameTime());
+
+            // Assert
+            mockNavigator.Verify(m => m.Update(keyboardState), Times.Once);
+        }
     }
 
     [Fact]
     public void OnEnter_WhenNavigatorIsNull_ShouldCreateNavigator()
     {
         // Arrange
-        var scene = CreateGameOverScene(navigator: null);
-
-        // Act
-        scene.OnEnter();
         var mockInputProvider = new Mock<IMenuInputProvider>();
         mockInputProvider.Setup(m => m.GetMouseState()).Returns(new MouseState());
         mockInputProvider.Setup(m => m.GetKeyboardState()).Returns(new KeyboardState());
 
-        // Update should work without throwing (navigator created)
-        var exception = Record.Exception(() => scene.Update(new GameTime()));
+        var scene = CreateGameOverScene(inputProvider: mockInputProvider.Object, navigator: null);
 
-        // Assert
-        Assert.Null(exception);
+        using (scene)
+        {
+            // Act
+            scene.OnEnter();
+
+            // Update should work without throwing (navigator created)
+            var exception = Record.Exception(() => scene.Update(new GameTime()));
+
+            // Assert
+            Assert.Null(exception);
+        }
     }
 }

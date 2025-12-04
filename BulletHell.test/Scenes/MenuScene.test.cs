@@ -13,7 +13,7 @@ public class MenuSceneTests
     public void Constructor_ShouldInitializeInLoginMode()
     {
         // Arrange & Act
-        var menuScene = CreateMenuScene();
+        using var menuScene = CreateMenuScene();
 
         // Assert
         Assert.Equal(RegistrationMode.Login, menuScene.CurrentMode);
@@ -23,7 +23,7 @@ public class MenuSceneTests
     public void ToggleMode_ShouldSwitchFromLoginToRegister()
     {
         // Arrange
-        var menuScene = CreateMenuScene();
+        using var menuScene = CreateMenuScene();
         Assert.Equal(RegistrationMode.Login, menuScene.CurrentMode);
 
         // Act
@@ -37,7 +37,7 @@ public class MenuSceneTests
     public void ToggleMode_ShouldSwitchFromRegisterToLogin()
     {
         // Arrange
-        var menuScene = CreateMenuScene();
+        using var menuScene = CreateMenuScene();
         menuScene.ToggleMode(); // Nu i Register-mode
 
         // Act
@@ -51,7 +51,7 @@ public class MenuSceneTests
     public void GetActionButtonText_ShouldReturnLogIn_WhenInLoginMode()
     {
         // Arrange
-        var menuScene = CreateMenuScene();
+        using var menuScene = CreateMenuScene();
 
         // Act
         var buttonText = menuScene.GetActionButtonText();
@@ -64,7 +64,7 @@ public class MenuSceneTests
     public void GetActionButtonText_ShouldReturnRegister_WhenInRegisterMode()
     {
         // Arrange
-        var menuScene = CreateMenuScene();
+        using var menuScene = CreateMenuScene();
         menuScene.ToggleMode();
 
         // Act
@@ -80,7 +80,7 @@ public class MenuSceneTests
         // Arrange
         var apiClient = Substitute.For<IApiClient>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
-        var menuScene = CreateMenuSceneWithMocks(apiClient, passwordHasher);
+        using var menuScene = CreateMenuSceneWithMocks(apiClient, passwordHasher);
 
         var username = "newuser";
         var password = "SecurePass123";
@@ -119,7 +119,7 @@ public class MenuSceneTests
     )
     {
         // Arrange
-        var menuScene = CreateMenuScene();
+        using var menuScene = CreateMenuScene();
 
         // Act
         var result = await menuScene.RegisterUserAsync(username, password);
@@ -135,7 +135,7 @@ public class MenuSceneTests
         // Arrange
         var apiClient = Substitute.For<IApiClient>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
-        var menuScene = CreateMenuSceneWithMocks(apiClient, passwordHasher);
+        using var menuScene = CreateMenuSceneWithMocks(apiClient, passwordHasher);
 
         passwordHasher.HashPassword(Arg.Any<string>()).Returns("$2a$12$hash");
         apiClient

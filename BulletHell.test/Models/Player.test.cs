@@ -20,7 +20,7 @@ public class PlayerTests(ITestOutputHelper output)
         var mockSprite = new Mock<ISpriteHelper>();
         mockInput.Setup(i => i.GetDirection()).Returns(Vector2.Zero);
 
-        var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
+        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(1.0 / 60.0));
 
         // Act
@@ -43,7 +43,7 @@ public class PlayerTests(ITestOutputHelper output)
         var mockSprite = new Mock<ISpriteHelper>();
         mockInput.Setup(i => i.GetDirection()).Returns(new Vector2(x, y));
 
-        var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
+        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
         var deltaTime = 1.0f / 60.0f;
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(deltaTime));
 
@@ -67,7 +67,7 @@ public class PlayerTests(ITestOutputHelper output)
         var mockSprite = new Mock<ISpriteHelper>();
         mockInput.Setup(i => i.GetDirection()).Returns(Vector2.Zero);
 
-        var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
+        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(1.0 / 60.0));
 
         // Act
@@ -91,7 +91,7 @@ public class PlayerTests(ITestOutputHelper output)
         var direction = new Vector2(x, y);
         mockInput.Setup(i => i.GetDirection()).Returns(direction);
 
-        var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
+        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
         var deltaTime = 1.0f / 60.0f;
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(deltaTime));
 
@@ -108,7 +108,7 @@ public class PlayerTests(ITestOutputHelper output)
     public void SetScreenBounds_ShouldStoreScreenDimensions()
     {
         // Arrange
-        var player = TestDataBuilders.CreateTestPlayer();
+        using var player = TestDataBuilders.CreateTestPlayer();
 
         // Act
         player.SetScreenBounds(800, 600);
@@ -126,7 +126,7 @@ public class PlayerTests(ITestOutputHelper output)
         // Arrange
         var mockSprite = MockFactories.CreateMockSpriteHelper(width: 32, height: 32);
         var mockInput = MockFactories.CreateMockInputProvider(new Vector2(1, 0));
-        var player = new Player(new Vector2(x, 300), mockInput, mockSprite);
+        using var player = new Player(new Vector2(x, 300), mockInput, mockSprite);
         player.SetScreenBounds(800, 600);
 
         // Act
@@ -144,7 +144,7 @@ public class PlayerTests(ITestOutputHelper output)
         // Arrange
         var mockSprite = MockFactories.CreateMockSpriteHelper(width: 32, height: 32);
         var mockInput = MockFactories.CreateMockInputProvider(new Vector2(0, 1));
-        var player = new Player(new Vector2(400, y), mockInput, mockSprite);
+        using var player = new Player(new Vector2(400, y), mockInput, mockSprite);
         player.SetScreenBounds(800, 600);
 
         // Act
@@ -161,7 +161,7 @@ public class PlayerTests(ITestOutputHelper output)
     public void LoadContent_WithNullTexture_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var player = TestDataBuilders.CreateTestPlayer();
+        using var player = TestDataBuilders.CreateTestPlayer();
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => player.LoadContent(null!));
@@ -172,7 +172,7 @@ public class PlayerTests(ITestOutputHelper output)
     {
         // Arrange
         var mockInput = MockFactories.CreateMockInputProvider(isShootPressed: true);
-        var player = TestDataBuilders.CreateTestPlayer(
+        using var player = TestDataBuilders.CreateTestPlayer(
             position: new Vector2(100, 100),
             input: mockInput
         );
@@ -191,7 +191,7 @@ public class PlayerTests(ITestOutputHelper output)
     {
         // Arrange
         var mockInput = MockFactories.CreateMockInputProvider(isShootPressed: false);
-        var player = TestDataBuilders.CreateTestPlayer(input: mockInput);
+        using var player = TestDataBuilders.CreateTestPlayer(input: mockInput);
 
         // Act
         var result = player.TryShoot();
@@ -205,7 +205,7 @@ public class PlayerTests(ITestOutputHelper output)
     {
         // Arrange
         var mockInput = MockFactories.CreateMockInputProvider(isShootPressed: true);
-        var player = TestDataBuilders.CreateTestPlayer(input: mockInput);
+        using var player = TestDataBuilders.CreateTestPlayer(input: mockInput);
 
         // Act - first shot should succeed
         var firstShot = player.TryShoot();
@@ -221,7 +221,7 @@ public class PlayerTests(ITestOutputHelper output)
     {
         // Arrange
         var mockInput = MockFactories.CreateMockInputProvider(isShootPressed: true);
-        var player = TestDataBuilders.CreateTestPlayer(input: mockInput);
+        using var player = TestDataBuilders.CreateTestPlayer(input: mockInput);
 
         // Shoot to activate cooldown
         player.TryShoot();
@@ -245,7 +245,7 @@ public class PlayerTests(ITestOutputHelper output)
     public void Draw_WithNullSpriteBatch_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var player = TestDataBuilders.CreateTestPlayer();
+        using var player = TestDataBuilders.CreateTestPlayer();
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => player.Draw(null!));
@@ -285,7 +285,7 @@ public class PlayerTests(ITestOutputHelper output)
         // Arrange
         var mockInput = MockFactories.CreateMockInputProvider();
         var mockSprite = MockFactories.CreateMockSpriteHelper();
-        var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
+        using var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
 
         var expectedLives = 3;
 
@@ -308,7 +308,7 @@ public class PlayerTests(ITestOutputHelper output)
         var mockSprite = new Mock<ISpriteHelper>();
 
         // Act
-        var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
+        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
 
         // Assert
         Assert.NotNull(player.Collider);
@@ -324,7 +324,7 @@ public class PlayerTests(ITestOutputHelper output)
         mockSprite.Setup(s => s.Width).Returns(32);
         mockSprite.Setup(s => s.Height).Returns(32);
         var mockInput = MockFactories.CreateMockInputProvider(new Vector2(1, 0));
-        var player = new Player(new Vector2(50, 50), mockInput, mockSprite.Object);
+        using var player = new Player(new Vector2(50, 50), mockInput, mockSprite.Object);
         player.SetScreenBounds(800, 600);
 
         // Act
@@ -342,7 +342,7 @@ public class PlayerTests(ITestOutputHelper output)
         mockSprite.Setup(s => s.Width).Returns(24);
         mockSprite.Setup(s => s.Height).Returns(16);
         var mockInput = new Mock<IInputProvider>();
-        var player = new Player(Vector2.Zero, mockInput.Object, mockSprite.Object);
+        using var player = new Player(Vector2.Zero, mockInput.Object, mockSprite.Object);
 
         // Act
         // Radius should be initialized in constructor based on sprite dimensions
@@ -358,7 +358,7 @@ public class PlayerTests(ITestOutputHelper output)
         // Arrange
         var mockInput = MockFactories.CreateMockInputProvider();
         var mockSprite = MockFactories.CreateMockSpriteHelper();
-        var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
+        using var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
 
         var expected = PlayerConfig.MaxHealth;
 
@@ -377,7 +377,7 @@ public class PlayerTests(ITestOutputHelper output)
     public void TakeDamage_WhenHealthDropsToZero_ShouldReduceLifeAndResetHealth()
     {
         // Arrange
-        var player = TestDataBuilders.CreateTestPlayer();
+        using var player = TestDataBuilders.CreateTestPlayer();
 
         var damage = 100;
         var expectedLives = player.Lives - 1;
@@ -402,7 +402,7 @@ public class PlayerTests(ITestOutputHelper output)
         // Arrange
         var mockInput = MockFactories.CreateMockInputProvider();
         var mockSprite = MockFactories.CreateMockSpriteHelper();
-        var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
+        using var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
 
         var startingLives = player.Lives;
 
