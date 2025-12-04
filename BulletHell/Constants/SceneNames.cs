@@ -7,4 +7,5 @@ public static class SceneNames
 {
     public const string Menu = "Menu";
     public const string Battle = "Battle";
+    public const string GameOver = "GameOver";
 }

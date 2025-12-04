@@ -1,3 +1,4 @@
+using BulletHell.Constants;
 using BulletHell.Graphics;
 using BulletHell.Helpers;
 using BulletHell.Inputs;
@@ -120,6 +121,11 @@ public class BattleScene : Scene
         {
             _hud.HP = _player.Health;
             _hud.Lives = _player.Lives;
+        }
+
+        if (_player.Lives <= 0)
+        {
+            _game.ChangeScene(SceneNames.GameOver);
         }
     }
 

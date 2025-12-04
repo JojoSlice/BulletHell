@@ -43,6 +43,7 @@ public class Game1 : Game
         {
             { SceneNames.Menu, new MenuScene(this, _sharedWhiteTexture) },
             { SceneNames.Battle, new BattleScene(this) },
+            { SceneNames.GameOver, new GameOverScene(this, _sharedWhiteTexture) },
         };
 
         _currentScene = _scenes[SceneNames.Menu];
