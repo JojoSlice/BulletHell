@@ -1,5 +1,7 @@
 using System;
 using BulletHell.Constants;
+using BulletHell.Interfaces;
+using BulletHell.Managers;
 using BulletHell.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -25,6 +27,7 @@ public class GameOverScene : Scene
     private Button _menuButton = null!;
     private Button _exitButton = null!;
     private Song? _gameOverMusic;
+    private IMenuNavigator? _menuNavigator;
 
     public GameOverScene(Game1 game, Texture2D whiteTexture)
         : base(game)
@@ -75,6 +78,19 @@ public class GameOverScene : Scene
             _whiteTexture
         );
         _exitButton.OnClick += OnExitClicked;
+
+        SetupMenuNavigation();
+    }
+
+    private void SetupMenuNavigation()
+    {
+        if (_menuNavigator == null)
+        {
+            _menuNavigator = new MenuNavigator();
+            _menuNavigator.AddItem(_restartButton);
+            _menuNavigator.AddItem(_menuButton);
+            _menuNavigator.AddItem(_exitButton);
+        }
     }
 
     public override void OnExit()
@@ -83,6 +99,8 @@ public class GameOverScene : Scene
         {
             MediaPlayer.Stop();
         }
+
+        _menuNavigator?.Clear();
 
         _restartButton.OnClick -= OnRestartClicked;
         _menuButton.OnClick -= OnMenuClicked;
@@ -111,10 +129,13 @@ public class GameOverScene : Scene
         ObjectDisposedException.ThrowIf(_disposed, this);
 
         var mouseState = Mouse.GetState();
+        var keyboardState = Keyboard.GetState();
 
         _restartButton.Update(mouseState);
         _menuButton.Update(mouseState);
         _exitButton.Update(mouseState);
+
+        _menuNavigator?.Update(keyboardState);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -140,6 +161,12 @@ public class GameOverScene : Scene
     {
         if (disposing)
         {
+            if (_menuNavigator is IDisposable disposableNavigator)
+            {
+                disposableNavigator.Dispose();
+            }
+            _menuNavigator = null;
+
             _restartButton.Dispose();
             _menuButton.Dispose();
             _exitButton.Dispose();
