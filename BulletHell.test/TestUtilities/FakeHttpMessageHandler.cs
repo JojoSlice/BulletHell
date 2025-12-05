@@ -32,12 +32,16 @@ public static class FakeHttpResponseBuilder
 {
     public static HttpResponseMessage CreateUserCreatedResponse(int userId)
     {
-        var response = new { Id = userId, UserName = "testuser" };
+        var apiResponse = new
+        {
+            isSuccess = true,
+            data = new { id = userId, userName = "testuser" }
+        };
 
         return new HttpResponseMessage(HttpStatusCode.Created)
         {
             Content = new StringContent(
-                JsonSerializer.Serialize(response),
+                JsonSerializer.Serialize(apiResponse),
                 Encoding.UTF8,
                 "application/json"
             ),
