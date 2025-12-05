@@ -107,74 +107,11 @@ jobs:
         id: build
         run: dotnet build BulletHellSpaceShooter.sln --configuration Release --no-restore /p:TreatWarningsAsErrors=true
 
-      - name: Run tests
-        id: test
-        env:
-          DISPLAY: :99
-        run: |
-          # Start virtual display for MonoGame tests
-          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-          sleep 2
-
-          dotnet test BulletHellSpaceShooter.sln \
-            --configuration Release \
-            --no-build \
-            --verbosity normal \
-            --collect:"XPlat Code Coverage" \
-            --results-directory ./TestResults \
-            --logger "trx" \
-            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
-
-      - name: List test results (debug)
-        if: always()
-        run: |
-          echo "Contents of TestResults directory:"
-          ls -laR TestResults/ || echo "TestResults directory not found"
-          echo ""
-          echo "Looking for TRX files:"
-          find TestResults -name "*.trx" -type f 2>/dev/null || echo "No TRX files found"
-          echo ""
-          echo "Looking for coverage files:"
-          find TestResults -name "coverage.cobertura.xml" -type f 2>/dev/null || echo "No coverage files found"
-
-      - name: Code Coverage Report
-        id: coverage
-        if: always() && steps.test.outcome != 'skipped'
-        continue-on-error: true
-        uses: irongut/CodeCoverageSummary@v1.3.0
-        with:
-          filename: TestResults/**/coverage.cobertura.xml
-          badge: true
-          fail_below_min: true
-          format: markdown
-          hide_branch_rate: false
-          hide_complexity: true
-          indicators: true
-          output: both
-          thresholds: '70 85'
-
-      - name: Add Coverage PR Comment
-        if: github.event_name == 'pull_request' && steps.coverage.outcome == 'success'
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          recreate: true
-          path: code-coverage-results.md
-
-      - name: Test Report
-        uses: dorny/test-reporter@v2
-        if: always() && steps.test.outcome != 'skipped'
-        continue-on-error: true
-        with:
-          name: .NET Tests
-          path: TestResults/**/*.trx
-          reporter: dotnet-trx
-          fail-on-error: false
-
       - name: Build results
         if: success()
         shell: bash
         run: |
-          echo "✅ Build och tester lyckades på Ubuntu!"
+          echo "✅ Build lyckades på Ubuntu!"
           echo "Ändrade ${{ steps.stats.outputs.changed_files }} filer med ${{ steps.stats.outputs.changed_lines }} rader"
 
       - name: Comment PR on failure
@@ -191,9 +128,6 @@ jobs:
             } else if ('${{ steps.build.outcome }}' === 'failure') {
               failedStep = 'Build with Code Analysis';
               errorDetails = 'Build misslyckades. Detta kan bero på:\n- Kompileringsfel i koden\n- Code analysis varningar (behandlas som fel)\n- Syntaxfel';
-            } else if ('${{ steps.test.outcome }}' === 'failure') {
-              failedStep = 'Run tests';
-              errorDetails = 'Ett eller flera tester misslyckades. Kontrollera:\n- Att alla tester passerar lokalt\n- Testloggar för detaljer om vilka tester som failade\n- Om det finns nya breaking changes';
             }
 
             github.rest.issues.createComment({
@@ -216,10 +150,10 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `## 📊 Build Statistik\n\n` +
-                    `✅ Build och tester lyckades på Ubuntu!\n\n` +
+                    `✅ Build lyckades på Ubuntu!\n\n` +
                     `### Ändringar i denna PR:\n` +
                     `- **Ändrade .cs filer:** ${{ steps.stats.outputs.changed_files }}\n` +
                     `- **Ändrade rader:** ${{ steps.stats.outputs.changed_lines }}\n\n` +
                     `✨ Code analysis: Inga varningar eller fel\n` +
-                    `✅ Alla tester passerade`
+                    `✅ Build komplett - tester körs i separat workflow`
             })
