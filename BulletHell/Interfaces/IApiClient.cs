@@ -20,9 +20,9 @@ public interface IApiClient
     /// Loggar in en användare.
     /// </summary>
     /// <param name="username">Användarnamn.</param>
-    /// <param name="passwordHash">Hashat lösenord (BCrypt).</param>
+    /// <param name="password">Lösenord (plaintext - verifieras med BCrypt på servern).</param>
     /// <returns>RegistrationResult med status och meddelande.</returns>
-    Task<RegistrationResult> LoginAsync(string username, string passwordHash);
+    Task<RegistrationResult> LoginAsync(string username, string password);
 
     /// <summary>
     /// Hämtar alla highscores.

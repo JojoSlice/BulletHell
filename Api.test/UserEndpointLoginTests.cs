@@ -39,7 +39,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
         var loginRequest = new LoginRequest
         {
             UserName = username,
-            PasswordHash = passwordHash,
+            Password = "password123", // Use plaintext password
         };
 
         // Act
@@ -79,7 +79,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
         var loginRequest = new LoginRequest
         {
             UserName = username,
-            PasswordHash = "wrongPasswordHash",
+            Password = "wrongPassword", // Use plaintext password
         };
 
         // Act
@@ -107,7 +107,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
         var loginRequest = new LoginRequest
         {
             UserName = "nonexistentuser_" + Guid.NewGuid(),
-            PasswordHash = "someHash",
+            Password = "somePassword",
         };
 
         // Act
@@ -132,7 +132,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
     public async Task Login_WithEmptyUsername_ReturnsBadRequest()
     {
         // Arrange
-        var loginRequest = new LoginRequest { UserName = "", PasswordHash = "someHash" };
+        var loginRequest = new LoginRequest { UserName = "", Password = "somePassword" };
 
         // Act
         var response = await _client.PostAsJsonAsync(

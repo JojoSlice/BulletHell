@@ -276,8 +276,7 @@ public class MenuScene : Scene
 
         try
         {
-            var passwordHash = _passwordHasher.HashPassword(password);
-            var result = await _apiClient.LoginAsync(username, passwordHash);
+            var result = await _apiClient.LoginAsync(username, password);
 
             if (result.Success)
             {
