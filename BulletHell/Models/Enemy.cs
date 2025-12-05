@@ -108,4 +108,15 @@ public class Enemy : IHealth, ICollidable
             IsAlive = false;
         }
     }
+
+    public void Reset(Vector2 position)
+    {
+        Position = position;
+        _velocity = Vector2.Zero;
+        _shootCooldown = 0f;
+        Health = EnemyConfig.MaxHealth;
+        IsAlive = true;
+        CollisionDamage = 25;
+        _collider.Position = Position;
+    }
 }
