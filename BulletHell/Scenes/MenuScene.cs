@@ -244,12 +244,7 @@ public class MenuScene : Scene
             if (result.Success)
             {
                 ShowMessage($"Välkommen {username}!", Color.Green);
-
-                // Rensa fält
-                _usernameField?.Clear();
-                _passwordField?.Clear();
-
-                ToggleMode();
+                OnLoginSuccess(result.UserId, username);
             }
             else
             {
