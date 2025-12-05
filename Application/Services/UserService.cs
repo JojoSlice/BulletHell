@@ -3,31 +3,58 @@ using Application.Mapping;
 using Contracts.Requests.User;
 using Contracts.Responses.Common;
 using Contracts.Responses.User;
-using Domain.Entities;
-using Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Repository.Data;
 
 namespace Application.Services;
 
-public class UserService(IRepository<User> repository) : IUserService<UserResponse>
+public class UserService(MyDbContext dbContext) : IUserService<UserResponse>
 {
     public async Task<Response<List<UserResponse>>> GetAll() =>
-        (await repository.GetAllAsync()).MapToResponse();
+        (await dbContext.Users.ToListAsync()).MapToResponse();
 
     public async Task<Response<UserResponse?>> GetById(int id) =>
-        (await repository.GetByIdAsync(id)).MapToResponse();
+        (await dbContext.Users.FindAsync(id)).MapToResponse();
 
-    public async Task<Response<UserResponse>> Create(CreateUserRequest user) =>
-        (await repository.CreateAsync(user.MapToDomain())).MapToResponse()!;
+    public async Task<Response<UserResponse>> Create(CreateUserRequest user)
+    {
+        var entry = await dbContext.Users.AddAsync(user.MapToDomain());
+        await dbContext.SaveChangesAsync();
+        return entry.Entity.MapToResponse()!;
+    }
 
-    public async Task<Response<UserResponse>> Update(UpdateUserRequest user) =>
-        (await repository.UpdateAsync(user.MapToDomain())).MapToResponse()!;
+    public async Task<Response<UserResponse>> Update(UpdateUserRequest user)
+    {
+        var entry = dbContext.Users.Update(user.MapToDomain());
+        await dbContext.SaveChangesAsync();
+        return entry.Entity.MapToResponse()!;
+    }
 
-    public async Task<Response<string>> Delete(int id) =>
-        (await repository.DeleteAsync(id)).MapToResponse();
+    public async Task<Response<string>> Delete(int id)
+    {
+        var entity = await dbContext.Users.FindAsync(id);
+        if (entity == null)
+        {
+            return new Response<string>
+            {
+                IsSuccess = false,
+                Data = null,
+            };
+        }
+
+        dbContext.Users.Remove(entity);
+        await dbContext.SaveChangesAsync();
+
+        return new Response<string>
+        {
+            IsSuccess = true,
+            Data = "Deleted",
+        };
+    }
 
     public async Task<Response<UserResponse?>> Login(LoginRequest request)
     {
-        var user = await repository.GetByUsernameAsync(request.UserName);
+        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
 
         if (user == null
         || (user.PasswordHash != request.PasswordHash))
