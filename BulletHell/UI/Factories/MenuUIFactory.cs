@@ -13,12 +13,15 @@ public class MenuUIFactory
     private const int ButtonHeight = 50;
     private const int InputFieldWidth = 300;
     private const int InputFieldHeight = 40;
-    private const int ModeToggleYPosition = 100;
     private const int UsernameFieldYOffset = 80;
     private const int PasswordFieldYOffset = 150;
     private const int ActionButtonYOffset = 210;
+    private const int ModeToggleButtonYOffset = 270;
     private const int StartButtonYOffset = 0;
-    private const int ExitButtonYOffset = 300;
+    private const int ExitButtonYOffset = 330;
+    private const int LoggedInLabelYPosition = 280;
+    private const int LogoutButtonYOffset = 70;
+    private const int LoggedInExitButtonYOffset = 150;
 
     private readonly SpriteFont _font;
     private readonly Texture2D _whiteTexture;
@@ -40,14 +43,17 @@ public class MenuUIFactory
         _screenHeight = screenHeight;
     }
 
-    public Button CreateModeToggleButton(RegistrationMode initialMode, Action onModeToggle)
+    public Button CreateModeToggleButton(string text, Action onModeToggle)
     {
+        var centerX = (_screenWidth / 2) - (ButtonWidth / 2);
+        var centerY = _screenHeight / 2;
+
         var button = new Button(
             _font,
-            $"Mode: {initialMode}",
+            text,
             new Rectangle(
-                _screenWidth / 2 - ButtonWidth / 2,
-                ModeToggleYPosition,
+                centerX,
+                centerY + ModeToggleButtonYOffset,
                 ButtonWidth,
                 ButtonHeight
             ),
@@ -86,7 +92,7 @@ public class MenuUIFactory
 
         var button = new Button(
             _font,
-            "Start Game",
+            "Starta spel",
             new(centerX, centerY + StartButtonYOffset, ButtonWidth, ButtonHeight),
             _whiteTexture
         );
@@ -102,7 +108,7 @@ public class MenuUIFactory
 
         var button = new Button(
             _font,
-            "Exit",
+            "Avsluta",
             new(centerX, centerY + ExitButtonYOffset, ButtonWidth, ButtonHeight),
             _whiteTexture
         );
@@ -118,7 +124,7 @@ public class MenuUIFactory
 
         return new InputField(
             _font,
-            "Username:",
+            "Användarnamn:",
             new(centerX, centerY + UsernameFieldYOffset, InputFieldWidth, InputFieldHeight),
             _textInputHandler,
             _whiteTexture,
@@ -133,7 +139,7 @@ public class MenuUIFactory
 
         return new InputField(
             _font,
-            "Password:",
+            "Lösenord:",
             new(centerX, centerY + PasswordFieldYOffset, InputFieldWidth, InputFieldHeight),
             _textInputHandler,
             _whiteTexture,
@@ -141,9 +147,30 @@ public class MenuUIFactory
         );
     }
 
+    public Button CreateLogoutButton(Action onLogout)
+    {
+        var centerX = (_screenWidth / 2) - (ButtonWidth / 2);
+        var centerY = _screenHeight / 2;
+
+        var button = new Button(
+            _font,
+            "Logga ut",
+            new(centerX, centerY + LogoutButtonYOffset, ButtonWidth, ButtonHeight),
+            _whiteTexture
+        );
+
+        button.OnClick += onLogout;
+        return button;
+    }
+
     public Vector2 GetCenteredPosition(string text, float y)
     {
         var size = _font.MeasureString(text);
         return new Vector2(((float)_screenWidth / 2) - (size.X / 2), y);
+    }
+
+    public Vector2 GetLoggedInLabelPosition(string text)
+    {
+        return GetCenteredPosition(text, LoggedInLabelYPosition);
     }
 }

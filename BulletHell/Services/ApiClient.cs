@@ -45,13 +45,25 @@ public class ApiClient : IApiClient
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var userResponse = JsonSerializer.Deserialize<UserResponse>(content, _jsonOptions);
+                var apiResponse = JsonSerializer.Deserialize<Response<UserResponse>>(
+                    content,
+                    _jsonOptions
+                );
+
+                if (apiResponse?.IsSuccess == true && apiResponse.Data != null)
+                {
+                    return new RegistrationResult
+                    {
+                        Success = true,
+                        Message = "User created successfully!",
+                        UserId = apiResponse.Data.Id,
+                    };
+                }
 
                 return new RegistrationResult
                 {
-                    Success = true,
-                    Message = "User created successfully!",
-                    UserId = userResponse?.Id,
+                    Success = false,
+                    Message = "Could not create user",
                 };
             }
 
@@ -94,14 +106,14 @@ public class ApiClient : IApiClient
         }
     }
 
-    public async Task<RegistrationResult> LoginAsync(string username, string passwordHash)
+    public async Task<RegistrationResult> LoginAsync(string username, string password)
     {
         ArgumentNullException.ThrowIfNull(username);
-        ArgumentNullException.ThrowIfNull(passwordHash);
+        ArgumentNullException.ThrowIfNull(password);
 
         try
         {
-            var request = new LoginRequest { UserName = username, PasswordHash = passwordHash };
+            var request = new LoginRequest { UserName = username, Password = password };
 
             var response = await _httpClient.PostAsJsonAsync(ApiEndpoints.User.Login, request);
 

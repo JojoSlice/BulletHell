@@ -4,6 +4,7 @@ using Contracts.Requests.User;
 using Contracts.Responses.Common;
 using Contracts.Responses.User;
 using Xunit;
+using BCrypt.Net;
 
 namespace Api.test;
 
@@ -26,7 +27,8 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
     {
         // Arrange - Create a user first
         var username = $"testuser_{Guid.NewGuid():N}";
-        var passwordHash = "hashedPassword123";
+        var password = "password123";
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
         var createRequest = new CreateUserRequest
         {
@@ -39,7 +41,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
         var loginRequest = new LoginRequest
         {
             UserName = username,
-            PasswordHash = passwordHash,
+            Password = password, // Use plaintext password
         };
 
         // Act
@@ -66,7 +68,8 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
     {
         // Arrange - Create a user first
         var username = $"testuser_{Guid.NewGuid():N}";
-        var correctPasswordHash = "hashedPassword123";
+        var correctPassword = "correctPassword";
+        var correctPasswordHash = BCrypt.Net.BCrypt.HashPassword(correctPassword);
 
         var createRequest = new CreateUserRequest
         {
@@ -79,7 +82,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
         var loginRequest = new LoginRequest
         {
             UserName = username,
-            PasswordHash = "wrongPasswordHash",
+            Password = "wrongPassword", // Use plaintext password
         };
 
         // Act
@@ -107,7 +110,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
         var loginRequest = new LoginRequest
         {
             UserName = "nonexistentuser_" + Guid.NewGuid(),
-            PasswordHash = "someHash",
+            Password = "somePassword",
         };
 
         // Act
@@ -132,7 +135,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
     public async Task Login_WithEmptyUsername_ReturnsBadRequest()
     {
         // Arrange
-        var loginRequest = new LoginRequest { UserName = "", PasswordHash = "someHash" };
+        var loginRequest = new LoginRequest { UserName = "", Password = "somePassword" };
 
         // Act
         var response = await _client.PostAsJsonAsync(
