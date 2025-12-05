@@ -10,6 +10,7 @@ permissions:
   contents: read
   pull-requests: write
   checks: write
+  actions: write
 
 jobs:
   build:
@@ -107,6 +108,14 @@ jobs:
         id: build
         run: dotnet build BulletHellSpaceShooter.sln --configuration Release --no-restore /p:TreatWarningsAsErrors=true
 
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v5
+        with:
+          name: build-output
+          path: '**/bin/Release/**'
+          if-no-files-found: error
+
       - name: Build results
         if: success()
         shell: bash
@@ -157,3 +166,10 @@ jobs:
                     `✨ Code analysis: Inga varningar eller fel\n` +
                     `✅ Build komplett - tester körs i separat workflow`
             })
+
+  run-tests:
+    needs: build
+    uses: ./.github/workflows/test-on-build.yml
+    with:
+      pr_number: ${{ github.event.pull_request.number }}
+      commit_sha: ${{ github.sha }}
