@@ -1,13 +1,13 @@
 using Api.Endpoints;
 using Application.ServiceCollection;
-using Repository.ServiceCollection;
+using Repository.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddRepositoryServices();
 builder.Services.AddApplicationServices();
+builder.Services.AddDbContext<MyDbContext>();
 
 var app = builder.Build();
 
