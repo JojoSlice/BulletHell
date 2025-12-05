@@ -149,7 +149,7 @@ public class MenuScene : Scene
         _modeToggleButton.UpdateText($"Läge: {_currentMode}");
     }
 
-    private void OnLoginSuccess(int userId, string username)
+    private void OnLoginSuccess(int? userId, string username)
     {
         _isLoggedIn = true;
         _loggedInUsername = username;
