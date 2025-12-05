@@ -6,7 +6,7 @@ using System;
 
 namespace BulletHell.Models;
 
-public class Enemy
+public class Enemy : IHealth, ICollidable
 {
     private readonly ISpriteHelper _sprite;
     private readonly Collider _collider;
