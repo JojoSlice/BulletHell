@@ -138,6 +138,11 @@ public class MenuScene : Scene
         return _currentMode == RegistrationMode.Login ? "Logga in" : "Registrera";
     }
 
+    public string GetModeToggleButtonText()
+    {
+        return _currentMode == RegistrationMode.Login ? "Registrera dig" : "Logga in";
+    }
+
     private void UpdateActionButtonText()
     {
         _actionButton?.UpdateText(GetActionButtonText());
@@ -146,7 +151,7 @@ public class MenuScene : Scene
     private void OnModeToggleClicked()
     {
         ToggleMode();
-        _modeToggleButton.UpdateText($"Läge: {_currentMode}");
+        _modeToggleButton.UpdateText(GetModeToggleButtonText());
     }
 
     private void OnLoginSuccess(int? userId, string username)
@@ -325,7 +330,7 @@ public class MenuScene : Scene
 
     private void InitializeModeToggleButton()
     {
-        _modeToggleButton = _uiFactory.CreateModeToggleButton(_currentMode, OnModeToggleClicked);
+        _modeToggleButton = _uiFactory.CreateModeToggleButton(GetModeToggleButtonText(), OnModeToggleClicked);
     }
 
     private void InitializeActionButton()
@@ -489,10 +494,10 @@ public class MenuScene : Scene
 
     private void DrawLoggedOutUI(SpriteBatch spriteBatch)
     {
-        _modeToggleButton?.Draw(spriteBatch);
         _usernameField?.Draw(spriteBatch);
         _passwordField?.Draw(spriteBatch);
         _actionButton?.Draw(spriteBatch);
+        _modeToggleButton?.Draw(spriteBatch);
         _menuButtons[1].Draw(spriteBatch); // Exit
     }
 

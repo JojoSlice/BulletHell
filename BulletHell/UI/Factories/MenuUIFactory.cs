@@ -13,12 +13,12 @@ public class MenuUIFactory
     private const int ButtonHeight = 50;
     private const int InputFieldWidth = 300;
     private const int InputFieldHeight = 40;
-    private const int ModeToggleYPosition = 100;
     private const int UsernameFieldYOffset = 80;
     private const int PasswordFieldYOffset = 150;
     private const int ActionButtonYOffset = 210;
+    private const int ModeToggleButtonYOffset = 270;
     private const int StartButtonYOffset = 0;
-    private const int ExitButtonYOffset = 300;
+    private const int ExitButtonYOffset = 330;
     private const int LoggedInLabelYPosition = 280;
     private const int LogoutButtonYOffset = 70;
     private const int LoggedInExitButtonYOffset = 150;
@@ -43,14 +43,17 @@ public class MenuUIFactory
         _screenHeight = screenHeight;
     }
 
-    public Button CreateModeToggleButton(RegistrationMode initialMode, Action onModeToggle)
+    public Button CreateModeToggleButton(string text, Action onModeToggle)
     {
+        var centerX = (_screenWidth / 2) - (ButtonWidth / 2);
+        var centerY = _screenHeight / 2;
+
         var button = new Button(
             _font,
-            $"Läge: {initialMode}",
+            text,
             new Rectangle(
-                _screenWidth / 2 - ButtonWidth / 2,
-                ModeToggleYPosition,
+                centerX,
+                centerY + ModeToggleButtonYOffset,
                 ButtonWidth,
                 ButtonHeight
             ),
