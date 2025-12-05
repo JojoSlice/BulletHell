@@ -108,14 +108,6 @@ jobs:
         id: build
         run: dotnet build BulletHellSpaceShooter.sln --configuration Release --no-restore /p:TreatWarningsAsErrors=true
 
-      - name: Upload build artifacts
-        if: success()
-        uses: actions/upload-artifact@v5
-        with:
-          name: build-output
-          path: '**/bin/Release/**'
-          if-no-files-found: error
-
       - name: Build results
         if: success()
         shell: bash

@@ -27,12 +27,6 @@ jobs:
           fetch-depth: 0
           ref: ${{ inputs.commit_sha }}
 
-      - name: Download build artifacts from build workflow
-        uses: actions/download-artifact@v6
-        with:
-          name: build-output
-          path: ./build_output
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
@@ -53,20 +47,17 @@ jobs:
           DISPLAY: :99
         continue-on-error: true
         run: |
-          # Copy build outputs into repository (if needed)
-          if [ -d ./build_output ]; then
-            echo "Copying build outputs into repo"
-            rsync -a --remove-source-files ./build_output/ ./ || true
-          fi
-
           # Start virtual display for MonoGame tests
           Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
           sleep 2
 
-          # Run tests using the downloaded build outputs; no rebuild
+          # Restore and build before testing
+          dotnet restore BulletHellSpaceShooter.sln
+          dotnet build BulletHellSpaceShooter.sln --configuration Release --no-restore
+
+          # Run tests with coverage
           dotnet test BulletHellSpaceShooter.sln \
             --configuration Release \
-            --no-build \
             --verbosity normal \
             --collect:"XPlat Code Coverage" \
             --results-directory ./TestResults \
