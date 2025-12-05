@@ -182,4 +182,28 @@ public class EnemyTest(ITestOutputHelper output)
         output.WriteLine($"Enemy is alive after damage: {enemy.IsAlive}");
         output.WriteLine($"ShouldBeRemoved returned: {removed} ✔️");
     }
+    [Fact]
+    public void Enemy_TakeDamage_ShouldReduceHealth()
+    {
+        // Arrange
+        var sprite = Substitute.For<ISpriteHelper>();
+        var enemy = new Enemy(new Vector2(0, 0), sprite);
+
+        int startHealth = enemy.Health;
+        int damage = 1;
+        int expected = startHealth - damage;
+
+        // Act
+        enemy.TakeDamage(damage);
+        int actual = enemy.Health;
+
+        // Assert
+        Assert.Equal(expected, actual);
+
+        // Output
+        output.WriteLine($"Start Health:   {startHealth}");
+        output.WriteLine($"Damage Taken:   {damage}");
+        output.WriteLine($"Expected Health:{expected}");
+        output.WriteLine($"Actual Health:  {actual}");
+    }
 }

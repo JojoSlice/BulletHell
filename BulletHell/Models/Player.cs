@@ -9,7 +9,7 @@ namespace BulletHell.Models;
 /// <summary>
 /// Represents the player character.
 /// </summary>
-public class Player : IDisposable
+public class Player : IDisposable, IHealth, ICollidable
 {
     private readonly float _speed = PlayerConfig.Speed;
     private readonly ISpriteHelper _sprite;
@@ -29,6 +29,7 @@ public class Player : IDisposable
     public int Height => _sprite.Height;
     public int MaxLives => PlayerConfig.Lives;
     public int Lives { get; private set; } = PlayerConfig.Lives;
+    public bool IsAlive => Lives > 0;
     public int Health { get; private set; } = PlayerConfig.MaxHealth;
     public int Score { get; private set; }
     public void AddScore(int value)

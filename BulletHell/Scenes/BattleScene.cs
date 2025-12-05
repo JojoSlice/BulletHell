@@ -124,7 +124,7 @@ public class BattleScene : Scene
             _hud.UpdateScore(_player.Score);
         }
 
-        if (_player.Lives <= 0)
+        if (!_player.IsAlive)
         {
             _game.ChangeScene(SceneNames.GameOver);
         }

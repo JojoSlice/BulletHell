@@ -457,4 +457,29 @@ public class PlayerTests(ITestOutputHelper output)
         _output.WriteLine($"Expected Score: {expected}");
         _output.WriteLine($"Actual Score: {actual} ✔️");
     }
+    [Fact]
+    public void Player_TakeDamage_ShouldReduceHealth()
+    {
+        // Arrange
+        var mockInput = new Mock<IInputProvider>();
+        var mockSprite = new Mock<ISpriteHelper>();
+        using var player = new Player(new Vector2(0, 0), mockInput.Object, mockSprite.Object);
+
+        int startHealth = player.Health;
+        int damage = 1;
+        int expected = startHealth - damage;
+
+        // Act
+        player.TakeDamage(damage);
+        int actual = player.Health;
+
+        // Assert
+        Assert.Equal(expected, actual);
+
+        // Output
+        _output.WriteLine($"Start Health:   {startHealth}");
+        _output.WriteLine($"Damage Taken:   {damage}");
+        _output.WriteLine($"Expected Health:{expected}");
+        _output.WriteLine($"Actual Health:  {actual}");
+    }
 }

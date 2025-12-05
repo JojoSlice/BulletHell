@@ -6,7 +6,7 @@ using System;
 
 namespace BulletHell.Models;
 
-public class Enemy
+public class Enemy : IHealth, ICollidable
 {
     private readonly ISpriteHelper _sprite;
     private readonly Collider _collider;
@@ -107,5 +107,16 @@ public class Enemy
             Health = 0;
             IsAlive = false;
         }
+    }
+
+    public void Reset(Vector2 position)
+    {
+        Position = position;
+        _velocity = Vector2.Zero;
+        _shootCooldown = 0f;
+        Health = EnemyConfig.MaxHealth;
+        IsAlive = true;
+        CollisionDamage = 25;
+        _collider.Position = Position;
     }
 }

@@ -1,3 +1,4 @@
+using BulletHell.Configurations;
 using BulletHell.Interfaces;
 using BulletHell.Models;
 using BulletHell.test.TestUtilities;
@@ -6,7 +7,7 @@ using NSubstitute;
 
 namespace BulletHell.test.Models;
 
-public class EnemyBulletTest
+public class EnemyBulletTest(ITestOutputHelper output)
 {
     [Fact]
     public void EnemyBullet_ShouldMoveAccordingToVelocity()
@@ -88,5 +89,25 @@ public class EnemyBulletTest
         // Assert
         var expected = Math.Max(9, 15) / 2f;
         Assert.Equal(expected, bullet.Collider.Radius);
+    }
+    [Fact]
+    public void EnemyBullet_Reset_ShouldAssignEnemyDamage()
+    {
+        // Arrange
+        var sprite = Substitute.For<ISpriteHelper>();
+        using var bullet = new Bullet<Enemy>(Vector2.Zero, Vector2.UnitY, sprite);
+
+        var expected = BulletConfig.Enemy.Damage;
+
+        // Act
+        bullet.Reset(Vector2.Zero, Vector2.UnitY);
+        var actual = bullet.Damage;
+
+        // Assert
+        Assert.Equal(expected, actual);
+
+        // Output
+        output.WriteLine($"Expected Damage: {expected}");
+        output.WriteLine($"Actual Damage:   {actual}");
     }
 }

@@ -7,7 +7,7 @@ using NSubstitute;
 
 namespace BulletHell.test.Models;
 
-public class PlayerBulletTests
+public class PlayerBulletTests(ITestOutputHelper output)
 {
     [Theory]
     [InlineData(-5, 5, true)]
@@ -352,5 +352,25 @@ public class PlayerBulletTests
 
         // Assert
         Assert.Equal(newPosition, bullet.Collider.Position);
+    }
+    [Fact]
+    public void PlayerBullet_Reset_ShouldAssignPlayerDamage()
+    {
+        // Arrange
+        var sprite = Substitute.For<ISpriteHelper>();
+        using var bullet = new Bullet<Player>(Vector2.Zero, Vector2.UnitY, sprite);
+
+        var expected = BulletConfig.Player.Damage;
+
+        // Act
+        bullet.Reset(Vector2.Zero, Vector2.UnitY);
+        var actual = bullet.Damage;
+
+        // Assert
+        Assert.Equal(expected, actual);
+
+        // Output
+        output.WriteLine($"Expected Damage: {expected}");
+        output.WriteLine($"Actual Damage:   {actual}");
     }
 }
