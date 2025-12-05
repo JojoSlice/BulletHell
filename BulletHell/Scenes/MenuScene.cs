@@ -39,6 +39,11 @@ public class MenuScene : Scene
     private IMenuNavigator? _menuNavigator;
     private Button _modeToggleButton = null!;
     private Button _actionButton = null!;
+    private Button? _logoutButton;
+
+    private bool _isLoggedIn = false;
+    private string? _loggedInUsername;
+    private int? _loggedInUserId;
 
     private Texture2D? _backgroundTexture;
     private Song? _menuMusic;
@@ -130,7 +135,7 @@ public class MenuScene : Scene
 
     public string GetActionButtonText()
     {
-        return _currentMode == RegistrationMode.Login ? "Log In" : "Register";
+        return _currentMode == RegistrationMode.Login ? "Logga in" : "Registrera";
     }
 
     private void UpdateActionButtonText()
@@ -141,7 +146,53 @@ public class MenuScene : Scene
     private void OnModeToggleClicked()
     {
         ToggleMode();
-        _modeToggleButton.UpdateText($"Mode: {_currentMode}");
+        _modeToggleButton.UpdateText($"Läge: {_currentMode}");
+    }
+
+    private void OnLoginSuccess(int userId, string username)
+    {
+        _isLoggedIn = true;
+        _loggedInUsername = username;
+        _loggedInUserId = userId;
+
+        // Rensa input-fält
+        _usernameField?.Clear();
+        _passwordField?.Clear();
+
+        // Återuppbygg navigator
+        RebuildNavigator();
+    }
+
+    private void OnLogout()
+    {
+        _isLoggedIn = false;
+        _loggedInUsername = null;
+        _loggedInUserId = null;
+
+        // Återuppbygg navigator
+        RebuildNavigator();
+    }
+
+    private void RebuildNavigator()
+    {
+        _menuNavigator?.Clear();
+
+        if (_isLoggedIn)
+        {
+            // Start → Logout → Exit
+            _menuNavigator?.AddItem(_menuButtons[0]);
+            _menuNavigator?.AddItem(_logoutButton!);
+            _menuNavigator?.AddItem(_menuButtons[1]);
+        }
+        else
+        {
+            // Username → Password → Action → ModeToggle → Exit
+            _menuNavigator?.AddItem(_usernameField!);
+            _menuNavigator?.AddItem(_passwordField!);
+            _menuNavigator?.AddItem(_actionButton);
+            _menuNavigator?.AddItem(_modeToggleButton);
+            _menuNavigator?.AddItem(_menuButtons[1]);
+        }
     }
 
     public async Task<RegistrationResult> RegisterUserAsync(string username, string password)
@@ -189,8 +240,9 @@ public class MenuScene : Scene
             {
                 ShowMessage($"Välkommen {username}!", Color.Green);
 
-                // Rensa fält (note: InputField doesn't have Clear() method yet, would need to be added)
-                // För nu hoppar vi över detta
+                // Rensa fält
+                _usernameField?.Clear();
+                _passwordField?.Clear();
 
                 ToggleMode();
             }
