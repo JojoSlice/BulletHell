@@ -6,7 +6,7 @@ using System;
 
 namespace BulletHell.Models;
 
-public class Bullet<T> : IDisposable
+public class Bullet<T> : IDisposable, IDamageDealer, ICollidable
 {
     private readonly ISpriteHelper _sprite;
     private readonly Collider _collider;
@@ -33,6 +33,7 @@ public class Bullet<T> : IDisposable
     public int Width => _sprite.Width;
     public int Height => _sprite.Height;
     public int Damage { get; private set; } = 1;
+    // 1 är endast ett failsafe. Det riktiga Damage-värdet sätts i Reset() baserat på BulletConfig.
 
     public Bullet(Vector2 startPosition, Vector2 direction, ISpriteHelper sprite)
     {
@@ -137,10 +138,6 @@ public class Bullet<T> : IDisposable
     public void Reset(Vector2 position, Vector2 directionOrVelocity, int damage = 1)
     {
         Position = position;
-
-        Damage = typeof(T) == typeof(Player)
-            ? BulletConfig.Player.Damage
-            : BulletConfig.Enemy.Damage;
 
         if (typeof(T) == typeof(Player))
         {
