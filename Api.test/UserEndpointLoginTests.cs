@@ -4,6 +4,7 @@ using Contracts.Requests.User;
 using Contracts.Responses.Common;
 using Contracts.Responses.User;
 using Xunit;
+using BCrypt.Net;
 
 namespace Api.test;
 
@@ -26,7 +27,8 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
     {
         // Arrange - Create a user first
         var username = $"testuser_{Guid.NewGuid():N}";
-        var passwordHash = "hashedPassword123";
+        var password = "password123";
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
         var createRequest = new CreateUserRequest
         {
@@ -39,7 +41,7 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
         var loginRequest = new LoginRequest
         {
             UserName = username,
-            Password = "password123", // Use plaintext password
+            Password = password, // Use plaintext password
         };
 
         // Act
@@ -66,7 +68,8 @@ public class UserEndpointLoginTests : IClassFixture<CustomWebApplicationFactory<
     {
         // Arrange - Create a user first
         var username = $"testuser_{Guid.NewGuid():N}";
-        var correctPasswordHash = "hashedPassword123";
+        var correctPassword = "correctPassword";
+        var correctPasswordHash = BCrypt.Net.BCrypt.HashPassword(correctPassword);
 
         var createRequest = new CreateUserRequest
         {
