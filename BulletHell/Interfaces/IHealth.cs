@@ -1,8 +1,10 @@
-﻿namespace BulletHell.Interfaces;
-
-public interface IHealth
+﻿namespace BulletHell.Interfaces
 {
-    int Health { get; }
-    void TakeDamage(int amount);
-    bool IsAlive { get; }
+// Interface för alla objekt som har hälsa, kan ta skada och kan dö.
+    public interface IHealth
+    {
+        int Health { get; }
+        void TakeDamage(int amount);
+        bool IsAlive { get; }
+    }
 }
