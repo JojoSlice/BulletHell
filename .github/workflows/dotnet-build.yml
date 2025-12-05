@@ -10,6 +10,7 @@ permissions:
   contents: read
   pull-requests: write
   checks: write
+  actions: write
 
 jobs:
   build:
@@ -157,3 +158,10 @@ jobs:
                     `✨ Code analysis: Inga varningar eller fel\n` +
                     `✅ Build komplett - tester körs i separat workflow`
             })
+
+  run-tests:
+    needs: build
+    uses: ./.github/workflows/test-on-build.yml
+    with:
+      pr_number: ${{ github.event.pull_request.number }}
+      commit_sha: ${{ github.sha }}

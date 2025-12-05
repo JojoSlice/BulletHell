@@ -1,10 +1,14 @@
 name: Test on Build
 
 on:
-  workflow_run:
-    workflows: ["Build on PR"]
-    types:
-      - completed
+  workflow_call:
+    inputs:
+      pr_number:
+        required: true
+        type: number
+      commit_sha:
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -17,10 +21,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout code at provided commit
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          ref: ${{ inputs.commit_sha }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
@@ -53,7 +58,6 @@ jobs:
           # Run tests with coverage
           dotnet test BulletHellSpaceShooter.sln \
             --configuration Release \
-            --no-build \
             --verbosity normal \
             --collect:"XPlat Code Coverage" \
             --results-directory ./TestResults \
@@ -116,18 +120,6 @@ jobs:
 
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@v2.9.0
-        if: github.event.workflow_run.event == 'pull_request'
         with:
-          recreate: true
           path: code-coverage-results.md
-          number: ${{ github.event.workflow_run.pull_requests[0].number }}
-
-      - name: Test Report Summary
-        uses: dorny/test-reporter@v2
-        if: always()
-        continue-on-error: true
-        with:
-          name: .NET Tests
-          path: TestResults/**/*.trx
-          reporter: dotnet-trx
-          fail-on-error: false
+          number: ${{ inputs.pr_number }}
