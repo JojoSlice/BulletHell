@@ -58,7 +58,7 @@ public class MenuScene : Scene
             whiteTexture,
             new MouseKeyboardInputProvider(),
             new KeyboardTextInputHandler(),
-            new ApiClient(new HttpClient { BaseAddress = new Uri("http://localhost:5000") }),
+            new ApiClient(new HttpClient { BaseAddress = new Uri("http://localhost:5111") }),
             new BCryptPasswordHasher()
         ) { }
 

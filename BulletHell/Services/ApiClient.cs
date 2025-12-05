@@ -45,13 +45,25 @@ public class ApiClient : IApiClient
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var userResponse = JsonSerializer.Deserialize<UserResponse>(content, _jsonOptions);
+                var apiResponse = JsonSerializer.Deserialize<Response<UserResponse>>(
+                    content,
+                    _jsonOptions
+                );
+
+                if (apiResponse?.IsSuccess == true && apiResponse.Data != null)
+                {
+                    return new RegistrationResult
+                    {
+                        Success = true,
+                        Message = "User created successfully!",
+                        UserId = apiResponse.Data.Id,
+                    };
+                }
 
                 return new RegistrationResult
                 {
-                    Success = true,
-                    Message = "User created successfully!",
-                    UserId = userResponse?.Id,
+                    Success = false,
+                    Message = "Could not create user",
                 };
             }
 
