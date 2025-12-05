@@ -124,13 +124,3 @@ jobs:
           recreate: true
           path: code-coverage-results.md
           number: ${{ inputs.pr_number }}
-
-      - name: Test Report Summary
-        uses: dorny/test-reporter@v2
-        if: always()
-        continue-on-error: true
-        with:
-          name: .NET Tests
-          path: TestResults/**/*.trx
-          reporter: dotnet-trx
-          fail-on-error: false
