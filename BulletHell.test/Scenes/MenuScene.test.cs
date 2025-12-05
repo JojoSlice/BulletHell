@@ -57,7 +57,7 @@ public class MenuSceneTests
         var buttonText = menuScene.GetActionButtonText();
 
         // Assert
-        Assert.Equal("Log In", buttonText);
+        Assert.Equal("Logga in", buttonText);
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class MenuSceneTests
         var buttonText = menuScene.GetActionButtonText();
 
         // Assert
-        Assert.Equal("Register", buttonText);
+        Assert.Equal("Registrera", buttonText);
     }
 
     [Fact]

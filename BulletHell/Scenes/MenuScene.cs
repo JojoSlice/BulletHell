@@ -130,7 +130,7 @@ public class MenuScene : Scene
 
     public string GetActionButtonText()
     {
-        return _currentMode == RegistrationMode.Login ? "Log In" : "Register";
+        return _currentMode == RegistrationMode.Login ? "Logga in" : "Registrera";
     }
 
     private void UpdateActionButtonText()
