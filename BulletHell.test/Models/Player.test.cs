@@ -477,9 +477,9 @@ public class PlayerTests(ITestOutputHelper output)
         Assert.Equal(expected, actual);
 
         // Output
-        output.WriteLine($"Start Health:   {startHealth}");
-        output.WriteLine($"Damage Taken:   {damage}");
-        output.WriteLine($"Expected Health:{expected}");
-        output.WriteLine($"Actual Health:  {actual}");
+        _output.WriteLine($"Start Health:   {startHealth}");
+        _output.WriteLine($"Damage Taken:   {damage}");
+        _output.WriteLine($"Expected Health:{expected}");
+        _output.WriteLine($"Actual Health:  {actual}");
     }
 }
