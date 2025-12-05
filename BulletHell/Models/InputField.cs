@@ -168,6 +168,12 @@ public class InputField : INavigable, IDisposable
         }
     }
 
+    public void Clear()
+    {
+        _text = "";
+        _textChanged = true;
+    }
+
     public void Dispose()
     {
         Dispose(true);

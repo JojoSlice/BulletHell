@@ -5,6 +5,7 @@ using Contracts.Responses.Common;
 using Contracts.Responses.User;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
+using BCrypt.Net;
 
 namespace Application.Services;
 
@@ -56,8 +57,17 @@ public class UserService(MyDbContext dbContext) : IUserService<UserResponse>
     {
         var user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
 
-        if (user == null
-        || (user.PasswordHash != request.PasswordHash))
+        if (user == null)
+        {
+            return new Response<UserResponse?>
+            {
+                IsSuccess = false,
+                Data = null,
+            };
+        }
+
+        // Verify password using BCrypt
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
             return new Response<UserResponse?>
             {
