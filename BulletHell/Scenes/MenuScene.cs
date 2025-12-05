@@ -282,8 +282,7 @@ public class MenuScene : Scene
             if (result.Success)
             {
                 ShowMessage($"Välkommen tillbaka {username}!", Color.Green);
-                // TODO: Store user session (UserId, Username)
-                // TODO: Optionally transition to game
+                OnLoginSuccess(result.UserId, username);
             }
             else
             {
@@ -321,6 +320,7 @@ public class MenuScene : Scene
         InitializeModeToggleButton();
         InitializeActionButton();
         InitializeMenuComponents();
+        InitializeLogoutButton();
         SetupMenuNavigation();
     }
 
@@ -334,13 +334,26 @@ public class MenuScene : Scene
         _actionButton = _uiFactory.CreateActionButton(GetActionButtonText(), OnActionButtonClicked);
     }
 
+    private void InitializeLogoutButton()
+    {
+        _logoutButton = _uiFactory.CreateLogoutButton(OnLogout);
+    }
+
     private void InitializeMenuComponents()
     {
         if (_menuButtons == null || _menuButtons.Length == 0)
         {
             var startButton = _uiFactory.CreateStartGameButton(() =>
-                _game.ChangeScene(SceneNames.Battle)
-            );
+            {
+                if (_isLoggedIn)
+                {
+                    _game.ChangeScene(SceneNames.Battle);
+                }
+                else
+                {
+                    ShowMessage("Du måste logga in först!", Color.Red);
+                }
+            });
             var exitButton = _uiFactory.CreateExitButton(() => _game.Exit());
             _menuButtons = [startButton, exitButton];
 
@@ -354,12 +367,8 @@ public class MenuScene : Scene
         if (_menuNavigator == null)
         {
             _menuNavigator = new MenuNavigator();
-            _menuNavigator.AddItem(_menuButtons[0]); // Start button
-            _menuNavigator.AddItem(_usernameField!); // Username field
-            _menuNavigator.AddItem(_passwordField!); // Password field
-            _menuNavigator.AddItem(_actionButton); // Action button (Login/Register)
-            _menuNavigator.AddItem(_menuButtons[1]); // Exit button
         }
+        RebuildNavigator();
     }
 
     public override void OnExit()
@@ -381,6 +390,11 @@ public class MenuScene : Scene
             _actionButton.OnClick -= OnActionButtonClicked;
         }
 
+        if (_logoutButton != null)
+        {
+            _logoutButton.OnClick -= OnLogout;
+        }
+
         base.OnExit();
     }
 
@@ -389,26 +403,48 @@ public class MenuScene : Scene
         var mouseState = _inputProvider.GetMouseState();
         var keyState = _inputProvider.GetKeyboardState();
 
-        _usernameField?.Update(gameTime, mouseState);
-        _passwordField?.Update(gameTime, mouseState);
-
-        _modeToggleButton?.Update(mouseState);
-        _actionButton?.Update(mouseState);
-
-        foreach (var button in _menuButtons)
+        if (_isLoggedIn)
         {
-            button.Update(mouseState);
-        }
+            _menuButtons[0].Update(mouseState); // Start
+            _logoutButton?.Update(mouseState);
+            _menuButtons[1].Update(mouseState); // Exit
 
-        if (_usernameField?.IsFocused == false && _passwordField?.IsFocused == false)
-        {
             _menuNavigator?.Update(keyState);
+        }
+        else
+        {
+            _usernameField?.Update(gameTime, mouseState);
+            _passwordField?.Update(gameTime, mouseState);
+            _modeToggleButton?.Update(mouseState);
+            _actionButton?.Update(mouseState);
+            _menuButtons[1].Update(mouseState); // Exit
+
+            if (_usernameField?.IsFocused == false && _passwordField?.IsFocused == false)
+            {
+                _menuNavigator?.Update(keyState);
+            }
         }
 
         _feedbackDisplay.Update(gameTime);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
+    {
+        DrawBackground(spriteBatch);
+        DrawTitle(spriteBatch);
+        _feedbackDisplay.Draw(spriteBatch, _font, _screenWidth, FeedbackMessageYPosition);
+
+        if (_isLoggedIn)
+        {
+            DrawLoggedInUI(spriteBatch);
+        }
+        else
+        {
+            DrawLoggedOutUI(spriteBatch);
+        }
+    }
+
+    private void DrawBackground(SpriteBatch spriteBatch)
     {
         // Draw background with aspect ratio preserved
         if (_backgroundTexture != null)
@@ -428,27 +464,37 @@ public class MenuScene : Scene
                 Color.White
             );
         }
+    }
 
+    private void DrawTitle(SpriteBatch spriteBatch)
+    {
         spriteBatch.DrawString(
             _font,
             _title,
             _uiFactory.GetCenteredPosition(_title, TitleYPosition),
             Color.Black
         );
+    }
 
+    private void DrawLoggedInUI(SpriteBatch spriteBatch)
+    {
+        // Rita "Inloggad som: {username}"
+        var labelText = $"Inloggad som: {_loggedInUsername}";
+        var labelPos = _uiFactory.GetLoggedInLabelPosition(labelText);
+        spriteBatch.DrawString(_font, labelText, labelPos, Color.White);
+
+        _menuButtons[0].Draw(spriteBatch); // Start
+        _logoutButton?.Draw(spriteBatch);
+        _menuButtons[1].Draw(spriteBatch); // Exit
+    }
+
+    private void DrawLoggedOutUI(SpriteBatch spriteBatch)
+    {
         _modeToggleButton?.Draw(spriteBatch);
-
         _usernameField?.Draw(spriteBatch);
         _passwordField?.Draw(spriteBatch);
-
         _actionButton?.Draw(spriteBatch);
-
-        foreach (var button in _menuButtons)
-        {
-            button.Draw(spriteBatch);
-        }
-
-        _feedbackDisplay.Draw(spriteBatch, _font, _screenWidth, FeedbackMessageYPosition);
+        _menuButtons[1].Draw(spriteBatch); // Exit
     }
 
     protected override void Dispose(bool disposing)
@@ -457,6 +503,7 @@ public class MenuScene : Scene
         {
             _modeToggleButton?.Dispose();
             _actionButton?.Dispose();
+            _logoutButton?.Dispose();
 
             if (_menuButtons != null)
             {
