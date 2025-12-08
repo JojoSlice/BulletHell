@@ -141,7 +141,7 @@ public class GameOverScene : Scene
                 _leaderboard?.UpdateHighScores(result.Data);
             }
         }
-        catch (Exception)
+        catch (HttpRequestException)
         {
             // Ignorera fel vid hämtning av leaderboard
         }
