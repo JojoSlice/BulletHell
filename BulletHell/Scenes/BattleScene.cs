@@ -110,7 +110,7 @@ public class BattleScene : Scene
             return;
         }
 
-        if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null)
+        if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null || _background == null)
             return;
 
         _background.Update(gameTime);
@@ -146,7 +146,7 @@ public class BattleScene : Scene
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null)
+        if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null || _background == null)
             return;
 
         _background.Draw(spriteBatch);
@@ -170,7 +170,7 @@ public class BattleScene : Scene
     {
         if (disposing)
         {
-            _background.Dispose();
+            _background?.Dispose();
             _background = null;
 
             _player?.Dispose();
