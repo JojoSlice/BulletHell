@@ -43,12 +43,12 @@ public class MenuScene : Scene
 
     private bool _isLoggedIn = false;
     private string? _loggedInUsername;
-    private int? _loggedInUserId;
 
     private Texture2D? _backgroundTexture;
     private Song? _menuMusic;
 
     private RegistrationMode _currentMode = RegistrationMode.Login;
+    private Leaderboard? _leaderboard;
 
     public RegistrationMode CurrentMode => _currentMode;
 
@@ -129,7 +129,6 @@ public class MenuScene : Scene
                 ? RegistrationMode.Register
                 : RegistrationMode.Login;
 
-        // Uppdatera knapp-text
         UpdateActionButtonText();
     }
 
@@ -158,13 +157,11 @@ public class MenuScene : Scene
     {
         _isLoggedIn = true;
         _loggedInUsername = username;
-        _loggedInUserId = userId;
+        _game.CurrentUserId = userId;
 
-        // Rensa input-fält
         _usernameField?.Clear();
         _passwordField?.Clear();
 
-        // Återuppbygg navigator
         RebuildNavigator();
     }
 
@@ -172,9 +169,8 @@ public class MenuScene : Scene
     {
         _isLoggedIn = false;
         _loggedInUsername = null;
-        _loggedInUserId = null;
+        _game.CurrentUserId = null;
 
-        // Återuppbygg navigator
         RebuildNavigator();
     }
 
@@ -184,14 +180,12 @@ public class MenuScene : Scene
 
         if (_isLoggedIn)
         {
-            // Start → Logout → Exit
             _menuNavigator?.AddItem(_menuButtons[0]);
             _menuNavigator?.AddItem(_logoutButton!);
             _menuNavigator?.AddItem(_menuButtons[1]);
         }
         else
         {
-            // Username → Password → Action → ModeToggle → Exit
             _menuNavigator?.AddItem(_usernameField!);
             _menuNavigator?.AddItem(_passwordField!);
             _menuNavigator?.AddItem(_actionButton);
@@ -321,11 +315,33 @@ public class MenuScene : Scene
         InitializeMenuComponents();
         InitializeLogoutButton();
         SetupMenuNavigation();
+
+        _leaderboard = new Leaderboard(_font);
+        _ = LoadLeaderboardAsync();
+    }
+
+    private async Task LoadLeaderboardAsync()
+    {
+        try
+        {
+            var result = await _apiClient.GetAllHighScoresAsync();
+            if (result.Success && result.Data != null)
+            {
+                _leaderboard?.UpdateHighScores(result.Data);
+            }
+        }
+        catch (Exception)
+        {
+            // Ignorera fel vid hämtning av leaderboard
+        }
     }
 
     private void InitializeModeToggleButton()
     {
-        _modeToggleButton = _uiFactory.CreateModeToggleButton(GetModeToggleButtonText(), OnModeToggleClicked);
+        _modeToggleButton = _uiFactory.CreateModeToggleButton(
+            GetModeToggleButtonText(),
+            OnModeToggleClicked
+        );
     }
 
     private void InitializeActionButton()
@@ -441,11 +457,12 @@ public class MenuScene : Scene
         {
             DrawLoggedOutUI(spriteBatch);
         }
+
+        _leaderboard?.Draw(spriteBatch);
     }
 
     private void DrawBackground(SpriteBatch spriteBatch)
     {
-        // Draw background with aspect ratio preserved
         if (_backgroundTexture != null)
         {
             float scaleX = (float)_screenWidth / _backgroundTexture.Width;
@@ -477,7 +494,6 @@ public class MenuScene : Scene
 
     private void DrawLoggedInUI(SpriteBatch spriteBatch)
     {
-        // Rita "Inloggad som: {username}"
         var labelText = $"Inloggad som: {_loggedInUsername}";
         var labelPos = _uiFactory.GetLoggedInLabelPosition(labelText);
         spriteBatch.DrawString(_font, labelText, labelPos, Color.White);

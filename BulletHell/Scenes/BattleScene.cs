@@ -126,6 +126,7 @@ public class BattleScene : Scene
 
         if (!_player.IsAlive)
         {
+            _game.FinalScore = _player.Score;
             _game.ChangeScene(SceneNames.GameOver);
         }
     }

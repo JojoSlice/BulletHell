@@ -16,6 +16,9 @@ public class Game1 : Game
     private Scene? _currentScene;
     private bool _disposed;
 
+    public int? CurrentUserId { get; set; }
+    public int FinalScore { get; set; }
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
