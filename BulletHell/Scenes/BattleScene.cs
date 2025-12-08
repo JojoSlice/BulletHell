@@ -10,6 +10,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Reflection.Metadata;
+using System.Diagnostics;
+using BulletHell.Configurations;
 
 namespace BulletHell.Scenes;
 
@@ -25,10 +28,12 @@ public class BattleScene : Scene
     private EnemyManager? _enemyManager;
     private BulletManager<Enemy>? _enemyBulletManager;
     private CollisionManager? _collisionManager;
+    private Texture2D? _backgroundTexture;
     private Texture2D? _playerTexture;
     private Texture2D? _bulletTexture;
     private Texture2D? _enemyTexture;
     private Texture2D? _enemyBulletTexture;
+    private Background? _background;
     private HUD? _hud;
     private Camera? _camera;
     private Texture2D? _lifeTexture;
@@ -57,6 +62,8 @@ public class BattleScene : Scene
         _enemyBulletManager = new BulletManager<Enemy>();
         _enemyManager = new EnemyManager(_enemyBulletManager);
 
+        _background = new Background(new SpriteHelper());
+
         _hud = new HUD();
         _hud.MaxHP = 100;
         _hud.HP = _player.Health;
@@ -69,6 +76,9 @@ public class BattleScene : Scene
             new Vector2(400, 0),
             new SpriteHelper()
         ));
+
+        _backgroundTexture = _game.Content.Load<Texture2D>("background");
+        _background.LoadContent(_backgroundTexture);
 
         _playerTexture = _game.Content.Load<Texture2D>("player");
         _player.LoadContent(_playerTexture);
@@ -103,6 +113,7 @@ public class BattleScene : Scene
         if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null)
             return;
 
+        _background.Update(gameTime);
         _collisionManager?.CheckCollisions();
         _player.Update(gameTime);
         _camera?.Follow(_player.Position, _game.GraphicsDevice.Viewport, 0.1f);
@@ -138,6 +149,7 @@ public class BattleScene : Scene
         if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null)
             return;
 
+        _background.Draw(spriteBatch);
         _player.Draw(spriteBatch);
         _bulletManager.Draw(spriteBatch);
         _enemyManager.Draw(spriteBatch);
@@ -158,6 +170,9 @@ public class BattleScene : Scene
     {
         if (disposing)
         {
+            _background.Dispose();
+            _background = null;
+
             _player?.Dispose();
             _player = null;
 

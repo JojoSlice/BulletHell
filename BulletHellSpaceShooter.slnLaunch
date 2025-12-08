@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Game + API",
+    "Projects": [
+      {
+        "Path": "Api\\Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "BulletHell\\BulletHell.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
