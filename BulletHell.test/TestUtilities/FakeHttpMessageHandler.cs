@@ -106,7 +106,7 @@ public static class FakeHttpResponseBuilder
         List<(int id, int score, int userId)> highScores
     )
     {
-        var data = highScores.Select(hs => new { id = hs.id, score = hs.score, userId = hs.userId });
+        var data = highScores.Select(hs => new { id = hs.id, score = hs.score, userId = hs.userId, userName = $"user{hs.userId}" });
         var apiResponse = new { isSuccess = true, data };
 
         return new HttpResponseMessage(HttpStatusCode.OK)
@@ -121,7 +121,7 @@ public static class FakeHttpResponseBuilder
 
     public static HttpResponseMessage CreateHighScoreResponse(int id, int score, int userId)
     {
-        var apiResponse = new { isSuccess = true, data = new { id, score, userId } };
+        var apiResponse = new { isSuccess = true, data = new { id, score, userId, userName = $"user{userId}" } };
 
         return new HttpResponseMessage(HttpStatusCode.OK)
         {
@@ -135,7 +135,7 @@ public static class FakeHttpResponseBuilder
 
     public static HttpResponseMessage CreateHighScoreCreatedResponse(int id, int score, int userId)
     {
-        var apiResponse = new { isSuccess = true, data = new { id, score, userId } };
+        var apiResponse = new { isSuccess = true, data = new { id, score, userId, userName = $"user{userId}" } };
 
         return new HttpResponseMessage(HttpStatusCode.OK)
         {
