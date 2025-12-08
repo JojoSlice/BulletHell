@@ -15,7 +15,8 @@ public static class MappingExtensions
     {
         Id = hs.Id,
         Score = hs.Score,
-        UserId = hs.UserId
+        UserId = hs.UserId,
+        UserName = hs.User?.UserName ?? "Unknown"
     };
 
     public static Response<List<HighScoreResponse>> MapToResponse(this List<HighScore> highScores)

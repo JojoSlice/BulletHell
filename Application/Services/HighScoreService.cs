@@ -11,15 +11,18 @@ namespace Application.Services;
 public class HighScoreService(MyDbContext context) : IHighScoreService<HighScoreResponse>
 {
     public async Task<Response<List<HighScoreResponse>>> GetAll() =>
-        (await context.Highscores.ToListAsync()).MapToResponse();
+        (await context.Highscores.Include(hs => hs.User).ToListAsync()).MapToResponse();
 
     public async Task<Response<HighScoreResponse?>> GetById(int id) =>
-        (await context.Highscores.FindAsync(id)).MapToResponse();
+        (await context.Highscores.Include(hs => hs.User).FirstOrDefaultAsync(hs => hs.Id == id)).MapToResponse();
 
     public async Task<Response<HighScoreResponse>> Create(CreateHighScoreRequest highScore)
     {
         var newHighScore = context.Highscores.Add(highScore.MapToDomain()).Entity;
         await context.SaveChangesAsync();
+
+        // Reload with User navigation property
+        await context.Entry(newHighScore).Reference(hs => hs.User).LoadAsync();
         return newHighScore.MapToResponse()!;
     }
 
@@ -27,6 +30,9 @@ public class HighScoreService(MyDbContext context) : IHighScoreService<HighScore
     {
         var updatedHighScore = context.Highscores.Update(highScore.MapToDomain()).Entity;
         await context.SaveChangesAsync();
+
+        // Reload with User navigation property
+        await context.Entry(updatedHighScore).Reference(hs => hs.User).LoadAsync();
         return updatedHighScore.MapToResponse()!;
     }
 

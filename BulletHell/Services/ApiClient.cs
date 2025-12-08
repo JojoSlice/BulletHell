@@ -200,6 +200,7 @@ public class ApiClient : IApiClient
                         Id = hs.Id,
                         Score = hs.Score,
                         UserId = hs.UserId,
+                        UserName = hs.UserName,
                     }).ToList();
 
                     return new HighScoreListResult
@@ -270,6 +271,7 @@ public class ApiClient : IApiClient
                         Id = apiResponse.Data.Id,
                         Score = apiResponse.Data.Score,
                         UserId = apiResponse.Data.UserId,
+                        UserName = apiResponse.Data.UserName,
                     };
 
                     return new HighScoreOperationResult
@@ -346,6 +348,7 @@ public class ApiClient : IApiClient
                         Id = apiResponse.Data.Id,
                         Score = apiResponse.Data.Score,
                         UserId = apiResponse.Data.UserId,
+                        UserName = apiResponse.Data.UserName,
                     };
 
                     return new HighScoreOperationResult
@@ -424,6 +427,7 @@ public class ApiClient : IApiClient
                         Id = apiResponse.Data.Id,
                         Score = apiResponse.Data.Score,
                         UserId = apiResponse.Data.UserId,
+                        UserName = apiResponse.Data.UserName,
                     };
 
                     return new HighScoreOperationResult
