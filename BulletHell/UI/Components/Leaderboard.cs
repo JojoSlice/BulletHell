@@ -40,7 +40,6 @@ public class Leaderboard
         }
 
         var title = "TOP 10 HIGHSCORES";
-        var titleSize = _font.MeasureString(title);
         spriteBatch.DrawString(_font, title, new Vector2(_xPosition, _yPosition), Color.Gold);
 
         var backgroundWidth = 280;
