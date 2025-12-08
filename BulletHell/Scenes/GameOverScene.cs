@@ -182,14 +182,9 @@ public class GameOverScene : Scene
             {
                 var createResult = await _apiClient.CreateHighScoreAsync(finalScore, userId.Value);
 
-                if (createResult.Success)
-                {
-                    _highScoreMessage = $"Din poäng: {finalScore}\nNYTT HIGHSCORE!";
-                }
-                else
-                {
-                    _highScoreMessage = $"Din poäng: {finalScore}\n(Kunde ej spara highscore)";
-                }
+                _highScoreMessage = createResult.Success
+                    ? $"Din poäng: {finalScore}\nNYTT HIGHSCORE!"
+                    : $"Din poäng: {finalScore}\n(Kunde ej spara highscore)";
             }
             else if (finalScore > userHighScore.Score)
             {
