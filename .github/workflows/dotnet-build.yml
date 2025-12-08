@@ -70,39 +70,21 @@ jobs:
         id: restore
         run: dotnet restore BulletHellSpaceShooter.sln
 
-      - name: Check for vulnerable packages
+      - name: Check for vulnerable packages (collect report, don't fail job)
         id: vulnerability-check
-        continue-on-error: false
+        shell: bash
         run: |
           echo "Checking for vulnerable NuGet packages..."
-          dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
+          # Collect the report even if empty
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt || true
 
           if grep -q "has the following vulnerable packages" vulnerability-report.txt; then
             echo "has_vulnerabilities=true" >> $GITHUB_OUTPUT
             echo "⚠️ Sårbara paket hittades!"
-            exit 1
           else
             echo "has_vulnerabilities=false" >> $GITHUB_OUTPUT
             echo "✅ Inga sårbara paket hittades"
           fi
-
-      - name: Comment on vulnerabilities
-        if: steps.vulnerability-check.outputs.has_vulnerabilities == 'true'
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const fs = require('fs');
-            const vulnReport = fs.readFileSync('vulnerability-report.txt', 'utf8');
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## ⚠️ Sårbara NuGet-paket hittades\n\n` +
-                    `Följande sårbara paket upptäcktes i projektet:\n\n` +
-                    `\`\`\`\n${vulnReport}\n\`\`\`\n\n` +
-                    `Vänligen uppdatera dessa paket till säkra versioner.`
-            });
 
       - name: Build with Code Analysis
         id: build
@@ -115,49 +97,104 @@ jobs:
           echo "✅ Build lyckades på Ubuntu!"
           echo "Ändrade ${{ steps.stats.outputs.changed_files }} filer med ${{ steps.stats.outputs.changed_lines }} rader"
 
-      - name: Comment PR on failure
-        if: failure() && steps.vulnerability-check.outputs.has_vulnerabilities != 'true'
-        uses: actions/github-script@v8
+      # Generate a single "sticky" comment body regardless of outcome (includes vulnerability report)
+      - name: Generate sticky comment body (includes vulnerability report)
+        if: always()
+        shell: bash
+        env:
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          RESTORE_OUTCOME: ${{ steps.restore.outcome }}
+          VULN: ${{ steps.vulnerability-check.outputs.has_vulnerabilities }}
+          CHANGED_FILES: ${{ steps.stats.outputs.changed_files }}
+          CHANGED_LINES: ${{ steps.stats.outputs.changed_lines }}
+          RUN_ID: ${{ github.run_id }}
+          REPO: ${{ github.repository }}
+          SERVER_URL: ${{ github.server_url }}
+        run: |
+          failedStep='Okänt steg'
+          errorDetails=''
+
+          if [ "${RESTORE_OUTCOME}" = "failure" ]; then
+            failedStep='Restore dependencies'
+            errorDetails='Det gick inte att återställa NuGet-paket. Kontrollera att alla paketversioner är giltiga.'
+          elif [ "${BUILD_OUTCOME}" = "failure" ]; then
+            failedStep='Build with Code Analysis'
+            errorDetails='Build misslyckades. Detta kan bero på:\n- Kompileringsfel i koden\n- Code analysis varningar (behandlas som fel)\n- Syntaxfel'
+          fi
+
+          if [ "${BUILD_OUTCOME}" = "success" ]; then
+            status_line='✅ Build lyckades på Ubuntu!'
+          else
+            status_line='❌ Build misslyckades'
+          fi
+
+          if [ "${VULN}" = "true" ]; then
+            vuln_summary='⚠️ Sårbara NuGet-paket hittades — fullständig lista nedan.'
+          else
+            vuln_summary='✅ Inga sårbara NuGet-paket hittades'
+          fi
+
+          # Prepare vulnerability report (truncate to avoid huge comments)
+          VULN_REPORT_FILE="vulnerability-report.txt"
+          VULN_CONTENT=""
+          TRUNCATED_NOTICE=""
+
+          if [ -f "${VULN_REPORT_FILE}" ]; then
+            # Strip any leading/trailing whitespace and detect size
+            # Keep at most 12000 characters to be safe for comment limits
+            VULN_CONTENT=$(head -c 12000 "${VULN_REPORT_FILE}" || true)
+            TOTAL_SIZE=$(wc -c < "${VULN_REPORT_FILE}" || echo 0)
+            RETAINED_SIZE=$(printf "%s" "$VULN_CONTENT" | wc -c)
+            if [ "${TOTAL_SIZE}" -gt "${RETAINED_SIZE}" ]; then
+              TRUNCATED_NOTICE="_(Rapport förkortad — se artifact eller körningsloggar för hela innehållet)_"
+            fi
+          else
+            VULN_CONTENT="Inga data (vulnerability-report.txt saknas)."
+          fi
+
+          cat > comment.md <<EOF
+## 📊 Build Statistik
+
+${status_line}
+
+### Ändringar i denna PR:
+- **Ändrade .cs filer:** ${CHANGED_FILES}
+- **Ändrade rader:** ${CHANGED_LINES}
+
+${vuln_summary}
+
+EOF
+
+          if [ "${VULN}" = "true" ]; then
+            cat >> comment.md <<EOF
+### Sårbara paket (utdrag)
+\`\`\`
+${VULN_CONTENT}
+\`\`\`
+
+${TRUNCATED_NOTICE}
+
+EOF
+          fi
+
+          if [ "${BUILD_OUTCOME}" != "success" ]; then
+            cat >> comment.md <<EOF
+**Steg som failade:** ${failedStep}
+
+**Detaljer:** ${errorDetails}
+
+[Se fullständiga loggar här](${SERVER_URL}/${REPO}/actions/runs/${RUN_ID})
+EOF
+          fi
+
+      - name: Create or update sticky PR comment with build statistics and vulnerabilities
+        if: always()
+        uses: peter-evans/create-or-update-comment@v4
         with:
-          script: |
-            let failedStep = 'Okänt steg';
-            let errorDetails = '';
-
-            if ('${{ steps.restore.outcome }}' === 'failure') {
-              failedStep = 'Restore dependencies';
-              errorDetails = 'Det gick inte att återställa NuGet-paket. Kontrollera att alla paketversioner är giltiga.';
-            } else if ('${{ steps.build.outcome }}' === 'failure') {
-              failedStep = 'Build with Code Analysis';
-              errorDetails = 'Build misslyckades. Detta kan bero på:\n- Kompileringsfel i koden\n- Code analysis varningar (behandlas som fel)\n- Syntaxfel';
-            }
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## ❌ Build Misslyckades\n\n` +
-                    `**Steg som failade:** ${failedStep}\n\n` +
-                    `**Detaljer:** ${errorDetails}\n\n` +
-                    `[Se fullständiga loggar här](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`
-            })
-
-      - name: Comment PR
-        if: success()
-        uses: actions/github-script@v8
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## 📊 Build Statistik\n\n` +
-                    `✅ Build lyckades på Ubuntu!\n\n` +
-                    `### Ändringar i denna PR:\n` +
-                    `- **Ändrade .cs filer:** ${{ steps.stats.outputs.changed_files }}\n` +
-                    `- **Ändrade rader:** ${{ steps.stats.outputs.changed_lines }}\n\n` +
-                    `✨ Code analysis: Inga varningar eller fel\n` +
-                    `✅ Build komplett - tester körs i separat workflow`
-            })
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-file: comment.md
+          identifier: build-statistics
 
   run-tests:
     needs: build
