@@ -199,15 +199,9 @@ public class GameOverScene : Scene
                     userId.Value
                 );
 
-                if (updateResult.Success)
-                {
-                    _highScoreMessage =
-                        $"Din poäng: {finalScore}\nNYTT HIGHSCORE!\nTidigare rekord: {userHighScore.Score}";
-                }
-                else
-                {
-                    _highScoreMessage = $"Din poäng: {finalScore}\n(Kunde ej uppdatera highscore)";
-                }
+                _highScoreMessage = updateResult.Success
+                    ? $"Din poäng: {finalScore}\nNYTT HIGHSCORE!\nTidigare rekord: {userHighScore.Score}"
+                    : $"Din poäng: {finalScore}\n(Kunde ej uppdatera highscore)";
             }
             else
             {
