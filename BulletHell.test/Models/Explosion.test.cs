@@ -32,4 +32,26 @@ public class ExplosionTests
         // Output
         _output.WriteLine($"Expected: {expected}, Actual: {actual}");
     }
+
+    [Fact]
+    public void Explosion_ShouldBecomeNotAlive_WhenAnimationFinished()
+    {
+        // Arrange
+        var spriteMock = new Mock<ISpriteHelper>();
+        spriteMock.SetupGet(s => s.IsAnimationFinished).Returns(true);
+
+        var explosion = new Explosion(Vector2.Zero, spriteMock.Object);
+
+        bool expected = false;
+
+        // Act
+        explosion.Update(new GameTime());
+        bool actual = explosion.IsAlive;
+
+        // Assert
+        Assert.Equal(expected, actual);
+
+        // Output
+        _output.WriteLine($"Expected: {expected}, Actual: {actual}");
+    }
 }
