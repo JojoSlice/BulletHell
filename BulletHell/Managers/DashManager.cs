@@ -53,7 +53,7 @@ public class DashManager : IDisposable
         var dash = _dashPool.Get();
         dash.Reset(spawnPos);
 
-        if (dash.Width == 0 && _dashTexture != null)
+        if (dash.Width == 0)
         {
             dash.LoadContent(_dashTexture);
         }
