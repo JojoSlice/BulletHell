@@ -31,6 +31,7 @@ namespace BulletHell.Models
 
         public void Dispose()
         {
+            _sprite.Dispose();
         }
     }
 }

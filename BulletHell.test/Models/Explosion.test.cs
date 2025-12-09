@@ -54,4 +54,35 @@ public class ExplosionTests
         // Output
         _output.WriteLine($"Expected: {expected}, Actual: {actual}");
     }
+
+    [Fact]
+    public void Explosion_Dispose_ShouldDisposeSprite()
+    {
+        // Arrange
+        var spriteMock = new Mock<ISpriteHelper>();
+        var explosion = new Explosion(Vector2.Zero, spriteMock.Object);
+
+        bool expected = true;
+
+        // Act
+        explosion.Dispose();
+
+        bool actual;
+
+        try
+        {
+            spriteMock.Verify(s => s.Dispose(), Times.Once);
+            actual = true;
+        }
+        catch
+        {
+            actual = false;
+        }
+
+        // Assert
+        Assert.Equal(expected, actual);
+
+        // Output
+        _output.WriteLine($"Expected Dispose call: {expected}, Actual: {actual}");
+    }
 }
