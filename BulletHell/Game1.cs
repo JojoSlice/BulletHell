@@ -88,14 +88,19 @@ public class Game1 : Game
 
             if (cameraTransform.HasValue)
             {
-                // Two-pass rendering: World with camera, then HUD without
+                // Three-pass rendering: Background without camera, world with camera, then HUD without
 
-                // Pass 1: Draw world with camera transform
+                // Pass 1: Draw background without camera (screen coordinates)
+                _spriteBatch.Begin();
+                _currentScene.DrawBackground(_spriteBatch);
+                _spriteBatch.End();
+
+                // Pass 2: Draw world with camera transform
                 _spriteBatch.Begin(transformMatrix: cameraTransform.Value);
                 _currentScene.Draw(_spriteBatch);
                 _spriteBatch.End();
 
-                // Pass 2: Draw HUD without camera (screen coordinates)
+                // Pass 3: Draw HUD without camera (screen coordinates)
                 _spriteBatch.Begin();
                 _currentScene.DrawHUD(_spriteBatch);
                 _spriteBatch.End();
