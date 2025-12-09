@@ -62,11 +62,12 @@ public class BattleScene : Scene
         _lifeTexture = _game.Content.Load<Texture2D>("player_Life");
         _hud.LifeTexture = _lifeTexture;
 
-        // Add initial enemy
         _enemyManager.AddEnemy(new Enemy(new Vector2(400, 0), new SpriteHelper()));
 
         _playerTexture = _game.Content.Load<Texture2D>("rymdskepp");
-        _player.LoadContent(_playerTexture);
+        var turnLeftTexture = _game.Content.Load<Texture2D>("rymdskeppturnleft");
+        var turnRightTexture = _game.Content.Load<Texture2D>("rymdskeppturnright");
+        _player.LoadContent(_playerTexture, turnLeftTexture, turnRightTexture);
 
         _bulletTexture = _game.Content.Load<Texture2D>("bullet");
         _bulletManager.LoadContent(_bulletTexture);
