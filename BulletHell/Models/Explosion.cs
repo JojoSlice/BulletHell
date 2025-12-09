@@ -7,14 +7,20 @@ namespace BulletHell.Models
 {
     public class Explosion : IDisposable
     {
+        private readonly ISpriteHelper _sprite;
         public bool IsAlive { get; private set; } = true;
 
         public Explosion(Vector2 position, ISpriteHelper sprite)
         {
+            _sprite = sprite;
         }
 
         public void Update(GameTime gameTime)
         {
+            _sprite.Update(gameTime);
+
+            if (_sprite.IsAnimationFinished)
+                IsAlive = false;
         }
 
         public void Draw(SpriteBatch spriteBatch)
