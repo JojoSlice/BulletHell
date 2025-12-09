@@ -105,6 +105,9 @@ public class BattleScene : Scene
         _enemyBulletTexture = _game.Content.Load<Texture2D>("enemy_bullet");
         _enemyBulletManager.LoadContent(_enemyBulletTexture);
 
+        _explosionTexture = _game.Content.Load<Texture2D>("enemy_explosion");
+        _explosionManager.LoadContent(_explosionTexture);
+
         _collisionManager = new CollisionManager(
             _player,
             _bulletManager,
