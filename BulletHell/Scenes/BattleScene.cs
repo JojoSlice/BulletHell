@@ -29,6 +29,7 @@ public class BattleScene : Scene
     private Texture2D? _bulletTexture;
     private Texture2D? _enemyTexture;
     private Texture2D? _enemyBulletTexture;
+    private Texture2D? _explosionTexture;
     private HUD? _hud;
     private Camera? _camera;
     private Texture2D? _lifeTexture;
@@ -102,6 +103,9 @@ public class BattleScene : Scene
 
         _enemyBulletTexture = _game.Content.Load<Texture2D>("enemy_bullet");
         _enemyBulletManager.LoadContent(_enemyBulletTexture);
+
+        _explosionTexture = _game.Content.Load<Texture2D>("enemy_explosion");
+        _explosionManager.LoadContent(_explosionTexture);
 
         _dashTexture = _game.Content.Load<Texture2D>("dash");
         _dashManager.LoadContent(_dashTexture);
