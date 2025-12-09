@@ -7,26 +7,36 @@ namespace BulletHell.Managers;
 
 public class ExplosionManager
 {
-    public List<Explosion> Explosions { get; } = new();
+    private readonly List<Explosion> _explosions = new();
+
+    public IReadOnlyList<Explosion> Explosions => _explosions; // för tests skull
+
+    private Texture2D _explosionTexture;
+
+    public void LoadContent(Texture2D texture)
+    {
+        _explosionTexture = texture;
+    }
 
     public void Add(Explosion explosion)
     {
-        Explosions.Add(explosion);
+        explosion.LoadContent(_explosionTexture);
+        _explosions.Add(explosion);
     }
 
     public void Update(GameTime gameTime)
     {
-        foreach (var exp in Explosions)
+        foreach (var exp in _explosions)
         {
             exp.Update(gameTime);
         }
 
-        Explosions.RemoveAll(e => !e.IsAlive);
+        _explosions.RemoveAll(e => !e.IsAlive);
     }
 
     public void Draw(SpriteBatch spriteBatch) // utan test
     {
-        foreach (var exp in Explosions)
+        foreach (var exp in _explosions)
         {
             exp.Draw(spriteBatch);
         }

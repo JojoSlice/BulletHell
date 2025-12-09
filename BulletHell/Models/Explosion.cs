@@ -14,6 +14,12 @@ namespace BulletHell.Models
         public Explosion(Vector2 position, ISpriteHelper sprite)
         {
             _sprite = sprite;
+            _position = position;
+        }
+
+        public void LoadContent(Texture2D texture)
+        {
+            _sprite.LoadSpriteSheet(texture, frameWidth: 48, frameHeight: 48, animationSpeed: 0.05f);
         }
 
         public void Update(GameTime gameTime)
