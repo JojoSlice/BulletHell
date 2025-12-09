@@ -234,7 +234,6 @@ jobs:
           header: build
           recreate: true
           path: comment.md
-          number: ${{ github.event.pull_request.number }}
 
   run-tests:
     needs: build
