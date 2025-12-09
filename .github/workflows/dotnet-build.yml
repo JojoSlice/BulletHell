@@ -232,7 +232,6 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2.9.0
         with:
           header: build
-          recreate: true
           path: comment.md
 
   run-tests:
