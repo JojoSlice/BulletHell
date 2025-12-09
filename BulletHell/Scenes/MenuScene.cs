@@ -461,7 +461,7 @@ public class MenuScene : Scene
         _leaderboard?.Draw(spriteBatch);
     }
 
-    private void DrawBackground(SpriteBatch spriteBatch)
+    private new void DrawBackground(SpriteBatch spriteBatch)
     {
         if (_backgroundTexture != null)
         {

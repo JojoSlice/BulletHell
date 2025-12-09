@@ -25,6 +25,12 @@ public abstract class Scene : IDisposable
     public virtual Matrix? GetCameraTransform() => null;
 
     /// <summary>
+    /// Draws background elements that should not be affected by camera transformation.
+    /// These are rendered before the world objects.
+    /// </summary>
+    public virtual void DrawBackground(SpriteBatch spriteBatch) { }
+
+    /// <summary>
     /// Draws HUD elements that should not be affected by camera transformation.
     /// These elements use screen coordinates and remain fixed on screen.
     /// </summary>
