@@ -48,7 +48,6 @@ public class CollisionManager
                     if (wasAlive && !enemy.IsAlive)
                     {
                         _player.AddScore(EnemyConfig.ScoreValue);
-
                         _expm.Add(new Explosion(enemy.Position, new SpriteHelper()));
                     }
 
