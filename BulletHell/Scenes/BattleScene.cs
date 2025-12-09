@@ -45,6 +45,7 @@ public class BattleScene : Scene
     private Texture2D? _rymdDashTexture3;
     private float _rymdDashSpawnTimer = 0f;
     private ExplosionManager _explosionManager;
+    private Texture2D? _explosionTexture;
 
     public BattleScene(Game1 game)
         : base(game)
@@ -112,7 +113,8 @@ public class BattleScene : Scene
             _player,
             _bulletManager,
             _enemyManager,
-            _enemyBulletManager
+            _enemyBulletManager,
+            _explosionManager
         );
 
         _dashTexture = _game.Content.Load<Texture2D>("dash");
@@ -123,7 +125,8 @@ public class BattleScene : Scene
         _rymdDashTexture3 = _game.Content.Load<Texture2D>("rymddash3");
         _rymdDashManager.LoadContent(_rymdDashTexture1, _rymdDashTexture2, _rymdDashTexture3);
 
-        _collisionManager = new CollisionManager(_player, _bulletManager, _enemyManager, _enemyBulletManager, _explosionManager);
+        _collisionManager =
+            new CollisionManager(_player, _bulletManager, _enemyManager, _enemyBulletManager, _explosionManager);
         _camera = new Camera();
         _camera.SetWorldBounds((float)_screenWidth * 2, (float)_screenHeight * 2);
     }
