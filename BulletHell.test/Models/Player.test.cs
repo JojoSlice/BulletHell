@@ -1,4 +1,5 @@
 using BulletHell.Configurations;
+using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using BulletHell.Models;
 using BulletHell.test.TestUtilities;
@@ -20,7 +21,8 @@ public class PlayerTests(ITestOutputHelper output)
         var mockSprite = new Mock<ISpriteHelper>();
         mockInput.Setup(i => i.GetDirection()).Returns(Vector2.Zero);
 
-        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
+        var turnController = new TurnAnimationController(mockSprite.Object);
+        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object, turnController);
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(1.0 / 60.0));
 
         // Act
@@ -43,7 +45,8 @@ public class PlayerTests(ITestOutputHelper output)
         var mockSprite = new Mock<ISpriteHelper>();
         mockInput.Setup(i => i.GetDirection()).Returns(new Vector2(x, y));
 
-        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
+        var turnController = new TurnAnimationController(mockSprite.Object);
+        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object, turnController);
         var deltaTime = 1.0f / 60.0f;
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(deltaTime));
 
@@ -67,7 +70,8 @@ public class PlayerTests(ITestOutputHelper output)
         var mockSprite = new Mock<ISpriteHelper>();
         mockInput.Setup(i => i.GetDirection()).Returns(Vector2.Zero);
 
-        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
+        var turnController = new TurnAnimationController(mockSprite.Object);
+        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object, turnController);
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(1.0 / 60.0));
 
         // Act
@@ -91,7 +95,8 @@ public class PlayerTests(ITestOutputHelper output)
         var direction = new Vector2(x, y);
         mockInput.Setup(i => i.GetDirection()).Returns(direction);
 
-        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
+        var turnController = new TurnAnimationController(mockSprite.Object);
+        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object, turnController);
         var deltaTime = 1.0f / 60.0f;
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(deltaTime));
 
@@ -126,7 +131,8 @@ public class PlayerTests(ITestOutputHelper output)
         // Arrange
         var mockSprite = MockFactories.CreateMockSpriteHelper(width: 32, height: 32);
         var mockInput = MockFactories.CreateMockInputProvider(new Vector2(1, 0));
-        using var player = new Player(new Vector2(x, 300), mockInput, mockSprite);
+        var turnController = new TurnAnimationController(mockSprite);
+        using var player = new Player(new Vector2(x, 300), mockInput, mockSprite, turnController);
         player.SetScreenBounds(800, 600);
 
         // Act
@@ -144,7 +150,8 @@ public class PlayerTests(ITestOutputHelper output)
         // Arrange
         var mockSprite = MockFactories.CreateMockSpriteHelper(width: 32, height: 32);
         var mockInput = MockFactories.CreateMockInputProvider(new Vector2(0, 1));
-        using var player = new Player(new Vector2(400, y), mockInput, mockSprite);
+        var turnController = new TurnAnimationController(mockSprite);
+        using var player = new Player(new Vector2(400, y), mockInput, mockSprite, turnController);
         player.SetScreenBounds(800, 600);
 
         // Act
@@ -285,7 +292,8 @@ public class PlayerTests(ITestOutputHelper output)
         // Arrange
         var mockInput = MockFactories.CreateMockInputProvider();
         var mockSprite = MockFactories.CreateMockSpriteHelper();
-        using var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
+        var turnController = new TurnAnimationController(mockSprite);
+        using var player = new Player(new Vector2(100, 100), mockInput, mockSprite, turnController);
 
         var expectedLives = 3;
 
@@ -308,7 +316,8 @@ public class PlayerTests(ITestOutputHelper output)
         var mockSprite = new Mock<ISpriteHelper>();
 
         // Act
-        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object);
+        var turnController = new TurnAnimationController(mockSprite.Object);
+        using var player = new Player(startPosition, mockInput.Object, mockSprite.Object, turnController);
 
         // Assert
         Assert.NotNull(player.Collider);
@@ -324,7 +333,8 @@ public class PlayerTests(ITestOutputHelper output)
         mockSprite.Setup(s => s.Width).Returns(32);
         mockSprite.Setup(s => s.Height).Returns(32);
         var mockInput = MockFactories.CreateMockInputProvider(new Vector2(1, 0));
-        using var player = new Player(new Vector2(50, 50), mockInput, mockSprite.Object);
+        var turnController = new TurnAnimationController(mockSprite.Object);
+        using var player = new Player(new Vector2(50, 50), mockInput, mockSprite.Object, turnController);
         player.SetScreenBounds(800, 600);
 
         // Act
@@ -342,7 +352,8 @@ public class PlayerTests(ITestOutputHelper output)
         mockSprite.Setup(s => s.Width).Returns(24);
         mockSprite.Setup(s => s.Height).Returns(16);
         var mockInput = new Mock<IInputProvider>();
-        using var player = new Player(Vector2.Zero, mockInput.Object, mockSprite.Object);
+        var turnController = new TurnAnimationController(mockSprite.Object);
+        using var player = new Player(Vector2.Zero, mockInput.Object, mockSprite.Object, turnController);
 
         // Act
         // Radius should be initialized in constructor based on sprite dimensions
@@ -358,7 +369,8 @@ public class PlayerTests(ITestOutputHelper output)
         // Arrange
         var mockInput = MockFactories.CreateMockInputProvider();
         var mockSprite = MockFactories.CreateMockSpriteHelper();
-        using var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
+        var turnController = new TurnAnimationController(mockSprite);
+        using var player = new Player(new Vector2(100, 100), mockInput, mockSprite, turnController);
 
         var expected = PlayerConfig.MaxHealth;
 
@@ -402,7 +414,8 @@ public class PlayerTests(ITestOutputHelper output)
         // Arrange
         var mockInput = MockFactories.CreateMockInputProvider();
         var mockSprite = MockFactories.CreateMockSpriteHelper();
-        using var player = new Player(new Vector2(100, 100), mockInput, mockSprite);
+        var turnController = new TurnAnimationController(mockSprite);
+        using var player = new Player(new Vector2(100, 100), mockInput, mockSprite, turnController);
 
         var startingLives = player.Lives;
 
@@ -437,7 +450,8 @@ public class PlayerTests(ITestOutputHelper output)
         // Arrange
         var mockInput = MockFactories.CreateMockInputProvider();
         var mockSprite = MockFactories.CreateMockSpriteHelper();
-        var player = new Player(new Vector2(0, 0), mockInput, mockSprite);
+        var turnController = new TurnAnimationController(mockSprite);
+        var player = new Player(new Vector2(0, 0), mockInput, mockSprite, turnController);
 
         int startingScore = player.Score;
         int pointsToAdd = 1;
@@ -463,7 +477,8 @@ public class PlayerTests(ITestOutputHelper output)
         // Arrange
         var mockInput = new Mock<IInputProvider>();
         var mockSprite = new Mock<ISpriteHelper>();
-        using var player = new Player(new Vector2(0, 0), mockInput.Object, mockSprite.Object);
+        var turnController = new TurnAnimationController(mockSprite.Object);
+        using var player = new Player(new Vector2(0, 0), mockInput.Object, mockSprite.Object, turnController);
 
         int startHealth = player.Health;
         int damage = 1;

@@ -1,5 +1,6 @@
 using System;
 using BulletHell.Configurations;
+using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,14 +16,18 @@ public class Player : IDisposable, IHealth, ICollidable
     private readonly ISpriteHelper _sprite;
     private readonly IInputProvider _input;
     private readonly Collider _collider;
+    private readonly TurnAnimationController _turnAnimationController;
     private float _shootCooldown;
     private int _screenHeight;
     private int _screenWidth;
     private bool _disposed;
 
-    // Knockback state
     private Vector2 _knockbackVelocity = Vector2.Zero;
     private float _knockbackTimer = 0f;
+
+    private Texture2D? _mainTexture;
+    private Texture2D? _turnLeftTexture;
+    private Texture2D? _turnRightTexture;
 
     public Vector2 Position { get; private set; }
     public int Width => _sprite.Width;
@@ -32,6 +37,7 @@ public class Player : IDisposable, IHealth, ICollidable
     public bool IsAlive => Lives > 0;
     public int Health { get; private set; } = PlayerConfig.MaxHealth;
     public int Score { get; private set; }
+
     public void AddScore(int value)
     {
         Score += value;
@@ -39,14 +45,20 @@ public class Player : IDisposable, IHealth, ICollidable
 
     public Collider Collider => _collider;
 
-    public Player(Vector2 startPosition, IInputProvider input, ISpriteHelper sprite)
+    public Player(
+        Vector2 startPosition,
+        IInputProvider input,
+        ISpriteHelper sprite,
+        TurnAnimationController turnAnimationController)
     {
         ArgumentNullException.ThrowIfNull(input, nameof(input));
         ArgumentNullException.ThrowIfNull(sprite, nameof(sprite));
+        ArgumentNullException.ThrowIfNull(turnAnimationController, nameof(turnAnimationController));
 
         Position = startPosition;
         _input = input;
         _sprite = sprite;
+        _turnAnimationController = turnAnimationController;
 
         _shootCooldown = 0f;
 
@@ -66,7 +78,10 @@ public class Player : IDisposable, IHealth, ICollidable
     /// <summary>
     /// Loads the player texture and initializes the sprite
     /// </summary>
-    public void LoadContent(Texture2D playerTexture)
+    public void LoadContent(
+        Texture2D playerTexture,
+        Texture2D? turnLeftTexture = null,
+        Texture2D? turnRightTexture = null)
     {
         ArgumentNullException.ThrowIfNull(playerTexture);
 
@@ -90,6 +105,10 @@ public class Player : IDisposable, IHealth, ICollidable
                 PlayerConfig.AnimationSpeed,
                 "AnimationSpeed must be non-negative"
             );
+
+        _mainTexture = playerTexture;
+        _turnLeftTexture = turnLeftTexture;
+        _turnRightTexture = turnRightTexture;
 
         _sprite.LoadSpriteSheet(
             playerTexture,
@@ -140,6 +159,7 @@ public class Player : IDisposable, IHealth, ICollidable
         else
         {
             Vector2 direction = _input.GetDirection();
+            _turnAnimationController.Update(direction, _mainTexture!, _turnLeftTexture, _turnRightTexture);
             Move(direction, deltaTime);
         }
 
@@ -198,14 +218,11 @@ public class Player : IDisposable, IHealth, ICollidable
         }
     }
 
-    /// <summary>
-    /// Draws the player to the screen
-    /// </summary>
     public void Draw(SpriteBatch spriteBatch)
     {
         ArgumentNullException.ThrowIfNull(spriteBatch);
 
-        _sprite.Draw(spriteBatch, Position, 0f, 1f);
+        _sprite.Draw(spriteBatch, Position, 0f, 0.8f);
     }
 
     protected virtual void Dispose(bool disposing)
