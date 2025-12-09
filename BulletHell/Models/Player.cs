@@ -12,33 +12,22 @@ namespace BulletHell.Models;
 /// </summary>
 public class Player : IDisposable, IHealth, ICollidable
 {
-    private enum TurnState
-    {
-        None,
-        TurningLeft,
-        TurningRight,
-        ExitingTurn,
-    }
-
     private readonly float _speed = PlayerConfig.Speed;
     private readonly ISpriteHelper _sprite;
     private readonly IInputProvider _input;
     private readonly Collider _collider;
+    private readonly TurnAnimationController _turnAnimationController;
     private float _shootCooldown;
     private int _screenHeight;
     private int _screenWidth;
     private bool _disposed;
 
-    // Knockback state
     private Vector2 _knockbackVelocity = Vector2.Zero;
     private float _knockbackTimer = 0f;
 
-    // Turn animation state
-    private Vector2 _lastDirection = Vector2.Zero;
     private Texture2D? _mainTexture;
     private Texture2D? _turnLeftTexture;
     private Texture2D? _turnRightTexture;
-    private TurnState _turnState = TurnState.None;
 
     public Vector2 Position { get; private set; }
     public int Width => _sprite.Width;
@@ -56,14 +45,20 @@ public class Player : IDisposable, IHealth, ICollidable
 
     public Collider Collider => _collider;
 
-    public Player(Vector2 startPosition, IInputProvider input, ISpriteHelper sprite)
+    public Player(
+        Vector2 startPosition,
+        IInputProvider input,
+        ISpriteHelper sprite,
+        TurnAnimationController turnAnimationController)
     {
         ArgumentNullException.ThrowIfNull(input, nameof(input));
         ArgumentNullException.ThrowIfNull(sprite, nameof(sprite));
+        ArgumentNullException.ThrowIfNull(turnAnimationController, nameof(turnAnimationController));
 
         Position = startPosition;
         _input = input;
         _sprite = sprite;
+        _turnAnimationController = turnAnimationController;
 
         _shootCooldown = 0f;
 
@@ -164,9 +159,8 @@ public class Player : IDisposable, IHealth, ICollidable
         else
         {
             Vector2 direction = _input.GetDirection();
-            UpdateTurnAnimation(direction);
+            _turnAnimationController.Update(direction, _mainTexture!, _turnLeftTexture, _turnRightTexture);
             Move(direction, deltaTime);
-            _lastDirection = direction;
         }
 
         if (_shootCooldown > 0)
@@ -193,107 +187,6 @@ public class Player : IDisposable, IHealth, ICollidable
 
         Position = newPosition;
         _collider.Position = Position;
-    }
-
-    private TurnState DetectTurnDirection(Vector2 current, Vector2 last)
-    {
-        if (current == Vector2.Zero)
-            return TurnState.None;
-
-        if (current.X < -0.1f && last.X >= -0.1f)
-            return TurnState.TurningLeft;
-
-        if (current.X > 0.1f && last.X <= 0.1f)
-            return TurnState.TurningRight;
-
-        if (current.X < -0.1f)
-            return TurnState.TurningLeft;
-
-        if (current.X > 0.1f)
-            return TurnState.TurningRight;
-
-        return TurnState.None;
-    }
-
-    private void UpdateTurnAnimation(Vector2 currentDirection)
-    {
-        if (_turnLeftTexture == null || _turnRightTexture == null)
-            return;
-
-        var spriteHelper = _sprite as SpriteHelper;
-        if (spriteHelper == null)
-            return;
-
-        var detectedTurn = DetectTurnDirection(currentDirection, _lastDirection);
-
-        if (_turnState == TurnState.None || _turnState == TurnState.ExitingTurn)
-        {
-            if (detectedTurn == TurnState.TurningLeft || detectedTurn == TurnState.TurningRight)
-            {
-                _turnState = detectedTurn;
-                var turnTexture = (detectedTurn == TurnState.TurningLeft)
-                    ? _turnLeftTexture
-                    : _turnRightTexture;
-
-                spriteHelper.SetTexture(turnTexture);
-                spriteHelper.SetSequenceAnimation(introEnd: 2, loopStart: 3, loopEnd: 7);
-                spriteHelper.ResetAnimation();
-            }
-        }
-        else if (_turnState == TurnState.TurningLeft || _turnState == TurnState.TurningRight)
-        {
-            if (detectedTurn == TurnState.None)
-            {
-                _turnState = TurnState.ExitingTurn;
-                spriteHelper.StartExitSequence();
-            }
-            else if (detectedTurn != _turnState)
-            {
-                _turnState = detectedTurn;
-                var turnTexture = (detectedTurn == TurnState.TurningLeft)
-                    ? _turnLeftTexture
-                    : _turnRightTexture;
-
-                spriteHelper.SetTexture(turnTexture);
-                spriteHelper.ResetAnimation();
-            }
-        }
-
-        if (_turnState == TurnState.ExitingTurn)
-        {
-            if (spriteHelper.IsExitComplete())
-            {
-                if (detectedTurn == TurnState.None)
-                {
-                    spriteHelper.SetTexture(_mainTexture!);
-                    spriteHelper.ResetToLooping();
-                    spriteHelper.ResetAnimation();
-                    _turnState = TurnState.None;
-                }
-                else
-                {
-                    _turnState = detectedTurn;
-                    var turnTexture = (detectedTurn == TurnState.TurningLeft)
-                        ? _turnLeftTexture
-                        : _turnRightTexture;
-
-                    spriteHelper.SetTexture(turnTexture);
-                    spriteHelper.SetSequenceAnimation(introEnd: 2, loopStart: 3, loopEnd: 7);
-                    spriteHelper.ResetAnimation();
-                }
-            }
-            else if (detectedTurn != TurnState.None && detectedTurn != _turnState)
-            {
-                _turnState = detectedTurn;
-                var turnTexture = (detectedTurn == TurnState.TurningLeft)
-                    ? _turnLeftTexture
-                    : _turnRightTexture;
-
-                spriteHelper.SetTexture(turnTexture);
-                spriteHelper.SetSequenceAnimation(introEnd: 2, loopStart: 3, loopEnd: 7);
-                spriteHelper.ResetAnimation();
-            }
-        }
     }
 
     /// <summary>

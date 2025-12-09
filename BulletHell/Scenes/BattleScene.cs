@@ -48,7 +48,8 @@ public class BattleScene : Scene
         Vector2 startPosition = new((float)_screenWidth / 2, (float)_screenHeight / 2);
         IInputProvider input = new KeyboardInputProvider();
         ISpriteHelper sprite = new SpriteHelper();
-        _player = new Player(startPosition, input, sprite);
+        var turnAnimationController = new TurnAnimationController(sprite);
+        _player = new Player(startPosition, input, sprite, turnAnimationController);
         _player.SetScreenBounds(_screenWidth, _screenHeight);
 
         _bulletManager = new BulletManager<Player>();
