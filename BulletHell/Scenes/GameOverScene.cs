@@ -337,9 +337,9 @@ public class GameOverScene : Scene
             }
             _menuNavigator = null;
 
-            _restartButton.Dispose();
-            _menuButton.Dispose();
-            _exitButton.Dispose();
+            _restartButton?.Dispose();
+            _menuButton?.Dispose();
+            _exitButton?.Dispose();
         }
 
         base.Dispose(disposing);
