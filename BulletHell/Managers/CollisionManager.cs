@@ -2,17 +2,39 @@ using BulletHell.Models;
 using Microsoft.Xna.Framework;
 using System.Linq;
 using BulletHell.Configurations;
+using BulletHell.Helpers;
 
 namespace BulletHell.Managers;
 
-public class CollisionManager(Player player, BulletManager<Player> pbm, EnemyManager em, BulletManager<Enemy> ebm)
+public class CollisionManager
 {
+    private readonly Player _player;
+    private readonly BulletManager<Player> _pbm;
+    private readonly EnemyManager _em;
+    private readonly BulletManager<Enemy> _ebm;
+    private readonly ExplosionManager _expm;
+
+    public CollisionManager(
+        Player player,
+        BulletManager<Player> pbm,
+        EnemyManager em,
+        BulletManager<Enemy> ebm,
+        ExplosionManager expm
+    )
+    {
+        _player = player;
+        _pbm = pbm;
+        _em = em;
+        _ebm = ebm;
+        _expm = expm;
+    }
+
     public void CheckCollisions()
     {
         CheckPlayerCollisions();
-        foreach (var bullet in pbm.Bullets)
+        foreach (var bullet in _pbm.Bullets)
         {
-            foreach (var enemy in em.Enemies)
+            foreach (var enemy in _em.Enemies)
             {
                 if (bullet.Collider.Distance(enemy.Collider) > 10)
                 {
@@ -25,39 +47,43 @@ public class CollisionManager(Player player, BulletManager<Player> pbm, EnemyMan
                     enemy.TakeDamage(bullet.Damage);
                     if (wasAlive && !enemy.IsAlive)
                     {
-                        player.AddScore(EnemyConfig.ScoreValue);
+                        _player.AddScore(EnemyConfig.ScoreValue);
+                        _expm.Add(new Explosion(enemy.Position, new SpriteHelper()));
                     }
+
                     bullet.MarkHit();
                 }
             }
         }
     }
+
     private void CheckPlayerCollisions()
     {
-        foreach (var enemyBullet in ebm.Bullets)
+        foreach (var enemyBullet in _ebm.Bullets)
         {
-            if (enemyBullet.Collider.Distance(player.Collider) > 10)
+            if (enemyBullet.Collider.Distance(_player.Collider) > 10)
             {
                 continue;
             }
-            if (enemyBullet.Collider.IsCollidingWith(player.Collider))
+
+            if (enemyBullet.Collider.IsCollidingWith(_player.Collider))
             {
-                player.TakeDamage(enemyBullet.Damage);
+                _player.TakeDamage(enemyBullet.Damage);
                 enemyBullet.MarkHit();
             }
         }
 
-        foreach (var enemy in em.Enemies.Where(enemy =>
-                     player.Collider.IsCollidingWith(enemy.Collider)))
+        foreach (var enemy in _em.Enemies.Where(enemy =>
+                     _player.Collider.IsCollidingWith(enemy.Collider)))
         {
-                player.TakeDamage(enemy.CollisionDamage);
-                PushBack(enemy.Collider.Position);
+            _player.TakeDamage(enemy.CollisionDamage);
+            PushBack(enemy.Collider.Position);
         }
     }
 
     private void PushBack(Vector2 enemyPosition)
     {
-        var direction = player.Collider.Position - enemyPosition;
+        var direction = _player.Collider.Position - enemyPosition;
         if (direction == Vector2.Zero)
         {
             direction = -Vector2.UnitY;
@@ -67,6 +93,6 @@ public class CollisionManager(Player player, BulletManager<Player> pbm, EnemyMan
         const float knockbackForce = 300f;
         const float knockbackDuration = 0.18f;
 
-        player.ApplyKnockback(direction, knockbackForce, knockbackDuration);
+        _player.ApplyKnockback(direction, knockbackForce, knockbackDuration);
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using BulletHell.Constants;
 using BulletHell.Graphics;
 using BulletHell.Helpers;
@@ -10,6 +9,7 @@ using BulletHell.UI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace BulletHell.Scenes;
 
@@ -44,9 +44,13 @@ public class BattleScene : Scene
     private Texture2D? _rymdDashTexture2;
     private Texture2D? _rymdDashTexture3;
     private float _rymdDashSpawnTimer = 0f;
+    private ExplosionManager _explosionManager;
+    private Texture2D? _explosionTexture;
 
     public BattleScene(Game1 game)
-        : base(game) { }
+        : base(game)
+    {
+    }
 
     public override void OnEnter()
     {
@@ -67,6 +71,7 @@ public class BattleScene : Scene
         _bulletManager = new BulletManager<Player>();
         _enemyBulletManager = new BulletManager<Enemy>();
         _enemyManager = new EnemyManager(_enemyBulletManager);
+        _explosionManager = new ExplosionManager();
         _dashManager = new DashManager();
         _rymdDashManager = new RymdDashManager();
 
@@ -101,11 +106,15 @@ public class BattleScene : Scene
         _enemyBulletTexture = _game.Content.Load<Texture2D>("enemy_bullet");
         _enemyBulletManager.LoadContent(_enemyBulletTexture);
 
+        _explosionTexture = _game.Content.Load<Texture2D>("enemy_explosion");
+        _explosionManager.LoadContent(_explosionTexture);
+
         _collisionManager = new CollisionManager(
             _player,
             _bulletManager,
             _enemyManager,
-            _enemyBulletManager
+            _enemyBulletManager,
+            _explosionManager
         );
 
         _dashTexture = _game.Content.Load<Texture2D>("dash");
@@ -116,6 +125,7 @@ public class BattleScene : Scene
         _rymdDashTexture3 = _game.Content.Load<Texture2D>("rymddash3");
         _rymdDashManager.LoadContent(_rymdDashTexture1, _rymdDashTexture2, _rymdDashTexture3);
 
+        _collisionManager = new CollisionManager(_player, _bulletManager, _enemyManager, _enemyBulletManager, _explosionManager);
         _camera = new Camera();
         _camera.SetWorldBounds((float)_screenWidth * 2, (float)_screenHeight * 2);
     }
@@ -172,6 +182,8 @@ public class BattleScene : Scene
         _bulletManager.Update(gameTime, _screenWidth, _screenHeight);
         _enemyManager.Update(gameTime, _screenWidth, _screenHeight);
         _enemyBulletManager.Update(gameTime, _screenWidth, _screenHeight);
+        _explosionManager.Update(gameTime);
+
 
         if (_hud != null)
         {
@@ -233,6 +245,7 @@ public class BattleScene : Scene
         _bulletManager.Draw(spriteBatch);
         _enemyManager.Draw(spriteBatch);
         _enemyBulletManager.Draw(spriteBatch);
+        _explosionManager.Draw(spriteBatch);
     }
 
     public override Matrix? GetCameraTransform()

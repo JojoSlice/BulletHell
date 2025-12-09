@@ -74,4 +74,6 @@ public interface ISpriteHelper : IDisposable
     /// Resets animation to frame 0
     /// </summary>
     void ResetAnimation();
+
+    bool IsAnimationFinished { get; }
 }
