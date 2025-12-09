@@ -16,6 +16,15 @@ jobs:
   build:
     name: Build on Ubuntu
     runs-on: ubuntu-latest
+    outputs:
+      changed_files: ${{ steps.set_outputs.outputs.changed_files }}
+      changed_lines: ${{ steps.set_outputs.outputs.changed_lines }}
+      has_vulnerabilities: ${{ steps.set_outputs.outputs.has_vulnerabilities }}
+      build_outcome: ${{ steps.set_outputs.outputs.build_outcome }}
+      restore_outcome: ${{ steps.set_outputs.outputs.restore_outcome }}
+      run_id: ${{ steps.set_outputs.outputs.run_id }}
+      repository: ${{ steps.set_outputs.outputs.repository }}
+      server_url: ${{ steps.set_outputs.outputs.server_url }}
 
     steps:
       - name: Checkout code
@@ -97,23 +106,56 @@ jobs:
           echo "✅ Build lyckades på Ubuntu!"
           echo "Ändrade ${{ steps.stats.outputs.changed_files }} filer med ${{ steps.stats.outputs.changed_lines }} rader"
 
-      # Generate a single "sticky" comment body regardless of outcome (includes vulnerability report)
+      # Upload vulnerability report so the comment job can include/truncate it
+      - name: Upload vulnerability report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability-report
+          path: vulnerability-report.txt
+
+      # Ensure job outputs are set even if earlier steps failed
+      - name: Set job outputs
+        id: set_outputs
+        if: always()
+        shell: bash
+        run: |
+          # Use expanded expressions to capture values
+          echo "changed_files=${{ steps.stats.outputs.changed_files }}" >> "$GITHUB_OUTPUT"
+          echo "changed_lines=${{ steps.stats.outputs.changed_lines }}" >> "$GITHUB_OUTPUT"
+          echo "has_vulnerabilities=${{ steps.vulnerability-check.outputs.has_vulnerabilities }}" >> "$GITHUB_OUTPUT"
+          echo "build_outcome=${{ steps.dotnet_build.outcome }}" >> "$GITHUB_OUTPUT"
+          echo "restore_outcome=${{ steps.restore.outcome }}" >> "$GITHUB_OUTPUT"
+          echo "run_id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          echo "repository=${{ github.repository }}" >> "$GITHUB_OUTPUT"
+          echo "server_url=${{ github.server_url }}" >> "$GITHUB_OUTPUT"
+
+  publish-comment:
+    name: Publish sticky PR comment
+    needs: build
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download vulnerability report artifact (if present)
+        uses: actions/download-artifact@v4
+        with:
+          name: vulnerability-report
+          path: ./artifacts
+        continue-on-error: true
+
       - name: Generate sticky comment body (includes vulnerability report)
         if: always()
         shell: bash
         run: |
-          # Capture values via expanded GitHub expressions into shell variables.
-          # Doing it this way avoids timing/evaluation issues when using `env:` with step outcomes.
-          BUILD_OUTCOME="${{ steps.dotnet_build.outcome }}"
-          RESTORE_OUTCOME="${{ steps.restore.outcome }}"
-          VULN="${{ steps.vulnerability-check.outputs.has_vulnerabilities }}"
-          CHANGED_FILES="${{ steps.stats.outputs.changed_files }}"
-          CHANGED_LINES="${{ steps.stats.outputs.changed_lines }}"
-          RUN_ID="${{ github.run_id }}"
-          REPO="${{ github.repository }}"
-          SERVER_URL="${{ github.server_url }}"
+          BUILD_OUTCOME="${{ needs.build.outputs.build_outcome }}"
+          RESTORE_OUTCOME="${{ needs.build.outputs.restore_outcome }}"
+          VULN="${{ needs.build.outputs.has_vulnerabilities }}"
+          CHANGED_FILES="${{ needs.build.outputs.changed_files }}"
+          CHANGED_LINES="${{ needs.build.outputs.changed_lines }}"
+          RUN_ID="${{ needs.build.outputs.run_id }}"
+          REPO="${{ needs.build.outputs.repository }}"
+          SERVER_URL="${{ needs.build.outputs.server_url }}"
 
-          # Provide safe defaults
           CHANGED_FILES="${CHANGED_FILES:-0}"
           CHANGED_LINES="${CHANGED_LINES:-0}"
 
@@ -140,14 +182,11 @@ jobs:
             vuln_summary='✅ Inga sårbara NuGet-paket hittades'
           fi
 
-          # Prepare vulnerability report (truncate to avoid huge comments)
-          VULN_REPORT_FILE="vulnerability-report.txt"
+          VULN_REPORT_FILE="./artifacts/vulnerability-report.txt"
           VULN_CONTENT=""
           TRUNCATED_NOTICE=""
 
           if [ -f "${VULN_REPORT_FILE}" ]; then
-            # Strip any leading/trailing whitespace and detect size
-            # Keep at most 12000 characters to be safe for comment limits
             VULN_CONTENT=$(head -c 12000 "${VULN_REPORT_FILE}" || true)
             TOTAL_SIZE=$(wc -c < "${VULN_REPORT_FILE}" || echo 0)
             RETAINED_SIZE=$(printf "%s" "$VULN_CONTENT" | wc -c)
@@ -157,44 +196,44 @@ jobs:
           else
             VULN_CONTENT="Inga data (vulnerability-report.txt saknas)."
           fi
+
           {
-              echo "## 📊 Build Statistik"
+            echo "## 📊 Build Statistik"
+            echo
+            echo "${status_line}"
+            echo
+            echo "### Ändringar i denna PR:"
+            echo "- **Ändrade .cs filer:** ${CHANGED_FILES}"
+            echo "- **Ändrade rader:** ${CHANGED_LINES}"
+            echo
+            echo "${vuln_summary}"
+            echo
+
+            if [ "${VULN}" = "true" ] && [ -n "${VULN_CONTENT}" ]; then
+              echo "### Sårbara paket (utdrag)"
+              echo '```'
+              printf '%s\n' "${VULN_CONTENT}"
+              echo '```'
               echo
-              echo "${status_line}"
+              echo "${TRUNCATED_NOTICE}"
               echo
-              echo "### Ändringar i denna PR:"
-              echo "- **Ändrade .cs filer:** ${CHANGED_FILES}"
-              echo "- **Ändrade rader:** ${CHANGED_LINES}"
+            fi
+
+            if [ "${BUILD_OUTCOME}" != "success" ]; then
+              echo "**Steg som failade:** ${failedStep}"
               echo
-              echo "${vuln_summary}"
+              echo "**Detaljer:** ${errorDetails}"
               echo
-          
-              if [ "${VULN}" = "true" ]; then
-                echo "### Sårbara paket (utdrag)"
-                echo '```'
-                printf '%s\n' "${VULN_CONTENT}"
-                echo '```'
-                echo
-                echo "${TRUNCATED_NOTICE}"
-                echo
-              fi
-          
-              if [ "${BUILD_OUTCOME}" != "success" ]; then
-                echo "**Steg som failade:** ${failedStep}"
-                echo
-                echo "**Detaljer:** ${errorDetails}"
-                echo
-                echo "[Se fullständiga loggar här](${SERVER_URL}/${REPO}/actions/runs/${RUN_ID})"
-              fi
-            } > comment.md
+              echo "[Se fullständiga loggar här](${SERVER_URL}/${REPO}/actions/runs/${RUN_ID})"
+            fi
+          } > comment.md
 
       - name: Create or update sticky PR comment
         uses: marocchino/sticky-pull-request-comment@v2.9.0
-        if: github.event.workflow_run.event == 'pull_request'
         with:
           recreate: true
           path: comment.md
-          number: ${{ github.event.workflow_run.pull_requests[0].number }}
+          number: ${{ github.event.pull_request.number }}
 
   run-tests:
     needs: build
