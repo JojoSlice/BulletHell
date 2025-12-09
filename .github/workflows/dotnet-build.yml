@@ -157,43 +157,37 @@ jobs:
           else
             VULN_CONTENT="Inga data (vulnerability-report.txt saknas)."
           fi
-
-          cat > comment.md <<EOF
-## 📊 Build Statistik
-
-${status_line}
-
-### Ändringar i denna PR:
-- **Ändrade .cs filer:** ${CHANGED_FILES}
-- **Ändrade rader:** ${CHANGED_LINES}
-
-${vuln_summary}
-
-EOF
-
-          if [ "${VULN}" = "true" ]; then
-            cat >> comment.md <<EOF
-### Sårbara paket (utdrag)
-\`\`\`
-${VULN_CONTENT}
-\`\`\`
-
-${TRUNCATED_NOTICE}
-
-EOF
-          fi
-
-          # Only add failed-step section when the build/restore actually failed.
-          if [ "${BUILD_OUTCOME}" != "success" ] || [ "${RESTORE_OUTCOME}" != "success" ]; then
-            cat >> comment.md <<EOF
-**Steg som failade:** ${failedStep}
-
-**Detaljer:** ${errorDetails}
-
-[Se fullständiga loggar här](${SERVER_URL}/${REPO}/actions/runs/${RUN_ID})
-EOF
-          fi
-
+          {
+              echo "## 📊 Build Statistik"
+              echo
+              echo "${status_line}"
+              echo
+              echo "### Ändringar i denna PR:"
+              echo "- **Ändrade .cs filer:** ${CHANGED_FILES}"
+              echo "- **Ändrade rader:** ${CHANGED_LINES}"
+              echo
+              echo "${vuln_summary}"
+              echo
+          
+              if [ "${VULN}" = "true" ]; then
+                echo "### Sårbara paket (utdrag)"
+                echo '```'
+                printf '%s\n' "${VULN_CONTENT}"
+                echo '```'
+                echo
+                echo "${TRUNCATED_NOTICE}"
+                echo
+              fi
+          
+              if [ "${BUILD_OUTCOME}" != "success" ]; then
+                echo "**Steg som failade:** ${failedStep}"
+                echo
+                echo "**Detaljer:** ${errorDetails}"
+                echo
+                echo "[Se fullständiga loggar här](${SERVER_URL}/${REPO}/actions/runs/${RUN_ID})"
+              fi
+            } > comment.md
+            
       - name: Create or update sticky PR comment with build statistics and vulnerabilities
         if: always()
         uses: peter-evans/create-or-update-comment@v4
