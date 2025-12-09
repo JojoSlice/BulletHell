@@ -147,44 +147,44 @@ jobs:
             RETAINED_SIZE=$(printf "%s" "$VULN_CONTENT" | wc -c)
             if [ "${TOTAL_SIZE}" -gt "${RETAINED_SIZE}" ]; then
               TRUNCATED_NOTICE="_(Rapport förkortad — se artifact eller körningsloggar för hela innehållet)_"
-            fi
+          fi
           else
             VULN_CONTENT="Inga data (vulnerability-report.txt saknas)."
           fi
 
           cat > comment.md <<EOF
-## 📊 Build Statistik
+          ## 📊 Build Statistik
 
-${status_line}
+          ${status_line}
 
-### Ändringar i denna PR:
-- **Ändrade .cs filer:** ${CHANGED_FILES}
-- **Ändrade rader:** ${CHANGED_LINES}
+          ### Ändringar i denna PR:
+          - **Ändrade .cs filer:** ${CHANGED_FILES}
+          - **Ändrade rader:** ${CHANGED_LINES}
 
-${vuln_summary}
+          ${vuln_summary}
 
-EOF
+          EOF
 
           if [ "${VULN}" = "true" ]; then
             cat >> comment.md <<EOF
-### Sårbara paket (utdrag)
-\`\`\`
-${VULN_CONTENT}
-\`\`\`
+            ### Sårbara paket (utdrag)
+            \`\`\`
+            ${VULN_CONTENT}
+            \`\`\`
 
-${TRUNCATED_NOTICE}
+            ${TRUNCATED_NOTICE}
 
-EOF
+            EOF
           fi
 
           if [ "${BUILD_OUTCOME}" != "success" ]; then
             cat >> comment.md <<EOF
-**Steg som failade:** ${failedStep}
+            **Steg som failade:** ${failedStep}
 
-**Detaljer:** ${errorDetails}
+            **Detaljer:** ${errorDetails}
 
-[Se fullständiga loggar här](${SERVER_URL}/${REPO}/actions/runs/${RUN_ID})
-EOF
+            [Se fullständiga loggar här](${SERVER_URL}/${REPO}/actions/runs/${RUN_ID})
+            EOF
           fi
 
       - name: Create or update sticky PR comment with build statistics and vulnerabilities
