@@ -74,7 +74,7 @@ public class ExplosionTests
             spriteMock.Verify(s => s.Dispose(), Times.Once);
             actual = true;
         }
-        catch
+        catch (Exception)
         {
             actual = false;
         }
