@@ -231,6 +231,7 @@ jobs:
       - name: Create or update sticky PR comment
         uses: marocchino/sticky-pull-request-comment@v2.9.0
         with:
+          header: build
           recreate: true
           path: comment.md
           number: ${{ github.event.pull_request.number }}
