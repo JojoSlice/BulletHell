@@ -1,4 +1,3 @@
-using System;
 using BulletHell.Constants;
 using BulletHell.Graphics;
 using BulletHell.Helpers;
@@ -10,6 +9,7 @@ using BulletHell.UI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace BulletHell.Scenes;
 
@@ -47,7 +47,9 @@ public class BattleScene : Scene
     private ExplosionManager _explosionManager;
 
     public BattleScene(Game1 game)
-        : base(game) { }
+        : base(game)
+    {
+    }
 
     public override void OnEnter()
     {
@@ -118,6 +120,7 @@ public class BattleScene : Scene
         _rymdDashTexture3 = _game.Content.Load<Texture2D>("rymddash3");
         _rymdDashManager.LoadContent(_rymdDashTexture1, _rymdDashTexture2, _rymdDashTexture3);
 
+        _collisionManager = new CollisionManager(_player, _bulletManager, _enemyManager, _enemyBulletManager, _explosionManager);
         _camera = new Camera();
         _camera.SetWorldBounds((float)_screenWidth * 2, (float)_screenHeight * 2);
     }
