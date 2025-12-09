@@ -8,6 +8,7 @@ namespace BulletHell.Models
     public class Explosion : IDisposable
     {
         private readonly ISpriteHelper _sprite;
+        private readonly Vector2 _position;
         public bool IsAlive { get; private set; } = true;
 
         public Explosion(Vector2 position, ISpriteHelper sprite)
@@ -25,6 +26,7 @@ namespace BulletHell.Models
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            _sprite.Draw(spriteBatch, _position, 0f, 1f); // utan test
         }
 
         public void Dispose()
