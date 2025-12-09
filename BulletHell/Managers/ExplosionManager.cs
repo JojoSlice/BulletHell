@@ -24,7 +24,7 @@ public class ExplosionManager
         Explosions.RemoveAll(e => !e.IsAlive);
     }
 
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch) // utan test
+    public void Draw(SpriteBatch spriteBatch) // utan test
     {
         foreach (var exp in Explosions)
         {
