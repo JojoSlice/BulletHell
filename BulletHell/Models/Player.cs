@@ -32,6 +32,7 @@ public class Player : IDisposable, IHealth, ICollidable
     public bool IsAlive => Lives > 0;
     public int Health { get; private set; } = PlayerConfig.MaxHealth;
     public int Score { get; private set; }
+
     public void AddScore(int value)
     {
         Score += value;
@@ -198,14 +199,11 @@ public class Player : IDisposable, IHealth, ICollidable
         }
     }
 
-    /// <summary>
-    /// Draws the player to the screen
-    /// </summary>
     public void Draw(SpriteBatch spriteBatch)
     {
         ArgumentNullException.ThrowIfNull(spriteBatch);
 
-        _sprite.Draw(spriteBatch, Position, 0f, 1f);
+        _sprite.Draw(spriteBatch, Position, 0f, 0.8f);
     }
 
     protected virtual void Dispose(bool disposing)

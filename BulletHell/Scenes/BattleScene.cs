@@ -1,3 +1,4 @@
+using System;
 using BulletHell.Constants;
 using BulletHell.Graphics;
 using BulletHell.Helpers;
@@ -9,7 +10,6 @@ using BulletHell.UI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 
 namespace BulletHell.Scenes;
 
@@ -34,9 +34,7 @@ public class BattleScene : Scene
     private Texture2D? _lifeTexture;
 
     public BattleScene(Game1 game)
-        : base(game)
-    {
-    }
+        : base(game) { }
 
     public override void OnEnter()
     {
@@ -65,12 +63,9 @@ public class BattleScene : Scene
         _hud.LifeTexture = _lifeTexture;
 
         // Add initial enemy
-        _enemyManager.AddEnemy(new Enemy(
-            new Vector2(400, 0),
-            new SpriteHelper()
-        ));
+        _enemyManager.AddEnemy(new Enemy(new Vector2(400, 0), new SpriteHelper()));
 
-        _playerTexture = _game.Content.Load<Texture2D>("player");
+        _playerTexture = _game.Content.Load<Texture2D>("rymdskepp");
         _player.LoadContent(_playerTexture);
 
         _bulletTexture = _game.Content.Load<Texture2D>("bullet");
@@ -82,7 +77,12 @@ public class BattleScene : Scene
         _enemyBulletTexture = _game.Content.Load<Texture2D>("enemy_bullet");
         _enemyBulletManager.LoadContent(_enemyBulletTexture);
 
-        _collisionManager = new CollisionManager(_player, _bulletManager, _enemyManager, _enemyBulletManager);
+        _collisionManager = new CollisionManager(
+            _player,
+            _bulletManager,
+            _enemyManager,
+            _enemyBulletManager
+        );
         _camera = new Camera();
         _camera.SetWorldBounds((float)_screenWidth * 2, (float)_screenHeight * 2);
     }
@@ -100,7 +100,12 @@ public class BattleScene : Scene
             return;
         }
 
-        if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null)
+        if (
+            _player == null
+            || _bulletManager == null
+            || _enemyManager == null
+            || _enemyBulletManager == null
+        )
             return;
 
         _collisionManager?.CheckCollisions();
@@ -135,7 +140,12 @@ public class BattleScene : Scene
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null)
+        if (
+            _player == null
+            || _bulletManager == null
+            || _enemyManager == null
+            || _enemyBulletManager == null
+        )
             return;
 
         _player.Draw(spriteBatch);
@@ -143,6 +153,7 @@ public class BattleScene : Scene
         _enemyManager.Draw(spriteBatch);
         _enemyBulletManager.Draw(spriteBatch);
     }
+
     public override Matrix? GetCameraTransform()
     {
         return _camera?.Transform;
