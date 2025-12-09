@@ -19,7 +19,7 @@ namespace BulletHell.Models
 
         public void LoadContent(Texture2D texture)
         {
-            _sprite.LoadSpriteSheet(texture, frameWidth: 48, frameHeight: 48, animationSpeed: 0.05f);
+            _sprite.LoadSpriteSheet(texture, frameWidth: 32, frameHeight: 32, animationSpeed: 0.05f);
         }
 
         public void Update(GameTime gameTime)
