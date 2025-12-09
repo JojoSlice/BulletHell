@@ -18,6 +18,13 @@ public class MyDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    // Centraliserad metod så både OnConfiguring och startup använder samma sökväg
+    public static string GetDefaultDatabasePath()
+    {
+        var defaultPath = Path.Join(AppContext.BaseDirectory, "..", "..", "..", "..", "Repository", "Data", "database.sqlite");
+        return Path.GetFullPath(defaultPath);
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // Respect DI configuration; only configure a default if none provided.
@@ -25,8 +32,7 @@ public class MyDbContext : DbContext
             return;
 
         // Fallback: attempt to resolve the scaffolded database file relative to the app base
-        var defaultPath = Path.Join(AppContext.BaseDirectory, "..", "..", "..", "..", "Repository", "Data", "database.sqlite");
-        defaultPath = Path.GetFullPath(defaultPath);
+        var defaultPath = GetDefaultDatabasePath();
         optionsBuilder.UseSqlite($"Data Source={defaultPath}");
     }
 
