@@ -187,15 +187,14 @@ jobs:
                 echo "[Se fullständiga loggar här](${SERVER_URL}/${REPO}/actions/runs/${RUN_ID})"
               fi
             } > comment.md
-            
-      - name: Create or update sticky PR comment with build statistics and vulnerabilities
+
+      - name: Create or update sticky PR comment
+        uses: marocchino/sticky-pull-request-comment@v2.9.0
         if: always()
-        uses: peter-evans/create-or-update-comment@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body-file: comment.md
-          identifier: build-statistics
+          recreate: true
+          path: comment.md
+          number: ${{ github.event.workflow_run.pull_requests[0].number }}
 
   run-tests:
     needs: build
