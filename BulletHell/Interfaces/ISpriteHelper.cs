@@ -44,4 +44,6 @@ public interface ISpriteHelper : IDisposable
     /// Draws the current sprite frame
     /// </summary>
     void Draw(SpriteBatch spriteBatch, Vector2 position, float rotation = 0f, float scale = 1f);
+
+    bool IsAnimationFinished { get; }
 }

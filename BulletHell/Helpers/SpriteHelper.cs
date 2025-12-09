@@ -131,4 +131,7 @@ public class SpriteHelper : ISpriteHelper, IDisposable
         Dispose(true);
         GC.SuppressFinalize(this);
     }
+
+    public bool IsAnimationFinished =>
+        _frames != null && _currentFrame >= _frames.Length - 1;
 }
