@@ -1,3 +1,4 @@
+using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using BulletHell.Models;
 using Microsoft.Xna.Framework;
@@ -14,12 +15,17 @@ public static class TestDataBuilders
     public static Player CreateTestPlayer(
         Vector2? position = null,
         IInputProvider? input = null,
-        ISpriteHelper? sprite = null)
+        ISpriteHelper? sprite = null,
+        TurnAnimationController? turnController = null)
     {
+        var mockSprite = sprite ?? Substitute.For<ISpriteHelper>();
+        var controller = turnController ?? new TurnAnimationController(mockSprite);
+
         return new Player(
             position ?? Vector2.Zero,
             input ?? Substitute.For<IInputProvider>(),
-            sprite ?? Substitute.For<ISpriteHelper>()
+            mockSprite,
+            controller
         );
     }
 

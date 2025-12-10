@@ -11,6 +11,19 @@ namespace BulletHell.Helpers;
 /// </summary>
 public class SpriteHelper : ISpriteHelper, IDisposable
 {
+    private enum AnimationMode
+    {
+        Looping,
+        SequenceWithExit,
+    }
+
+    private enum AnimationPhase
+    {
+        Intro,
+        Loop,
+        Exit,
+    }
+
     private Texture2D? _texture;
     private Rectangle[]? _frames;
     private int _currentFrame;
@@ -19,6 +32,13 @@ public class SpriteHelper : ISpriteHelper, IDisposable
     private int _frameWidth;
     private int _frameHeight;
     private bool _disposed;
+
+    // Animation state fields
+    private AnimationMode _mode = AnimationMode.Looping;
+    private AnimationPhase _phase = AnimationPhase.Intro;
+    private int _introEnd = -1;
+    private int _loopStart = -1;
+    private int _loopEnd = -1;
 
     public int Width => _frameWidth;
     public int Height => _frameHeight;
@@ -63,6 +83,78 @@ public class SpriteHelper : ISpriteHelper, IDisposable
         }
     }
 
+    public void SetTexture(Texture2D texture)
+    {
+        if (texture == null)
+            return;
+
+        _texture = texture;
+
+        int columns = texture.Width / _frameWidth;
+        int rows = texture.Height / _frameHeight;
+        int totalFrames = columns * rows;
+
+        _frames = new Rectangle[totalFrames];
+        int frameIndex = 0;
+
+        for (int row = 0; row < rows; row++)
+        {
+            for (int col = 0; col < columns; col++)
+            {
+                _frames[frameIndex] = new Rectangle(
+                    col * _frameWidth,
+                    row * _frameHeight,
+                    _frameWidth,
+                    _frameHeight
+                );
+                frameIndex++;
+            }
+        }
+    }
+
+    public void SetSequenceAnimation(int introEnd, int loopStart, int loopEnd)
+    {
+        _mode = AnimationMode.SequenceWithExit;
+        _phase = AnimationPhase.Intro;
+        _introEnd = introEnd;
+        _loopStart = loopStart;
+        _loopEnd = loopEnd;
+    }
+
+    public void ResetToLooping()
+    {
+        _mode = AnimationMode.Looping;
+        _phase = AnimationPhase.Intro;
+        _introEnd = -1;
+        _loopStart = -1;
+        _loopEnd = -1;
+    }
+
+    public void ResetAnimation()
+    {
+        _currentFrame = 0;
+        _timeElapsed = 0f;
+        if (_mode == AnimationMode.SequenceWithExit)
+        {
+            _phase = AnimationPhase.Intro;
+        }
+    }
+
+    public void StartExitSequence()
+    {
+        if (_mode == AnimationMode.SequenceWithExit)
+        {
+            _phase = AnimationPhase.Exit;
+            _currentFrame = _introEnd;
+            _timeElapsed = 0f;
+        }
+    }
+
+    public bool IsExitComplete()
+    {
+        return _mode == AnimationMode.SequenceWithExit && _phase == AnimationPhase.Exit && _currentFrame == 0;
+    }
+
     public void Update(GameTime gameTime)
     {
         if (_frames == null || _frames.Length == 0)
@@ -73,7 +165,50 @@ public class SpriteHelper : ISpriteHelper, IDisposable
         if (_timeElapsed >= _frameTime)
         {
             _timeElapsed = 0f;
-            _currentFrame = (_currentFrame + 1) % _frames.Length;
+
+            switch (_mode)
+            {
+                case AnimationMode.Looping:
+                    _currentFrame = (_currentFrame + 1) % _frames.Length;
+                    break;
+
+                case AnimationMode.SequenceWithExit:
+                    UpdateSequenceAnimation();
+                    break;
+            }
+        }
+    }
+
+    private void UpdateSequenceAnimation()
+    {
+        switch (_phase)
+        {
+            case AnimationPhase.Intro:
+                if (_currentFrame < _introEnd)
+                {
+                    _currentFrame++;
+                }
+                else
+                {
+                    _phase = AnimationPhase.Loop;
+                    _currentFrame = _loopStart;
+                }
+                break;
+
+            case AnimationPhase.Loop:
+                _currentFrame++;
+                if (_currentFrame > _loopEnd)
+                {
+                    _currentFrame = _loopStart;
+                }
+                break;
+
+            case AnimationPhase.Exit:
+                if (_currentFrame > 0)
+                {
+                    _currentFrame--;
+                }
+                break;
         }
     }
 
@@ -131,4 +266,7 @@ public class SpriteHelper : ISpriteHelper, IDisposable
         Dispose(true);
         GC.SuppressFinalize(this);
     }
+
+    public bool IsAnimationFinished =>
+        _frames != null && _currentFrame >= _frames.Length - 1;
 }

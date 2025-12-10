@@ -44,4 +44,36 @@ public interface ISpriteHelper : IDisposable
     /// Draws the current sprite frame
     /// </summary>
     void Draw(SpriteBatch spriteBatch, Vector2 position, float rotation = 0f, float scale = 1f);
+
+    /// <summary>
+    /// Sets a new texture for the sprite
+    /// </summary>
+    void SetTexture(Texture2D texture);
+
+    /// <summary>
+    /// Configures a sequence animation with intro, loop, and exit phases
+    /// </summary>
+    void SetSequenceAnimation(int introEnd, int loopStart, int loopEnd);
+
+    /// <summary>
+    /// Starts the exit sequence (plays frames in reverse)
+    /// </summary>
+    void StartExitSequence();
+
+    /// <summary>
+    /// Checks if the exit sequence has completed
+    /// </summary>
+    bool IsExitComplete();
+
+    /// <summary>
+    /// Resets to default looping behavior
+    /// </summary>
+    void ResetToLooping();
+
+    /// <summary>
+    /// Resets animation to frame 0
+    /// </summary>
+    void ResetAnimation();
+
+    bool IsAnimationFinished { get; }
 }

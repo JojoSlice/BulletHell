@@ -44,6 +44,8 @@ public class BattleScene : Scene
     private Texture2D? _rymdDashTexture2;
     private Texture2D? _rymdDashTexture3;
     private float _rymdDashSpawnTimer = 0f;
+    private ExplosionManager? _explosionManager;
+    private Texture2D? _explosionTexture;
 
     public BattleScene(Game1 game)
         : base(game)
@@ -62,12 +64,14 @@ public class BattleScene : Scene
         Vector2 startPosition = new((float)_screenWidth / 2, (float)_screenHeight / 2);
         IInputProvider input = new KeyboardInputProvider();
         ISpriteHelper sprite = new SpriteHelper();
-        _player = new Player(startPosition, input, sprite);
+        var turnAnimationController = new TurnAnimationController(sprite);
+        _player = new Player(startPosition, input, sprite, turnAnimationController);
         _player.SetScreenBounds(_screenWidth, _screenHeight);
 
         _bulletManager = new BulletManager<Player>();
         _enemyBulletManager = new BulletManager<Enemy>();
         _enemyManager = new EnemyManager(_enemyBulletManager);
+        _explosionManager = new ExplosionManager();
         _dashManager = new DashManager();
         _rymdDashManager = new RymdDashManager();
 
@@ -78,19 +82,20 @@ public class BattleScene : Scene
         _lifeTexture = _game.Content.Load<Texture2D>("player_Life");
         _hud.LifeTexture = _lifeTexture;
 
+        _enemyManager.AddEnemy(new Enemy(new Vector2(400, 0), new SpriteHelper()));
+
         _backgroundTexture = _game.Content.Load<Texture2D>("rymdbg");
         _backgroundTexture2 = _game.Content.Load<Texture2D>("rymdbg2");
         _backgroundTexture3 = _game.Content.Load<Texture2D>("rymdbg3");
         _backgroundTexture4 = _game.Content.Load<Texture2D>("rymdbg4");
 
         // Add initial enemy
-        _enemyManager.AddEnemy(new Enemy(
-            new Vector2(400, 0),
-            new SpriteHelper()
-        ));
+        _enemyManager.AddEnemy(new Enemy(new Vector2(400, 0), new SpriteHelper()));
 
-        _playerTexture = _game.Content.Load<Texture2D>("player");
-        _player.LoadContent(_playerTexture);
+        _playerTexture = _game.Content.Load<Texture2D>("rymdskepp");
+        var turnLeftTexture = _game.Content.Load<Texture2D>("rymdskeppturnleft");
+        var turnRightTexture = _game.Content.Load<Texture2D>("rymdskeppturnright");
+        _player.LoadContent(_playerTexture, turnLeftTexture, turnRightTexture);
 
         _bulletTexture = _game.Content.Load<Texture2D>("bullet");
         _bulletManager.LoadContent(_bulletTexture);
@@ -101,6 +106,17 @@ public class BattleScene : Scene
         _enemyBulletTexture = _game.Content.Load<Texture2D>("enemy_bullet");
         _enemyBulletManager.LoadContent(_enemyBulletTexture);
 
+        _explosionTexture = _game.Content.Load<Texture2D>("enemy_explosion");
+        _explosionManager.LoadContent(_explosionTexture);
+
+        _collisionManager = new CollisionManager(
+            _player,
+            _bulletManager,
+            _enemyManager,
+            _enemyBulletManager,
+            _explosionManager
+        );
+
         _dashTexture = _game.Content.Load<Texture2D>("dash");
         _dashManager.LoadContent(_dashTexture);
 
@@ -109,7 +125,7 @@ public class BattleScene : Scene
         _rymdDashTexture3 = _game.Content.Load<Texture2D>("rymddash3");
         _rymdDashManager.LoadContent(_rymdDashTexture1, _rymdDashTexture2, _rymdDashTexture3);
 
-        _collisionManager = new CollisionManager(_player, _bulletManager, _enemyManager, _enemyBulletManager);
+        _collisionManager = new CollisionManager(_player, _bulletManager, _enemyManager, _enemyBulletManager, _explosionManager);
         _camera = new Camera();
         _camera.SetWorldBounds((float)_screenWidth * 2, (float)_screenHeight * 2);
     }
@@ -127,7 +143,12 @@ public class BattleScene : Scene
             return;
         }
 
-        if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null)
+        if (
+            _player == null
+            || _bulletManager == null
+            || _enemyManager == null
+            || _enemyBulletManager == null
+        )
             return;
 
         // Spawn dash effects periodically
@@ -161,6 +182,7 @@ public class BattleScene : Scene
         _bulletManager.Update(gameTime, _screenWidth, _screenHeight);
         _enemyManager.Update(gameTime, _screenWidth, _screenHeight);
         _enemyBulletManager.Update(gameTime, _screenWidth, _screenHeight);
+        _explosionManager?.Update(gameTime);
 
         if (_hud != null)
         {
@@ -180,7 +202,12 @@ public class BattleScene : Scene
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        if (_player == null || _bulletManager == null || _enemyManager == null || _enemyBulletManager == null)
+        if (
+            _player == null
+            || _bulletManager == null
+            || _enemyManager == null
+            || _enemyBulletManager == null
+        )
             return;
 
         // Draw multi-layer parallax backgrounds (back to front)
@@ -205,9 +232,9 @@ public class BattleScene : Scene
             }
 
             // Draw layers from back to front with very slow speeds
-            DrawParallaxLayer(_backgroundTexture, 0.1f);   // Furthest, slowest
+            DrawParallaxLayer(_backgroundTexture, 0.1f); // Furthest, slowest
             DrawParallaxLayer(_backgroundTexture2, 0.15f); // Mid-back
-            DrawParallaxLayer(_backgroundTexture3, 0.2f);  // Mid-front
+            DrawParallaxLayer(_backgroundTexture3, 0.2f); // Mid-front
             DrawParallaxLayer(_backgroundTexture4, 0.25f); // Closest, fastest
         }
 
@@ -217,6 +244,7 @@ public class BattleScene : Scene
         _bulletManager.Draw(spriteBatch);
         _enemyManager.Draw(spriteBatch);
         _enemyBulletManager.Draw(spriteBatch);
+        _explosionManager?.Draw(spriteBatch);
     }
 
     public override Matrix? GetCameraTransform()
