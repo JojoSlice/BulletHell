@@ -118,7 +118,6 @@ public class DIIntegrationTests
         // Act
         using var scope = provider.CreateScope();
         var manager = scope.ServiceProvider.GetRequiredService<BulletManager<Player>>();
-        var config = scope.ServiceProvider.GetRequiredService<GameConfiguration>();
 
         // Assert
         Assert.NotNull(manager);
