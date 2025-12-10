@@ -11,8 +11,8 @@ namespace BulletHell.Configurations;
 public class JsonConfigurationProvider : IConfigurationProvider
 {
     private readonly string _configPath;
-    private GameConfiguration? _cachedConfig;
     private readonly JsonSerializerOptions _jsonOptions;
+    private GameConfiguration? _cachedConfig;
 
     /// <summary>
     /// Creates a new JSON configuration provider.
@@ -25,7 +25,7 @@ public class JsonConfigurationProvider : IConfigurationProvider
         {
             PropertyNameCaseInsensitive = true,
             ReadCommentHandling = JsonCommentHandling.Skip,
-            AllowTrailingCommas = true
+            AllowTrailingCommas = true,
         };
     }
 

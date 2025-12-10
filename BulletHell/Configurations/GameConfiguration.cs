@@ -1,3 +1,5 @@
+#pragma warning disable SA1402 // File may only contain a single type - Configuration classes are logically grouped
+
 namespace BulletHell.Configurations;
 
 /// <summary>

@@ -33,7 +33,7 @@ public static class GameServiceCollectionExtensions
         services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
         services.AddSingleton<HttpClient>(sp => new HttpClient
         {
-            BaseAddress = new Uri("http://localhost:5111")
+            BaseAddress = new Uri("http://localhost:5111"),
         });
         services.AddSingleton<IApiClient, ApiClient>();
 
