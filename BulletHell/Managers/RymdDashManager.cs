@@ -1,3 +1,4 @@
+using BulletHell.Configurations;
 using BulletHell.Models;
 using BulletHell.Utilities;
 using Microsoft.Xna.Framework;
@@ -12,12 +13,16 @@ public class RymdDashManager : IDisposable
     private readonly List<RymdDash> _activeDashes = new();
     private readonly ObjectPool<RymdDash>[] _dashPools = new ObjectPool<RymdDash>[3];
     private readonly Random _rand = new();
-    private readonly float[] _speeds = { 200f, 300f, 400f };
+    private readonly float[] _speeds;
     private readonly Texture2D?[] _textures = new Texture2D?[3];
     private bool _disposed;
 
-    public RymdDashManager()
+    public RymdDashManager(PoolConfiguration.PoolSizeConfig? poolConfig = null, EffectsConfiguration? effectsConfig = null)
     {
+        var pool = poolConfig ?? new PoolConfiguration.PoolSizeConfig { InitialSize = 5, MaxSize = 5 };
+        var effects = effectsConfig ?? new EffectsConfiguration();
+        _speeds = effects.RymdDashSpeeds;
+
         // Create 3 pools, one for each rymddash type
         for (int i = 0; i < 3; i++)
         {
@@ -25,8 +30,8 @@ public class RymdDashManager : IDisposable
             _dashPools[i] = new ObjectPool<RymdDash>(
                 () => new RymdDash(Vector2.Zero, _speeds[typeIndex]),
                 resetAction: null,
-                initialSize: 5,
-                maxSize: 5
+                initialSize: pool.InitialSize,
+                maxSize: pool.MaxSize
             );
         }
     }
