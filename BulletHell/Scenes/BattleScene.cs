@@ -44,7 +44,7 @@ public class BattleScene : Scene
     private Texture2D? _rymdDashTexture2;
     private Texture2D? _rymdDashTexture3;
     private float _rymdDashSpawnTimer = 0f;
-    private ExplosionManager _explosionManager;
+    private ExplosionManager? _explosionManager;
     private Texture2D? _explosionTexture;
 
     public BattleScene(Game1 game)
@@ -182,8 +182,7 @@ public class BattleScene : Scene
         _bulletManager.Update(gameTime, _screenWidth, _screenHeight);
         _enemyManager.Update(gameTime, _screenWidth, _screenHeight);
         _enemyBulletManager.Update(gameTime, _screenWidth, _screenHeight);
-        _explosionManager.Update(gameTime);
-
+        _explosionManager?.Update(gameTime);
 
         if (_hud != null)
         {
@@ -245,7 +244,7 @@ public class BattleScene : Scene
         _bulletManager.Draw(spriteBatch);
         _enemyManager.Draw(spriteBatch);
         _enemyBulletManager.Draw(spriteBatch);
-        _explosionManager.Draw(spriteBatch);
+        _explosionManager?.Draw(spriteBatch);
     }
 
     public override Matrix? GetCameraTransform()

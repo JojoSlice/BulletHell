@@ -11,7 +11,7 @@ public class ExplosionManager
 
     public IReadOnlyList<Explosion> Explosions => _explosions; // för tests skull
 
-    private Texture2D _explosionTexture;
+    private Texture2D _explosionTexture = null!;
 
     public void LoadContent(Texture2D texture)
     {
