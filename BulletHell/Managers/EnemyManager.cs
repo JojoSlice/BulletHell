@@ -1,3 +1,4 @@
+using BulletHell.Configurations;
 using BulletHell.Factories;
 using BulletHell.Helpers;
 using BulletHell.Interfaces;
@@ -15,21 +16,30 @@ public class EnemyManager : IEnemyManager
 {
     private readonly BulletManager<Enemy> _enemyBulletManager;
     private readonly ISpriteHelperFactory _spriteHelperFactory;
+    private readonly SpawnConfiguration _spawnConfig;
     private readonly List<Enemy> _enemies = new();
     private readonly ObjectPool<Enemy> _enemyPool;
     private readonly Random _rand = new();
     private Texture2D? _enemyTexture;
 
-    public EnemyManager(BulletManager<Enemy> bulletManager, ISpriteHelperFactory spriteHelperFactory)
+    public EnemyManager(
+        BulletManager<Enemy> bulletManager,
+        ISpriteHelperFactory spriteHelperFactory,
+        PoolConfiguration.PoolSizeConfig? poolConfig = null,
+        SpawnConfiguration? spawnConfig = null)
     {
         _enemyBulletManager = bulletManager ?? throw new ArgumentNullException(nameof(bulletManager));
         _spriteHelperFactory = spriteHelperFactory ?? throw new ArgumentNullException(nameof(spriteHelperFactory));
 
+        // Use provided config or defaults
+        var pool = poolConfig ?? new PoolConfiguration.PoolSizeConfig { InitialSize = 10, MaxSize = 15 };
+        _spawnConfig = spawnConfig ?? new SpawnConfiguration();
+
         _enemyPool = new ObjectPool<Enemy>(
             CreateEnemyFactory(),
             resetAction: null, // Enemies are reset manually via Reset() method
-            initialSize: 10, // Pre-allocate 10 enemies
-            maxSize: 15 // Max 15 enemies in pool
+            initialSize: pool.InitialSize,
+            maxSize: pool.MaxSize
         );
     }
 
@@ -76,8 +86,8 @@ public class EnemyManager : IEnemyManager
     {
         if (_enemies.Count < 1)
         {
-            int spawnX = _rand.Next(50, screenWidth - 50);
-            var spawnPos = new Vector2(spawnX, -50);
+            int spawnX = _rand.Next(_spawnConfig.EnemySpawnMargin, screenWidth - _spawnConfig.EnemySpawnMargin);
+            var spawnPos = new Vector2(spawnX, _spawnConfig.EnemySpawnOffsetY);
 
             var enemy = _enemyPool.Get();
             enemy.Reset(spawnPos);

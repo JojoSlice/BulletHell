@@ -1,0 +1,78 @@
+{
+  "player": {
+    "speed": 300.0,
+    "spriteWidth": 128,
+    "spriteHeight": 128,
+    "animationSpeed": 0.1,
+    "maxHealth": 100,
+    "lives": 3,
+    "turnAnimationIntroEnd": 2,
+    "turnAnimationLoopStart": 3,
+    "turnAnimationLoopEnd": 7,
+    "turnDetectionThreshold": 0.1
+  },
+  "enemy": {
+    "speed": 50.0,
+    "spriteWidth": 32,
+    "spriteHeight": 32,
+    "animationSpeed": 0.0,
+    "maxHealth": 20,
+    "scoreValue": 1
+  },
+  "bullets": {
+    "player": {
+      "speed": 600.0,
+      "spriteWidth": 8,
+      "spriteHeight": 8,
+      "animationSpeed": 0.05,
+      "lifetime": 3.0,
+      "fireCooldown": 0.2,
+      "damage": 10
+    },
+    "enemy": {
+      "speed": 100.0,
+      "spriteWidth": 8,
+      "spriteHeight": 8,
+      "animationSpeed": 0.05,
+      "fireCooldown": 1.5,
+      "damage": 10
+    }
+  },
+  "pools": {
+    "playerBullets": {
+      "initialSize": 50,
+      "maxSize": 200
+    },
+    "enemyBullets": {
+      "initialSize": 50,
+      "maxSize": 200
+    },
+    "enemies": {
+      "initialSize": 10,
+      "maxSize": 15
+    },
+    "dashes": {
+      "initialSize": 10,
+      "maxSize": 10
+    },
+    "rymdDashes": {
+      "initialSize": 5,
+      "maxSize": 5
+    }
+  },
+  "collision": {
+    "distanceCheckThreshold": 10.0,
+    "knockbackForce": 300.0,
+    "knockbackDuration": 0.18
+  },
+  "spawn": {
+    "enemySpawnMargin": 50,
+    "enemySpawnOffsetY": -50,
+    "dashSpawnOffsetY": -30
+  },
+  "effects": {
+    "dashSpawnInterval": 0.2,
+    "rymdDashSpawnInterval": 0.7,
+    "rymdDashSpeeds": [200.0, 300.0, 400.0]
+  }
+}
