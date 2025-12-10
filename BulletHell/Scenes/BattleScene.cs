@@ -1,4 +1,5 @@
 using BulletHell.Constants;
+using BulletHell.Factories;
 using BulletHell.Graphics;
 using BulletHell.Helpers;
 using BulletHell.Inputs;
@@ -61,16 +62,19 @@ public class BattleScene : Scene
         _screenWidth = _game.GraphicsDevice.Viewport.Width;
         _screenHeight = _game.GraphicsDevice.Viewport.Height;
 
+        // Create factory for sprite helpers
+        ISpriteHelperFactory spriteHelperFactory = new SpriteHelperFactory();
+
         Vector2 startPosition = new((float)_screenWidth / 2, (float)_screenHeight / 2);
         IInputProvider input = new KeyboardInputProvider();
-        ISpriteHelper sprite = new SpriteHelper();
+        ISpriteHelper sprite = spriteHelperFactory.Create();
         var turnAnimationController = new TurnAnimationController(sprite);
         _player = new Player(startPosition, input, sprite, turnAnimationController);
         _player.SetScreenBounds(_screenWidth, _screenHeight);
 
-        _bulletManager = new BulletManager<Player>();
-        _enemyBulletManager = new BulletManager<Enemy>();
-        _enemyManager = new EnemyManager(_enemyBulletManager);
+        _bulletManager = new BulletManager<Player>(spriteHelperFactory);
+        _enemyBulletManager = new BulletManager<Enemy>(spriteHelperFactory);
+        _enemyManager = new EnemyManager(_enemyBulletManager, spriteHelperFactory);
         _explosionManager = new ExplosionManager();
         _dashManager = new DashManager();
         _rymdDashManager = new RymdDashManager();
@@ -82,7 +86,7 @@ public class BattleScene : Scene
         _lifeTexture = _game.Content.Load<Texture2D>("player_Life");
         _hud.LifeTexture = _lifeTexture;
 
-        _enemyManager.AddEnemy(new Enemy(new Vector2(400, 0), new SpriteHelper()));
+        _enemyManager.AddEnemy(new Enemy(new Vector2(400, 0), spriteHelperFactory.Create()));
 
         _backgroundTexture = _game.Content.Load<Texture2D>("rymdbg");
         _backgroundTexture2 = _game.Content.Load<Texture2D>("rymdbg2");
@@ -90,7 +94,7 @@ public class BattleScene : Scene
         _backgroundTexture4 = _game.Content.Load<Texture2D>("rymdbg4");
 
         // Add initial enemy
-        _enemyManager.AddEnemy(new Enemy(new Vector2(400, 0), new SpriteHelper()));
+        _enemyManager.AddEnemy(new Enemy(new Vector2(400, 0), spriteHelperFactory.Create()));
 
         _playerTexture = _game.Content.Load<Texture2D>("rymdskepp");
         var turnLeftTexture = _game.Content.Load<Texture2D>("rymdskeppturnleft");
@@ -114,7 +118,8 @@ public class BattleScene : Scene
             _bulletManager,
             _enemyManager,
             _enemyBulletManager,
-            _explosionManager
+            _explosionManager,
+            spriteHelperFactory
         );
 
         _dashTexture = _game.Content.Load<Texture2D>("dash");
@@ -124,8 +129,6 @@ public class BattleScene : Scene
         _rymdDashTexture2 = _game.Content.Load<Texture2D>("rymddash2");
         _rymdDashTexture3 = _game.Content.Load<Texture2D>("rymddash3");
         _rymdDashManager.LoadContent(_rymdDashTexture1, _rymdDashTexture2, _rymdDashTexture3);
-
-        _collisionManager = new CollisionManager(_player, _bulletManager, _enemyManager, _enemyBulletManager, _explosionManager);
         _camera = new Camera();
         _camera.SetWorldBounds((float)_screenWidth * 2, (float)_screenHeight * 2);
     }

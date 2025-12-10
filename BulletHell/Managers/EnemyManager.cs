@@ -1,3 +1,4 @@
+using BulletHell.Factories;
 using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using BulletHell.Models;
@@ -13,14 +14,17 @@ namespace BulletHell.Managers;
 public class EnemyManager : IEnemyManager
 {
     private readonly BulletManager<Enemy> _enemyBulletManager;
+    private readonly ISpriteHelperFactory _spriteHelperFactory;
     private readonly List<Enemy> _enemies = new();
     private readonly ObjectPool<Enemy> _enemyPool;
     private readonly Random _rand = new();
     private Texture2D? _enemyTexture;
 
-    public EnemyManager(BulletManager<Enemy> bulletManager)
+    public EnemyManager(BulletManager<Enemy> bulletManager, ISpriteHelperFactory spriteHelperFactory)
     {
-        _enemyBulletManager = bulletManager;
+        _enemyBulletManager = bulletManager ?? throw new ArgumentNullException(nameof(bulletManager));
+        _spriteHelperFactory = spriteHelperFactory ?? throw new ArgumentNullException(nameof(spriteHelperFactory));
+
         _enemyPool = new ObjectPool<Enemy>(
             CreateEnemyFactory(),
             resetAction: null, // Enemies are reset manually via Reset() method
@@ -33,7 +37,7 @@ public class EnemyManager : IEnemyManager
     {
         return () =>
         {
-            ISpriteHelper sprite = new SpriteHelper();
+            ISpriteHelper sprite = _spriteHelperFactory.Create();
             return new Enemy(Vector2.Zero, sprite);
         };
     }

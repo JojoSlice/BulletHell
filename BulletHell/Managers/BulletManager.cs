@@ -1,3 +1,4 @@
+using BulletHell.Factories;
 using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using BulletHell.Models;
@@ -14,13 +15,16 @@ public class BulletManager<T> : IBulletManager, IDisposable
 {
     private readonly List<Bullet<T>> _activeBullets = new();
     private readonly ObjectPool<Bullet<T>> _bulletPool;
+    private readonly ISpriteHelperFactory _spriteHelperFactory;
     private Texture2D? _bulletTexture;
     private bool _disposed;
 
     public IReadOnlyList<Bullet<T>> Bullets => _activeBullets;
 
-    public BulletManager()
+    public BulletManager(ISpriteHelperFactory spriteHelperFactory)
     {
+        _spriteHelperFactory = spriteHelperFactory ?? throw new ArgumentNullException(nameof(spriteHelperFactory));
+
         _bulletPool = new ObjectPool<Bullet<T>>(
             CreateDefaultFactory(),
             resetAction: null, // Bullets are reset manually via Reset() method
@@ -33,7 +37,7 @@ public class BulletManager<T> : IBulletManager, IDisposable
     {
         return () =>
         {
-            ISpriteHelper sprite = new SpriteHelper();
+            ISpriteHelper sprite = _spriteHelperFactory.Create();
             return new Bullet<T>(Vector2.Zero, Vector2.Zero, sprite);
         };
     }

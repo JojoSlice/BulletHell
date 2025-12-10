@@ -1,4 +1,5 @@
 using BulletHell.Configurations;
+using BulletHell.Factories;
 using BulletHell.Interfaces;
 using BulletHell.Managers;
 using BulletHell.Models;
@@ -10,10 +11,13 @@ namespace BulletHell.test.Managers;
 public class EnemyManagerTest
 {
     private readonly ITestOutputHelper _output;
+    private readonly ISpriteHelperFactory _mockFactory;
 
     public EnemyManagerTest(ITestOutputHelper output)
     {
         _output = output;
+        _mockFactory = Substitute.For<ISpriteHelperFactory>();
+        _mockFactory.Create().Returns(Substitute.For<ISpriteHelper>());
     }
 
     [Theory]
@@ -26,8 +30,8 @@ public class EnemyManagerTest
         var sprite = Substitute.For<ISpriteHelper>();
         var enemy = new Enemy(new Vector2(x, y), sprite);
 
-        using var bulletManager = new BulletManager<Enemy>();
-        var manager = new EnemyManager(bulletManager);
+        using var bulletManager = new BulletManager<Enemy>(_mockFactory);
+        var manager = new EnemyManager(bulletManager, _mockFactory);
 
         manager.AddEnemy(enemy);
 
@@ -61,8 +65,8 @@ public class EnemyManagerTest
         var sprite = Substitute.For<ISpriteHelper>();
         var enemy = new Enemy(new Vector2(x, y), sprite);
 
-        using var bulletManager = new BulletManager<Enemy>();
-        var manager = new EnemyManager(bulletManager);
+        using var bulletManager = new BulletManager<Enemy>(_mockFactory);
+        var manager = new EnemyManager(bulletManager, _mockFactory);
 
         manager.AddEnemy(enemy);
 
@@ -94,8 +98,8 @@ public class EnemyManagerTest
 
         var startPosition = enemy.Position; // endast för output
 
-        using var bulletManager = new BulletManager<Enemy>();
-        var manager = new EnemyManager(bulletManager);
+        using var bulletManager = new BulletManager<Enemy>(_mockFactory);
+        var manager = new EnemyManager(bulletManager, _mockFactory);
 
         manager.AddEnemy(enemy);
 
@@ -124,8 +128,8 @@ public class EnemyManagerTest
     public void EnemyManager_TryShootEnemies_ShouldCreateBulletsViaBulletManager()
     {
         // Arrange
-        using var bulletManager = new BulletManager<Enemy>();
-        var manager = new EnemyManager(bulletManager);
+        using var bulletManager = new BulletManager<Enemy>(_mockFactory);
+        var manager = new EnemyManager(bulletManager, _mockFactory);
 
         var sprite = Substitute.For<ISpriteHelper>();
         var enemy = new Enemy(new Vector2(100, 100), sprite);

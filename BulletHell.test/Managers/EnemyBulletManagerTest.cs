@@ -1,16 +1,28 @@
+using BulletHell.Factories;
+using BulletHell.Interfaces;
 using BulletHell.Managers;
 using BulletHell.Models;
 using Microsoft.Xna.Framework;
+using NSubstitute;
 
 namespace BulletHell.test.Managers;
 
 public class EnemyBulletManagerTest(ITestOutputHelper output)
 {
+    private readonly ISpriteHelperFactory _mockFactory = CreateMockFactory();
+
+    private static ISpriteHelperFactory CreateMockFactory()
+    {
+        var factory = Substitute.For<ISpriteHelperFactory>();
+        factory.Create().Returns(Substitute.For<ISpriteHelper>());
+        return factory;
+    }
+
     [Fact]
     public void EnemyBulletManager_ShouldCreateBulletAndAddToList()
     {
         // Arrange
-        using var bulletManager = new BulletManager<Enemy>();
+        using var bulletManager = new BulletManager<Enemy>(_mockFactory);
         var startPosition = new Vector2(10, 10);
         var velocity = new Vector2(10, 10);
 
@@ -35,7 +47,7 @@ public class EnemyBulletManagerTest(ITestOutputHelper output)
         (int x, int y)
     {
         // Arrange
-        using var manager = new BulletManager<Enemy>();
+        using var manager = new BulletManager<Enemy>(_mockFactory);
         var startPosition = new Vector2(x, y);
         var velocity = new Vector2(10, 10);
         manager.CreateBullet(startPosition, velocity);
@@ -56,7 +68,7 @@ public class EnemyBulletManagerTest(ITestOutputHelper output)
     public void EnemyBulletManager_ShouldUpdateAllBullets()
     {
         // Arrange
-        using var manager = new BulletManager<Enemy>();
+        using var manager = new BulletManager<Enemy>(_mockFactory);
         var startingPosition = new Vector2(10, 10);
         var velocity = new Vector2(10, 10);
 

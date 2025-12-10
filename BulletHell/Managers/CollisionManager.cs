@@ -1,8 +1,10 @@
+using BulletHell.Configurations;
+using BulletHell.Factories;
+using BulletHell.Helpers;
 using BulletHell.Models;
 using Microsoft.Xna.Framework;
+using System;
 using System.Linq;
-using BulletHell.Configurations;
-using BulletHell.Helpers;
 
 namespace BulletHell.Managers;
 
@@ -13,20 +15,23 @@ public class CollisionManager
     private readonly EnemyManager _em;
     private readonly BulletManager<Enemy> _ebm;
     private readonly ExplosionManager _expm;
+    private readonly ISpriteHelperFactory _spriteHelperFactory;
 
     public CollisionManager(
         Player player,
         BulletManager<Player> pbm,
         EnemyManager em,
         BulletManager<Enemy> ebm,
-        ExplosionManager expm
+        ExplosionManager expm,
+        ISpriteHelperFactory spriteHelperFactory
     )
     {
-        _player = player;
-        _pbm = pbm;
-        _em = em;
-        _ebm = ebm;
-        _expm = expm;
+        _player = player ?? throw new ArgumentNullException(nameof(player));
+        _pbm = pbm ?? throw new ArgumentNullException(nameof(pbm));
+        _em = em ?? throw new ArgumentNullException(nameof(em));
+        _ebm = ebm ?? throw new ArgumentNullException(nameof(ebm));
+        _expm = expm ?? throw new ArgumentNullException(nameof(expm));
+        _spriteHelperFactory = spriteHelperFactory ?? throw new ArgumentNullException(nameof(spriteHelperFactory));
     }
 
     public void CheckCollisions()
@@ -48,7 +53,7 @@ public class CollisionManager
                     if (wasAlive && !enemy.IsAlive)
                     {
                         _player.AddScore(EnemyConfig.ScoreValue);
-                        _expm.Add(new Explosion(enemy.Position, new SpriteHelper()));
+                        _expm.Add(new Explosion(enemy.Position, _spriteHelperFactory.Create()));
                     }
 
                     bullet.MarkHit();
