@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Input;
 namespace BulletHell.Managers;
 
 /// <summary>
-/// Manages keyboard navigation through menu items
+/// Manages keyboard navigation through menu items.
 /// </summary>
 public class MenuNavigator : IMenuNavigator, IDisposable
 {

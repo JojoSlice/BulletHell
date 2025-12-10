@@ -42,4 +42,7 @@
   <ItemGroup>
     <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="BulletHell.test" />
+  </ItemGroup>
 </Project>
