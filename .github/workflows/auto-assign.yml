@@ -1,9 +1,9 @@
 name: Auto assign author to PR and issue
 on:
   issues:
-    types: [ opened, reopened ]
+    types: [ created, opened, reopened ]
   pull_request:
-    types: [ opened, reopened ]
+    types: [ created, opened, reopened ]
 
 permissions:
   issues: write
