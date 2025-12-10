@@ -1,3 +1,4 @@
+using BulletHell.Configurations;
 using BulletHell.Constants;
 using BulletHell.Factories;
 using BulletHell.Graphics;
@@ -7,6 +8,7 @@ using BulletHell.Interfaces;
 using BulletHell.Managers;
 using BulletHell.Models;
 using BulletHell.UI.Components;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -62,9 +64,14 @@ public class BattleScene : Scene
         _screenWidth = _game.GraphicsDevice.Viewport.Width;
         _screenHeight = _game.GraphicsDevice.Viewport.Height;
 
-        // Create factory for sprite helpers
-        ISpriteHelperFactory spriteHelperFactory = new SpriteHelperFactory();
+        // Resolve dependencies from DI container
+        if (_scopeServices == null)
+            throw new InvalidOperationException("InitializeScope must be called before OnEnter");
 
+        var spriteHelperFactory = _scopeServices.GetRequiredService<ISpriteHelperFactory>();
+        var config = _scopeServices.GetRequiredService<GameConfiguration>();
+
+        // Create player with dependencies
         Vector2 startPosition = new((float)_screenWidth / 2, (float)_screenHeight / 2);
         IInputProvider input = new KeyboardInputProvider();
         ISpriteHelper sprite = spriteHelperFactory.Create();
@@ -72,12 +79,13 @@ public class BattleScene : Scene
         _player = new Player(startPosition, input, sprite, turnAnimationController);
         _player.SetScreenBounds(_screenWidth, _screenHeight);
 
-        _bulletManager = new BulletManager<Player>(spriteHelperFactory);
-        _enemyBulletManager = new BulletManager<Enemy>(spriteHelperFactory);
-        _enemyManager = new EnemyManager(_enemyBulletManager, spriteHelperFactory);
-        _explosionManager = new ExplosionManager();
-        _dashManager = new DashManager();
-        _rymdDashManager = new RymdDashManager();
+        // Resolve managers from DI (these are scoped)
+        _bulletManager = _scopeServices.GetRequiredService<BulletManager<Player>>();
+        _enemyBulletManager = _scopeServices.GetRequiredService<BulletManager<Enemy>>();
+        _enemyManager = _scopeServices.GetRequiredService<EnemyManager>();
+        _explosionManager = _scopeServices.GetRequiredService<ExplosionManager>();
+        _dashManager = _scopeServices.GetRequiredService<DashManager>();
+        _rymdDashManager = _scopeServices.GetRequiredService<RymdDashManager>();
 
         _hud = new HUD();
         _hud.MaxHP = 100;
@@ -113,13 +121,15 @@ public class BattleScene : Scene
         _explosionTexture = _game.Content.Load<Texture2D>("enemy_explosion");
         _explosionManager.LoadContent(_explosionTexture);
 
+        // Create collision manager with resolved dependencies and player
         _collisionManager = new CollisionManager(
             _player,
             _bulletManager,
             _enemyManager,
             _enemyBulletManager,
             _explosionManager,
-            spriteHelperFactory
+            spriteHelperFactory,
+            config.Collision
         );
 
         _dashTexture = _game.Content.Load<Texture2D>("dash");
