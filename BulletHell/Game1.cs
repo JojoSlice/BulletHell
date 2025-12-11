@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using BulletHell.Constants;
 using BulletHell.Helpers;
 using BulletHell.Scenes;
+using BulletHell.ServiceCollection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -14,6 +17,7 @@ public class Game1 : Game
     private Texture2D? _sharedWhiteTexture;
     private Dictionary<string, Scene>? _scenes;
     private Scene? _currentScene;
+    private IServiceProvider? _serviceProvider;
     private bool _disposed;
 
     public int? CurrentUserId { get; set; }
@@ -43,6 +47,19 @@ public class Game1 : Game
         _sharedWhiteTexture = new Texture2D(GraphicsDevice, 1, 1);
         _sharedWhiteTexture.SetData(new[] { Color.White });
 
+        // Setup Dependency Injection container
+        var services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
+        services.AddGameServices();
+        services.AddSceneServices();
+
+        // Register Game1 instance and shared resources so scenes can access them
+        services.AddSingleton(this);
+        services.AddSingleton(GraphicsDevice);
+        services.AddSingleton(_sharedWhiteTexture);
+
+        _serviceProvider = services.BuildServiceProvider();
+
+        // Create scenes with dependency injection
         _scenes = new Dictionary<string, Scene>
         {
             { SceneNames.Menu, new MenuScene(this, _sharedWhiteTexture) },
@@ -51,6 +68,7 @@ public class Game1 : Game
         };
 
         _currentScene = _scenes[SceneNames.Menu];
+        _currentScene.InitializeScope(_serviceProvider);
         _currentScene.OnEnter();
 
         base.Initialize();
@@ -64,10 +82,13 @@ public class Game1 : Game
 
     public void ChangeScene(string sceneName)
     {
-        if (_scenes?.ContainsKey(sceneName) == true && _currentScene != null)
+        if (_scenes?.ContainsKey(sceneName) == true && _currentScene != null && _serviceProvider != null)
         {
             _currentScene.OnExit();
+            _currentScene.Dispose(); // Dispose the old scene's scope
+
             _currentScene = _scenes[sceneName];
+            _currentScene.InitializeScope(_serviceProvider); // Create new scope for new scene
             _currentScene.OnEnter();
         }
     }
@@ -140,6 +161,13 @@ public class Game1 : Game
                 }
 
                 _currentScene = null;
+
+                // Dispose DI container
+                if (_serviceProvider is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+                _serviceProvider = null;
             }
 
             _disposed = true;

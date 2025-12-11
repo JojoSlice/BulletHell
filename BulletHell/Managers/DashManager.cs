@@ -1,3 +1,5 @@
+using BulletHell.Configurations;
+using BulletHell.Factories;
 using BulletHell.Helpers;
 using BulletHell.Interfaces;
 using BulletHell.Models;
@@ -13,17 +15,22 @@ public class DashManager : IDisposable
 {
     private readonly List<Dash> _activeDashes = new();
     private readonly ObjectPool<Dash> _dashPool;
+    private readonly ISpriteHelperFactory _spriteHelperFactory;
     private readonly Random _rand = new();
     private Texture2D? _dashTexture;
     private bool _disposed;
 
-    public DashManager()
+    public DashManager(PoolConfiguration.PoolSizeConfig? poolConfig = null, ISpriteHelperFactory? spriteHelperFactory = null)
     {
+        _spriteHelperFactory = spriteHelperFactory ?? new SpriteHelperFactory();
+
+        var pool = poolConfig ?? new PoolConfiguration.PoolSizeConfig { InitialSize = 10, MaxSize = 10 };
+
         _dashPool = new ObjectPool<Dash>(
             CreateDashFactory(),
             resetAction: null,
-            initialSize: 10,
-            maxSize: 10
+            initialSize: pool.InitialSize,
+            maxSize: pool.MaxSize
         );
     }
 
@@ -31,7 +38,7 @@ public class DashManager : IDisposable
     {
         return () =>
         {
-            ISpriteHelper sprite = new SpriteHelper();
+            ISpriteHelper sprite = _spriteHelperFactory.Create();
             return new Dash(Vector2.Zero, sprite);
         };
     }

@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -7,11 +8,23 @@ namespace BulletHell.Scenes;
 public abstract class Scene : IDisposable
 {
     protected Game1 _game;
+    protected IServiceScope? _serviceScope;
+    protected IServiceProvider? _scopeServices;
     protected bool _disposed;
 
     protected Scene(Game1 game)
     {
         _game = game;
+    }
+
+    /// <summary>
+    /// Initializes the service scope for this scene.
+    /// This should be called after the scene is created to set up dependency injection.
+    /// </summary>
+    public virtual void InitializeScope(IServiceProvider serviceProvider)
+    {
+        _serviceScope = serviceProvider.CreateScope();
+        _scopeServices = _serviceScope.ServiceProvider;
     }
 
     public abstract void Update(GameTime gameTime);
@@ -46,6 +59,11 @@ public abstract class Scene : IDisposable
         {
             if (disposing)
             {
+                // Dispose service scope first
+                _serviceScope?.Dispose();
+                _serviceScope = null;
+                _scopeServices = null;
+
                 // Dispose managed resources
                 _game = null!;
             }

@@ -1,4 +1,6 @@
+using BulletHell.Configurations;
 using BulletHell.Constants;
+using BulletHell.Factories;
 using BulletHell.Graphics;
 using BulletHell.Helpers;
 using BulletHell.Inputs;
@@ -6,6 +8,7 @@ using BulletHell.Interfaces;
 using BulletHell.Managers;
 using BulletHell.Models;
 using BulletHell.UI.Components;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -61,19 +64,28 @@ public class BattleScene : Scene
         _screenWidth = _game.GraphicsDevice.Viewport.Width;
         _screenHeight = _game.GraphicsDevice.Viewport.Height;
 
+        // Resolve dependencies from DI container
+        if (_scopeServices == null)
+            throw new InvalidOperationException("InitializeScope must be called before OnEnter");
+
+        var spriteHelperFactory = _scopeServices.GetRequiredService<ISpriteHelperFactory>();
+        var config = _scopeServices.GetRequiredService<GameConfiguration>();
+
+        // Create player with dependencies
         Vector2 startPosition = new((float)_screenWidth / 2, (float)_screenHeight / 2);
         IInputProvider input = new KeyboardInputProvider();
-        ISpriteHelper sprite = new SpriteHelper();
+        ISpriteHelper sprite = spriteHelperFactory.Create();
         var turnAnimationController = new TurnAnimationController(sprite);
         _player = new Player(startPosition, input, sprite, turnAnimationController);
         _player.SetScreenBounds(_screenWidth, _screenHeight);
 
-        _bulletManager = new BulletManager<Player>();
-        _enemyBulletManager = new BulletManager<Enemy>();
-        _enemyManager = new EnemyManager(_enemyBulletManager);
-        _explosionManager = new ExplosionManager();
-        _dashManager = new DashManager();
-        _rymdDashManager = new RymdDashManager();
+        // Resolve managers from DI (these are scoped)
+        _bulletManager = _scopeServices.GetRequiredService<BulletManager<Player>>();
+        _enemyBulletManager = _scopeServices.GetRequiredService<BulletManager<Enemy>>();
+        _enemyManager = _scopeServices.GetRequiredService<EnemyManager>();
+        _explosionManager = _scopeServices.GetRequiredService<ExplosionManager>();
+        _dashManager = _scopeServices.GetRequiredService<DashManager>();
+        _rymdDashManager = _scopeServices.GetRequiredService<RymdDashManager>();
 
         _hud = new HUD();
         _hud.MaxHP = 100;
@@ -82,7 +94,7 @@ public class BattleScene : Scene
         _lifeTexture = _game.Content.Load<Texture2D>("player_Life");
         _hud.LifeTexture = _lifeTexture;
 
-        _enemyManager.AddEnemy(new Enemy(new Vector2(400, 0), new SpriteHelper()));
+        _enemyManager.AddEnemy(new Enemy(new Vector2(400, 0), spriteHelperFactory.Create()));
 
         _backgroundTexture = _game.Content.Load<Texture2D>("rymdbg");
         _backgroundTexture2 = _game.Content.Load<Texture2D>("rymdbg2");
@@ -90,7 +102,7 @@ public class BattleScene : Scene
         _backgroundTexture4 = _game.Content.Load<Texture2D>("rymdbg4");
 
         // Add initial enemy
-        _enemyManager.AddEnemy(new Enemy(new Vector2(400, 0), new SpriteHelper()));
+        _enemyManager.AddEnemy(new Enemy(new Vector2(400, 0), spriteHelperFactory.Create()));
 
         _playerTexture = _game.Content.Load<Texture2D>("rymdskepp");
         var turnLeftTexture = _game.Content.Load<Texture2D>("rymdskeppturnleft");
@@ -109,12 +121,15 @@ public class BattleScene : Scene
         _explosionTexture = _game.Content.Load<Texture2D>("enemy_explosion");
         _explosionManager.LoadContent(_explosionTexture);
 
+        // Create collision manager with resolved dependencies and player
         _collisionManager = new CollisionManager(
             _player,
             _bulletManager,
             _enemyManager,
             _enemyBulletManager,
-            _explosionManager
+            _explosionManager,
+            spriteHelperFactory,
+            config.Collision
         );
 
         _dashTexture = _game.Content.Load<Texture2D>("dash");
@@ -124,8 +139,6 @@ public class BattleScene : Scene
         _rymdDashTexture2 = _game.Content.Load<Texture2D>("rymddash2");
         _rymdDashTexture3 = _game.Content.Load<Texture2D>("rymddash3");
         _rymdDashManager.LoadContent(_rymdDashTexture1, _rymdDashTexture2, _rymdDashTexture3);
-
-        _collisionManager = new CollisionManager(_player, _bulletManager, _enemyManager, _enemyBulletManager, _explosionManager);
         _camera = new Camera();
         _camera.SetWorldBounds((float)_screenWidth * 2, (float)_screenHeight * 2);
     }
