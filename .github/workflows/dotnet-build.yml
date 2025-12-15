@@ -229,7 +229,7 @@ jobs:
           } > comment.md
 
       - name: Create or update sticky PR comment
-        uses: marocchino/sticky-pull-request-comment@v2.9.0
+        uses: marocchino/sticky-pull-request-comment@v2.9.4
         with:
           header: build
           path: comment.md
