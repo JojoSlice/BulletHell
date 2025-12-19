@@ -7,8 +7,14 @@ using NSubstitute;
 
 namespace BulletHell.test.Models;
 
-public class PlayerBulletTests(ITestOutputHelper output)
+public class PlayerBulletTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public PlayerBulletTests(ITestOutputHelper output)
+    {
+        _output = output;
+    }
     [Theory]
     [InlineData(-5, 5, true)]
     [InlineData(5, -5, true)]
@@ -370,7 +376,44 @@ public class PlayerBulletTests(ITestOutputHelper output)
         Assert.Equal(expected, actual);
 
         // Output
-        output.WriteLine($"Expected Damage: {expected}");
-        output.WriteLine($"Actual Damage:   {actual}");
+        _output.WriteLine($"Expected Damage: {expected}");
+        _output.WriteLine($"Actual Damage:   {actual}");
+    }
+
+    [Fact]
+    public void Update_MovesEnemyBulletDiagonally_WithExpectedPosition()
+    {
+        // ARRANGE
+        var startPosition = new Vector2(100, 100);
+        var direction = new Vector2(1, 1); // sned riktning
+        var mockSprite = Substitute.For<ISpriteHelper>();
+
+        using var bullet = new Bullet<Enemy>(
+            startPosition,
+            direction,
+            mockSprite
+        );
+
+        var gameTime = TestDataBuilders.OneFrame;
+        var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+        var speed = direction.Length(); // Enemy bullets använder velocity direkt
+        var normalizedDirection = Vector2.Normalize(direction);
+
+        var expectedPosition = startPosition + normalizedDirection * speed * deltaTime;
+
+        // ACT
+        bullet.Update(gameTime);
+        var actualPosition = bullet.Position;
+
+        // ASSERT
+        Assert.Equal(expectedPosition.X, actualPosition.X, 3);
+        Assert.Equal(expectedPosition.Y, actualPosition.Y, 3);
+
+        // OUTPUT (debug / verification)
+        _output.WriteLine($"Start position:    {startPosition}");
+        _output.WriteLine($"Direction:         {direction}");
+        _output.WriteLine($"Expected position: {expectedPosition}");
+        _output.WriteLine($"Actual position:   {actualPosition}");
     }
 }
