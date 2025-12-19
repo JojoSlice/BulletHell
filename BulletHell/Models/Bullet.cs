@@ -132,7 +132,9 @@ public class Bullet<T> : IDisposable, IDamageDealer, ICollidable
     {
         ArgumentNullException.ThrowIfNull(spriteBatch);
 
-        _sprite.Draw(spriteBatch, Position, 0f, 1f);
+        float rotation = MathF.Atan2(_direction.Y, _direction.X) + MathF.PI / 2f;
+
+        _sprite.Draw(spriteBatch, Position, rotation, 1f);
     }
 
     public void Reset(Vector2 position, Vector2 directionOrVelocity, int damage = 1)
