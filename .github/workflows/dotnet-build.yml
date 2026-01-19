@@ -109,7 +109,7 @@ jobs:
       # Upload vulnerability report so the comment job can include/truncate it
       - name: Upload vulnerability report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: vulnerability-report
           path: vulnerability-report.txt

@@ -76,7 +76,7 @@ jobs:
           find TestResults -name "coverage.cobertura.xml" -type f 2>/dev/null || echo "No cobertura files found"
 
       - name: Upload TestResults artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ always() }}
         with:
           name: test-results
