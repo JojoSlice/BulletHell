@@ -147,4 +147,41 @@ public class EnemyManagerTest
         _output.WriteLine($"Bullets created: {bulletManager.Bullets.Count}");
         _output.WriteLine("Result: EnemyManager.TryShootEnemies() created bullets via bullet manager ✔");
     }
+
+    [Fact]
+    public void TryShootEnemies_WhenSpreadTriggers_CreatesExactlyTwoBullets()
+    {
+        // ARRANGE
+        EnemyConfig.FireChance = 1.0f;
+        EnemyConfig.SpreadShotChance = 1.0f;
+
+        var mockBulletManager = Substitute.For<IBulletManager>();
+        var mockSpriteFactory = Substitute.For<ISpriteHelperFactory>();
+
+        var enemyManager = new EnemyManager(
+            mockBulletManager,
+            mockSpriteFactory
+        );
+
+        var mockSprite = Substitute.For<ISpriteHelper>();
+        var enemy = new Enemy(new Vector2(100, 100), mockSprite);
+        enemyManager.AddEnemy(enemy);
+
+        var expected = 2;
+        var actual = 0;
+
+        mockBulletManager
+            .When(x => x.CreateBullet(Arg.Any<Vector2>(), Arg.Any<Vector2>()))
+            .Do(_ => actual++);
+
+        // ACT
+        enemyManager.TryShootEnemies();
+
+        // ASSERT
+        Assert.Equal(expected, actual);
+
+        // OUTPUT
+        _output.WriteLine($"Expected bullet count: {expected}");
+        _output.WriteLine($"Actual bullet count:   {actual}");
+    }
 }

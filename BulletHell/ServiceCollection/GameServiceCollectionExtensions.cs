@@ -31,10 +31,7 @@ public static class GameServiceCollectionExtensions
 
         // API Services - Singleton (HttpClient should be singleton or use IHttpClientFactory)
         services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
-        services.AddSingleton<HttpClient>(sp => new HttpClient
-        {
-            BaseAddress = new Uri("http://localhost:5111"),
-        });
+        services.AddSingleton<HttpClient>(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5111"), });
         services.AddSingleton<IApiClient, ApiClient>();
 
         // Input providers - Singleton for menu (stateful but manages its own state)
@@ -63,6 +60,9 @@ public static class GameServiceCollectionExtensions
             var factory = sp.GetRequiredService<ISpriteHelperFactory>();
             return new BulletManager<Enemy>(factory, config.Pools.EnemyBullets);
         });
+
+        services.AddScoped<IBulletManager>(sp =>
+            sp.GetRequiredService<BulletManager<Enemy>>());
 
         services.AddScoped<EnemyManager>(sp =>
         {

@@ -14,7 +14,7 @@ namespace BulletHell.Managers;
 
 public class EnemyManager : IEnemyManager
 {
-    private readonly BulletManager<Enemy> _enemyBulletManager;
+    private readonly IBulletManager _enemyBulletManager;
     private readonly ISpriteHelperFactory _spriteHelperFactory;
     private readonly SpawnConfiguration _spawnConfig;
     private readonly List<Enemy> _enemies = new();
@@ -23,7 +23,7 @@ public class EnemyManager : IEnemyManager
     private Texture2D? _enemyTexture;
 
     public EnemyManager(
-        BulletManager<Enemy> bulletManager,
+        IBulletManager bulletManager,
         ISpriteHelperFactory spriteHelperFactory,
         PoolConfiguration.PoolSizeConfig? poolConfig = null,
         SpawnConfiguration? spawnConfig = null)
@@ -70,16 +70,44 @@ public class EnemyManager : IEnemyManager
 
     public void TryShootEnemies()
     {
-        _enemies
-            .Select(enemy => enemy.TryShoot())
-            .Where(shootData => shootData.HasValue)
-            .Select(shootData => shootData!.Value)
-            .ToList()
-            .ForEach(data =>
+        foreach (var enemy in _enemies)
+        {
+            var shootData = enemy.TryShoot();
+            if (!shootData.HasValue)
+                continue;
+
+            // 🔹 Extra random: fienden skjuter inte alltid ens när cooldownen är klar
+            if (_rand.NextDouble() > EnemyConfig.FireChance)
+                continue;
+
+            var (position, velocity) = shootData.Value;
+            float speed = velocity.Length();
+
+            // 🔹 Avgör OM detta blir spread
+            bool spread = _rand.NextDouble() <= EnemyConfig.SpreadShotChance;
+
+            if (spread)
             {
-                var (position, velocity) = data;
+                // ❌ inget mittenskott
+                // ✅ två breda sid-skott
+
+                var leftDir = Vector2.Normalize(
+                    new Vector2(-EnemyConfig.SpreadX, 1f)
+                );
+
+                var rightDir = Vector2.Normalize(
+                    new Vector2(EnemyConfig.SpreadX, 1f)
+                );
+
+                _enemyBulletManager.CreateBullet(position, leftDir * speed);
+                _enemyBulletManager.CreateBullet(position, rightDir * speed);
+            }
+            else
+            {
+                // 🔹 vanligt rakt skott
                 _enemyBulletManager.CreateBullet(position, velocity);
-            });
+            }
+        }
     }
 
     public void Update(GameTime gameTime, int screenWidth, int screenHeight)
