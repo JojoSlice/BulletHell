@@ -68,7 +68,7 @@ jobs:
             xvfb
 
       - name: Cache NuGet packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.nuget/packages
           key: ubuntu-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
@@ -109,7 +109,7 @@ jobs:
       # Upload vulnerability report so the comment job can include/truncate it
       - name: Upload vulnerability report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: vulnerability-report
           path: vulnerability-report.txt
@@ -137,7 +137,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download vulnerability report artifact (if present)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: vulnerability-report
           path: ./artifacts
@@ -229,7 +229,7 @@ jobs:
           } > comment.md
 
       - name: Create or update sticky PR comment
-        uses: marocchino/sticky-pull-request-comment@v2.9.0
+        uses: marocchino/sticky-pull-request-comment@v2.9.4
         with:
           header: build
           path: comment.md

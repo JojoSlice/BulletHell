@@ -17,7 +17,11 @@
     "spriteHeight": 32,
     "animationSpeed": 0.0,
     "maxHealth": 20,
-    "scoreValue": 1
+    "scoreValue": 1,
+
+    "fireChance": 0.6,
+    "spreadShotChance": 0.35,
+    "spreadX": 2.5
   },
   "bullets": {
     "player": {
