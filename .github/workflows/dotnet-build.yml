@@ -137,7 +137,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download vulnerability report artifact (if present)
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: vulnerability-report
           path: ./artifacts
